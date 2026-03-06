@@ -502,7 +502,7 @@ Integration with WebRTC {#rtc}
 ISSUE: I need to read more, as I have no idea how any of this works from a spec perspective. :)
 
 
-Security Considerations {#security}
+Security and Privacy Considerations {#security}
 =======================
 
 Same-Origin Contexts {#security-same-origin}
