@@ -113,12 +113,13 @@ and/or misconfigurations:
     itself.
 
 *   It's tempting to attempt to defend against a subset of server-side threats, like open redirects.
-    It's possible that we could do so in a proposal like this one, similar conceptually to what CSP
-    does today. That said, CSP's behavior around redirects is both a leak in itself, and has
-    garnered inconsistently favorable feedback from developers and researchers alike. For
-    simplicity's sake, this proposal will generally treat redirect responses as match failures. That
-    is, we'll start with a draconian policy which will block any redirect response. It's quite
-    probable that we'll shift this one way or another as use cases crystalize.
+    We'll struggle to do so in an effective manner, given that data which has left the client is
+    fundamentally now under the server's control. That said, it seems reasonable to allow developers
+    to choose whether or not the client will directly cooperate with servers' decisions to create
+    connections to other servers through redirect responses. We'll provide two options, with some
+    room for potential extension in the future if more granularity is required: by default, redirect
+    responses regardless of destination will be blocked. Developers can choose to allow all redirect
+    responses by setting a parameter on the header. See [[#redirects]] for details.
 
 
 Overlap with Content Security Policy {#overlap-with-csp}
@@ -163,6 +164,10 @@ is allowed to connect. It is a [=struct=] with the following [=struct/items=]:
 *   <dfn for="Connection Allowlist">disposition</dfn>, which is either
     <dfn grammar for="Connection Allowlist/disposition">enforce</dfn> or
     <dfn grammar for="Connection Allowlist/disposition">report</dfn>.
+*   <dfn for="Connection Allowlist">redirects</dfn>, which is either
+    <dfn grammar for="Connection Allowlist/redirects">allow</dfn> or
+    <dfn grammar for="Connection Allowlist/redirects">block</dfn>. It is
+    <a grammar for="Connection Allowlist/redirects">block</a> unless otherwise specified.
 
 
 Connection Allowlist Headers {#headers}
@@ -185,10 +190,19 @@ The [=structured header/inner list=] can contain either URL Patterns serialized 
 <dfn grammar for="Connection-Allowlist">`response-origin`</dfn> which represents a pattern matching
 the [=/response=]'s [=response/URL=]'s [=url/origin=]. Unexpected values will be ignored.
 
-The [=structured header/inner list=] may have arbitrary [=structured header/parameters=]. The 
-<dfn grammar for="Connection-Allowlist">`report-to`</dfn> parameter's value will be parsed as a
-[=structured header/token=] representing a Reporting API [=endpoint=] [[!REPORTING]]. All other
-parameters will be ignored.
+The [=structured header/inner list=] may have arbitrary [=structured header/parameters=]:
+
+*   The <dfn grammar for="Connection-Allowlist">`report-to`</dfn> parameter's value will be parsed
+    as a [=structured header/token=] representing a Reporting API [=endpoint=] [[!REPORTING]].
+
+*   The <dfn grammar for="Connection-Allowlist">`redirects`</dfn> parameter's value will be parsed
+    as a [=structured header/token=]. If it is present, it will be used to set the allowlist's
+    [=Connection Allowlist/redirects=]. It will be set to
+    <a grammar for="Connection Allowlist/redirects">block</a> if the value is the
+    [=structured header/token=] `block`, and
+    <a grammar for="Connection Allowlist/redirects">allow</a> otherwise.
+
+All other parameters will be ignored.
 
 Parsing {#parsing}
 -------
@@ -257,6 +271,15 @@ To <dfn abstract-op local-lt="parse header">parse a Connection Allowlist header<
         [=structured header/token=], set |allowlist|'s [=Connection Allowlist/reporting endpoint=]
         to |value|.
 
+    2.  If |key| is <a grammar for="Connection-Allowlist">`redirects`</a> and |value| is a
+        [=structured header/token=]:
+
+        1.  If |value| is "`block`", set |allowlist|'s [=Connection Allowlist/redirects=] to
+            <a grammar for="Connection Allowlist/redirects">block</a>.
+
+        2.  Else, set |allowlist|'s [=Connection Allowlist/redirects=] to
+            <a grammar for="Connection Allowlist/redirects">allow</a>.
+
 6.  Return |allowlist|.
 
 
@@ -316,7 +339,7 @@ using any protocol, on any port, with any path, and so on.
 </div>
 
 <div algorithm>
-The <dfn abstract-op export>should |url| be blocked by Connection Allowlist</dfn> algorithm takes a
+The <dfn abstract-op export>should |url| be blocked by Connection Allowlists</dfn> algorithm takes a
 [=/URL=] (|url|), an [=environment=] (|environment|), and a [=list=] of [=connection allowlists=]
 (|connection allowlists|). It returns either [=allowed=] or [=blocked=]:
 
@@ -339,13 +362,38 @@ The <dfn abstract-op export>should |url| be blocked by Connection Allowlist</dfn
 The <dfn abstract-op export>should |request| be blocked by Connection Allowlists</dfn> algorithm
 takes a [=/request=] (|request|), and returns either [=allowed=] or [=blocked=]:
 
-1.  If [=/request=]'s [=request/URL list=]'s [=list/size=] is greater than 1, return [=blocked=].
+1.  Let |allowlists| be |request|'s [=request/policy container=]'s
+    [=policy container/connection allowlists=].
 
-    ISSUE: See the open question below in [[#redirects]].
+2.  [=list/iterate|For each=] |allowlist| in |allowlists|:
 
-2.  Return the result of executing [$should url be blocked by Connection Allowlist$] given
-    |request|'s [=request/url=], |request|'s [=request/client=], and |request|'s
-    [=request/policy container=]'s [=policy container/connection allowlists=].
+    1.  If |request|'s [=request/URL list=]'s [=list/size=] is greater than 1:
+
+        1.  If |allowlist|'s [=Connection Allowlist/redirects=] is
+            <a grammar for="Connection Allowlist/redirects">allow</a>, [=continue=].
+
+        2.  [$report|Report a violation$] given |request|'s [=request/url=], |request|'s
+            [=request/client=], and |allowlist|.
+
+            Note: When redirects are blocked, we're intentionally reporting |request|'s
+            [=request/url=] and not its [=request/current url=] to avoid leaking more information
+            than necessary about redirect targets.
+
+        3.  If |allowlist|'s [=Connection Allowlist/disposition=] is
+            <a grammar for="Connection Allowlist/disposition">enforce</a>, return [=blocked=].
+
+        4.  [=Continue=].
+
+    2.  If [=match a URL to a Connection Allowlist=] given |request|'s [=request/url=] and
+        |allowlist| returns [=success=], [=continue=].
+
+    3.  [$report|Report a violation$] given |request|'s [=request/url=], |request|'s
+        [=request/client=], and |allowlist|.
+
+    4.  If |allowlist|'s [=Connection Allowlist/disposition=] is
+        <a grammar for="Connection Allowlist/disposition">enforce</a>, return [=blocked=].
+
+3.  Return [=allowed=].
 
 </div>
 
@@ -407,11 +455,6 @@ an [=environment=] (|environment|), and a [=connection allowlist=] (|allowlist|)
    : {{ConnectionAllowlistViolationReport/connection}}
    :: |resource URL|, [=strip URL for use in reports|stripped for use in reports=].
 
-      Note: Because we block redirects, we don't need to worry about [=request/url=] vs
-      [=request/current url=]. When we go back on that decision (see [[#redirects]]), we'll want
-      to ensure we use [=request/url=] to avoid leaking more information than necessary about
-      redirect targets.
-
    : {{ConnectionAllowlistViolationReport/allowlist}}
    :: A new list containing the result of serializing each pattern in |allowlist|'s [=Connection Allowlist/allowlist=]
 
@@ -464,7 +507,7 @@ connection=] to handle things like DNS prefetch, Web Transport, etc:
   In [=obtain a connection=], we'll add a check before the current step 2:
 
   <ol start=2>
-    2.  <ins>If [$should url be blocked by Connection Allowlist$] returns [=blocked=] when executed
+    2.  <ins>If [$should url be blocked by Connection Allowlists$] returns [=blocked=] when executed
         upon <var ignore>url</var>, <var ignore>environment</var>, and <var ignore>allowlists</var>,
         then return [=failure=].</ins>
   </ol>
@@ -503,7 +546,7 @@ ISSUE: I need to read more, as I have no idea how any of this works from a spec 
 
 
 Security and Privacy Considerations {#security}
-=======================
+===================================
 
 Same-Origin Contexts {#security-same-origin}
 --------------------
@@ -574,26 +617,55 @@ into an origin-based model which could be meaningfully compared against the allo
 Redirects {#redirects}
 ---------
 
-Currently, we specify that any redirected URL fails. This simplifies the initial proposal for
-discussion and ensures we don't leak data, but seems unlikely to satisfy developers with real-world
-deployment needs. I think we have a few realistic options:
+By default, Connection Allowlists block all redirects. This is a conservative posture which
+aims to prevent data exfiltration via open redirects or other server-side redirection mechanisms.
+If an allowlist is enforced on a document, any request that results in a redirect will be blocked
+unless the allowlist explicitly opts into allowing them.
 
-1.  Apply the allowlist to every hop of a redirect chain. This has the advantage of matching CSP's
-    behavior that developers are already familiar with. It _is_ a cross-origin data leak insofar as
-    it provides insight about another origin's decisions, which is unfortunate but perhaps
-    unavoidable (and non-unique).
+The <a grammar for="Connection-Allowlist">`redirects`</a> parameter allows developers to control
+this behavior. 
 
-2.  Allow _a specific rule_'s redirect chain to arbitrarily redirect. This narrows the concerns
-    above by forcing developers to annotate the allowlist with their expectations. It might be perfectly
-    acceptable for `https://trusted.example/` to redirect users to arbitrary locations, while other
-    endpoints are expected to remain put. Annotating list items should make this kind of distinction
-    possible if necessary (e.g. `("https://trusted.example/";redirection-allowed "https://less-so.example/")`).
+If set to <a grammar for="Connection Allowlist/redirects">`block`</a> (the default), any request
+with a redirect chain length greater than 1 will be blocked.
 
-3.  Narrow the above by allowing _a specific rule_ to redirect so long as the targets match the allowlist.
-    This creates less opportunity for unexpected connection than 1 or 2 by requiring developers to annotate
-    the specific rules which can redirect, but would do so in a way that's less broad (e.g.
-    `("https://semi-trusted.example/";redirection-allowed=within-allowlist ...)`).
+If set to <a grammar for="Connection Allowlist/redirects">`allow`</a>, the allowlist will be enforced
+only on the initial request. If the initial request matches the allowlist, any subsequent redirect
+will be allowed regardless of its location. This mode shifts the responsibility for data security
+to the server: once a request has been allowed to leave the client, the server is responsible for
+ensuring that it does not redirect the user's data to an untrusted location.
 
-We could add more options as well. CSP's earlier `navigate-to` proposal distinguished between intermediate
-redirects and the final, non-redirect response. You could imagine adding those kinds of options either to
-the entire allowlist or individual rules. Feedback here as well would be much appreciated.
+This approach acknowledges that different applications have different security requirements.
+Highly sensitive applications can choose to block all redirects, while others can rely on their
+trusted endpoints to handle redirects correctly.
+
+<div class="example" id="example-redirects">
+  Consider a document with the following header:
+
+  ```http
+  Connection-Allowlist: ("https://api.example")
+  ```
+
+  A request to `https://api.example/data` that returns a `302 Found` redirect to
+  `https://api.example/new-data` will be **blocked**, as redirects are blocked by default.
+
+  If the header is instead:
+
+  ```http
+  Connection-Allowlist: ("https://api.example");redirects=allow
+  ```
+
+  The same request to `https://api.example/data` will be **allowed**, and the subsequent redirect
+  to `https://api.example/new-data` (or even `https://attacker.com/`) will also be **allowed**.
+
+  Finally, for forward-compatibility, an unknown token will be treated as `allow`:
+
+  ```http
+  Connection-Allowlist: ("https://api.example");redirects=some-future-policy
+  ```
+
+  In this case, the `redirects` parameter is present but its value `some-future-policy` is unknown.
+  The user agent will treat this as `allow`, and the redirect will be **allowed**. This allows us
+  the possibility of introducing additional behaviors in the future without breaking existing
+  sites.
+</div>
+
