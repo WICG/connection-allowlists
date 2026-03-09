@@ -121,6 +121,11 @@ and/or misconfigurations:
     responses regardless of destination will be blocked. Developers can choose to allow all redirect
     responses by setting a parameter on the header. See [[#redirects]] for details.
 
+*   Similarly, WebRTC connections are difficult to constrain via URL patterns, as they often involve
+    dynamic endpoint discovery and peer-to-peer connections. We'll provide a global toggle to allow
+    developers to choose whether to allow or block WebRTC connections entirely. See [[#webrtc]] for
+    details.
+
 
 Overlap with Content Security Policy {#overlap-with-csp}
 ------------------------------------
@@ -168,6 +173,10 @@ is allowed to connect. It is a [=struct=] with the following [=struct/items=]:
     <dfn grammar for="Connection Allowlist/redirects">allow</dfn> or
     <dfn grammar for="Connection Allowlist/redirects">block</dfn>. It is
     <a grammar for="Connection Allowlist/redirects">block</a> unless otherwise specified.
+*   <dfn for="Connection Allowlist">webrtc</dfn>, which is either
+    <dfn grammar for="Connection Allowlist/webrtc">allow</dfn> or
+    <dfn grammar for="Connection Allowlist/webrtc">block</dfn>. It is
+    <a grammar for="Connection Allowlist/webrtc">block</a> unless otherwise specified.
 
 
 Connection Allowlist Headers {#headers}
@@ -201,6 +210,13 @@ The [=structured header/inner list=] may have arbitrary [=structured header/para
     <a grammar for="Connection Allowlist/redirects">block</a> if the value is the
     [=structured header/token=] `block`, and
     <a grammar for="Connection Allowlist/redirects">allow</a> otherwise.
+
+*   The <dfn grammar for="Connection-Allowlist">`webrtc`</dfn> parameter's value will be parsed
+    as a [=structured header/token=]. If it is present, it will be used to set the allowlist's
+    [=Connection Allowlist/webrtc=]. It will be set to
+    <a grammar for="Connection Allowlist/webrtc">block</a> if the value is the
+    [=structured header/token=] `block`, and
+    <a grammar for="Connection Allowlist/webrtc">allow</a> otherwise.
 
 All other parameters will be ignored.
 
@@ -280,6 +296,15 @@ To <dfn abstract-op local-lt="parse header">parse a Connection Allowlist header<
         2.  Else, set |allowlist|'s [=Connection Allowlist/redirects=] to
             <a grammar for="Connection Allowlist/redirects">allow</a>.
 
+    3.  If |key| is <a grammar for="Connection-Allowlist">`webrtc`</a> and |value| is a
+        [=structured header/token=]:
+
+        1.  If |value| is "`block`", set |allowlist|'s [=Connection Allowlist/webrtc=] to
+            <a grammar for="Connection Allowlist/webrtc">block</a>.
+
+        2.  Else, set |allowlist|'s [=Connection Allowlist/webrtc=] to
+            <a grammar for="Connection Allowlist/webrtc">allow</a>.
+
 6.  Return |allowlist|.
 
 
@@ -345,8 +370,7 @@ The <dfn abstract-op export>should |url| be blocked by Connection Allowlists</df
 
 1.  [=list/iterate|For each=] |connection allowlist| in |connection allowlists|:
     
-    1.  If [=match a URL to a Connection Allowlist=] given |url| and |connection allowlist| returns [=success=],
-        [=continue=].
+    1.  If |url| [=matches=] |connection allowlist|, [=continue=].
 
     2.  [$report|Report a violation$] given |url|, |environment|, and
         |connection allowlist|.
@@ -384,8 +408,7 @@ takes a [=/request=] (|request|), and returns either [=allowed=] or [=blocked=]:
 
         4.  [=Continue=].
 
-    2.  If [=match a URL to a Connection Allowlist=] given |request|'s [=request/url=] and
-        |allowlist| returns [=success=], [=continue=].
+    2.  If |request|'s [=request/url=] [=matches=] |allowlist|, [=continue=].
 
     3.  [$report|Report a violation$] given |request|'s [=request/url=], |request|'s
         [=request/client=], and |allowlist|.
@@ -410,6 +433,28 @@ a [=/host=] (|host|), an [=environment=] (|environment|), and a [=list=] of
         |connection allowlist|.
 
     3.  If |connection allowlist|'s [=Connection Allowlist/disposition=] is
+        <a grammar for="Connection Allowlist/disposition">enforce</a>, return [=blocked=].
+
+2.  Return [=allowed=].
+
+</div>
+
+
+<div algorithm>
+The <dfn abstract-op export>should WebRTC be blocked by Connection Allowlists</dfn> algorithm takes
+an [=environment settings object=] (|environment|) and returns either [=allowed=] or [=blocked=]:
+
+1.  Let |allowlists| be |environment|'s [=environment settings object/policy container=]'s
+    [=policy container/connection allowlists=].
+
+1.  [=list/iterate|For each=] |allowlist| in |allowlists|:
+
+    1.  If |allowlist|'s [=Connection Allowlist/webrtc=] is
+        <a grammar for="Connection Allowlist/webrtc">allow</a>, [=continue=].
+
+    2.  [$report|Report a violation$] given "`webrtc`", |environment|, and |allowlist|.
+
+    3.  If |allowlist|'s [=Connection Allowlist/disposition=] is
         <a grammar for="Connection Allowlist/disposition">enforce</a>, return [=blocked=].
 
 2.  Return [=allowed=].
@@ -445,15 +490,20 @@ serialized [=/URL=] of the connection which violated the allowlist.
 is the {{ConnectionAllowlistViolationReport/allowlist}}'s [=Connection Allowlist/disposition=].
 
 <div algorithm>
-To <dfn abstract-op local-lt="report">report a violation</dfn> given a [=URL=] (|resource URL|),
-an [=environment=] (|environment|), and a [=connection allowlist=] (|allowlist|):
+To <dfn abstract-op local-lt="report">report a violation</dfn> given a [=URL=] or the [=string=]
+"`webrtc`" (|resource URL|), an [=environment=] (|environment|), and a
+[=connection allowlist=] (|allowlist|):
 
 1. If |allowlist|'s [=Connection Allowlist/reporting endpoint=] is `null`, return.
 
 2. Let |violation| be a new {{ConnectionAllowlistViolationReport}}, initialized as follows:
 
+   : {{ConnectionAllowlistViolationReport/url}}
+   :: |environment|'s [=environment/creation URL=], [=strip URL for use in reports|stripped for use in reports=].
+
    : {{ConnectionAllowlistViolationReport/connection}}
-   :: |resource URL|, [=strip URL for use in reports|stripped for use in reports=].
+   :: If |resource URL| is a [=URL=], then |resource URL|, [=strip URL for use in reports|stripped for use in reports=].
+   :: Otherwise, |resource URL|.
 
    : {{ConnectionAllowlistViolationReport/allowlist}}
    :: A new list containing the result of serializing each pattern in |allowlist|'s [=Connection Allowlist/allowlist=]
@@ -542,7 +592,8 @@ step to the [=create a policy container from a fetch response=] algorithm:
 Integration with WebRTC {#rtc}
 -----------------------
 
-ISSUE: I need to read more, as I have no idea how any of this works from a spec perspective. :)
+To constrain WebRTC connections, [[webrtc]] can call into the [$should WebRTC be blocked by Connection Allowlists$]
+algorithm while determining whether candidates are <a spec="webrtc">administratively prohibited</a>.
 
 
 Security and Privacy Considerations {#security}
@@ -576,7 +627,7 @@ be helpful to explore.
 Service Workers {#security-service-worker}
 ---------------
 
-[=Service Workers=] complicate the story around allowlists, just as other same-origin contexts do.
+[=/Service Workers=] complicate the story around allowlists, just as other same-origin contexts do.
 Because they have a [=/policy container=] distinct from each of the documents they manage, it's
 quite possible for them to respond to messages or requests initiated in documents whose allowlist
 differs from the service worker's allowlist. This proposal follows other policies' design, allowing
@@ -668,4 +719,39 @@ trusted endpoints to handle redirects correctly.
   the possibility of introducing additional behaviors in the future without breaking existing
   sites.
 </div>
+
+WebRTC {#webrtc}
+------
+
+By default, Connection Allowlists block all WebRTC connections. This is a conservative posture
+intended to mitigate the risk of data exfiltration through WebRTC's unique networking
+characteristics, which can be difficult to constrain via URL patterns alone.
+
+The <a grammar for="Connection-Allowlist">`webrtc`</a> parameter allows developers to control
+this behavior.
+
+If set to <a grammar for="Connection Allowlist/webrtc">`block`</a> (the default), any attempt to
+establish a WebRTC connection will be blocked.
+
+If set to <a grammar for="Connection Allowlist/webrtc">`allow`</a>, WebRTC connections will be
+allowed. 
+
+<div class="example" id="example-webrtc">
+  Consider a document with the following header:
+
+  ```http
+  Connection-Allowlist: ("https://api.example")
+  ```
+
+  Any attempt to establish a WebRTC connection will be **blocked**, as WebRTC is blocked by default.
+
+  If the header is instead:
+
+  ```http
+  Connection-Allowlist: ("https://api.example"); webrtc=allow
+  ```
+
+  WebRTC connections will be **allowed**.
+</div>
+
 
