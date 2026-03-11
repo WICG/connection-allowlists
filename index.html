@@ -6,7 +6,7 @@
   <link href="https://www.w3.org/StyleSheets/TR/2021/W3C-UD" rel="stylesheet">
   <meta content="Bikeshed version 0ef803fdf, updated Tue Jan 6 11:59:39 2026 -0800" name="generator">
   <link href="https://wicg.github.io/connection-allowlists/" rel="canonical">
-  <meta content="a6184e20baf1a98ed77f744c018618a6a06d787b" name="revision">
+  <meta content="5b5fcb595f2e3c41edd49e002eea6559e3e45cfe" name="revision">
   <meta content="dark light" name="color-scheme">
   <link href="https://www.w3.org/StyleSheets/TR/2021/dark.css" media="(prefers-color-scheme: dark)" rel="stylesheet" type="text/css">
 <style>/* Boilerplate: style-autolinks */
@@ -737,7 +737,7 @@ var[data-var-color="6"] { --var-vg: #FFBCF2; }
   <div class="head">
    <h1 class="no-ref p-name" id="title">Connection Allowlists</h1>
    <p id="w3c-state"><a href="https://www.w3.org/standards/types/#UD">Unofficial Proposal Draft</a>,
-    <time class="dt-updated" datetime="2026-03-09">9 March 2026</time></p>
+    <time class="dt-updated" datetime="2026-03-11">11 March 2026</time></p>
    <div data-fill-with="spec-metadata">
     <dl>
      <dt>This version:
@@ -811,6 +811,7 @@ in a way that’s narrowly tailored to suit the problem.</p>
       <li><a href="#security-dns"><span class="secno">5.3</span> <span class="content">DNS</span></a>
       <li><a href="#security-postmessage"><span class="secno">5.4</span> <span class="content"><code>postMessage(...)</code></span></a>
       <li><a href="#redirects"><span class="secno">5.5</span> <span class="content">Redirects</span></a>
+      <li><a href="#webrtc"><span class="secno">5.6</span> <span class="content">WebRTC</span></a>
      </ol>
     <li>
      <a href="#w3c-conformance"><span class="secno"></span> <span class="content">Conformance</span></a>
@@ -904,6 +905,11 @@ connections to other servers through redirect responses. We’ll provide two opt
 room for potential extension in the future if more granularity is required: by default, redirect
 responses regardless of destination will be blocked. Developers can choose to allow all redirect
 responses by setting a parameter on the header. See <a href="#redirects">§ 5.5 Redirects</a> for details.</p>
+    <li data-md>
+     <p>Similarly, WebRTC connections are difficult to constrain via URL patterns, as they often involve
+dynamic endpoint discovery and peer-to-peer connections. We’ll provide a global toggle to allow
+developers to choose whether to allow or block WebRTC connections entirely. See <a href="#webrtc">§ 5.6 WebRTC</a> for
+details.</p>
    </ul>
    <h3 class="heading settled" data-level="1.2" id="overlap-with-csp"><span class="secno">1.2. </span><span class="content">Overlap with Content Security Policy</span><a class="self-link" href="#overlap-with-csp"></a></h3>
    <p>This proposal has a lot in common with Content Security Policy’s approach to restrictions upon
@@ -951,6 +957,11 @@ API <a data-link-type="dfn" href="https://w3c.github.io/reporting/#endpoint" id=
 <dfn class="dfn-paneled" data-dfn-for="Connection Allowlist/redirects" data-dfn-type="grammar" data-export id="grammardef-connection-allowlist-redirects-allow">allow</dfn> or
 <dfn class="dfn-paneled" data-dfn-for="Connection Allowlist/redirects" data-dfn-type="grammar" data-export id="grammardef-connection-allowlist-redirects-block">block</dfn>. It is
 <a data-link-type="grammar" href="#grammardef-connection-allowlist-redirects-block" id="ref-for-grammardef-connection-allowlist-redirects-block">block</a> unless otherwise specified.</p>
+    <li data-md>
+     <p><dfn class="dfn-paneled" data-dfn-for="Connection Allowlist" data-dfn-type="dfn" data-noexport id="connection-allowlist-webrtc">webrtc</dfn>, which is either
+<dfn class="dfn-paneled" data-dfn-for="Connection Allowlist/webrtc" data-dfn-type="grammar" data-export id="grammardef-connection-allowlist-webrtc-allow">allow</dfn> or
+<dfn class="dfn-paneled" data-dfn-for="Connection Allowlist/webrtc" data-dfn-type="grammar" data-export id="grammardef-connection-allowlist-webrtc-block">block</dfn>. It is
+<a data-link-type="grammar" href="#grammardef-connection-allowlist-webrtc-block" id="ref-for-grammardef-connection-allowlist-webrtc-block">block</a> unless otherwise specified.</p>
    </ul>
    <h2 class="heading settled" data-level="3" id="headers"><span class="secno">3. </span><span class="content">Connection Allowlist Headers</span><a class="self-link" href="#headers"></a></h2>
    <p>The <dfn class="dfn-paneled" data-dfn-type="http-header" data-export id="http-headerdef-connection-allowlist">Connection-Allowlist</dfn> response <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-header" id="ref-for-concept-header">header</a> contains a list of
@@ -979,6 +990,13 @@ as a <a data-link-type="dfn" href="https://www.rfc-editor.org/rfc/rfc9651#name-t
 <a data-link-type="grammar" href="#grammardef-connection-allowlist-redirects-block" id="ref-for-grammardef-connection-allowlist-redirects-block①">block</a> if the value is the
 <a data-link-type="dfn" href="https://www.rfc-editor.org/rfc/rfc9651#name-tokens" id="ref-for-name-tokens③">token</a> <code>block</code>, and
 <a data-link-type="grammar" href="#grammardef-connection-allowlist-redirects-allow" id="ref-for-grammardef-connection-allowlist-redirects-allow">allow</a> otherwise.</p>
+    <li data-md>
+     <p>The <dfn class="dfn-paneled" data-dfn-for="Connection-Allowlist" data-dfn-type="grammar" data-export id="grammardef-connection-allowlist-webrtc"><code>webrtc</code></dfn> parameter’s value will be parsed
+as a <a data-link-type="dfn" href="https://www.rfc-editor.org/rfc/rfc9651#name-tokens" id="ref-for-name-tokens④">token</a>. If it is present, it will be used to set the allowlist’s
+<a data-link-type="dfn" href="#connection-allowlist-webrtc" id="ref-for-connection-allowlist-webrtc">webrtc</a>. It will be set to
+<a data-link-type="grammar" href="#grammardef-connection-allowlist-webrtc-block" id="ref-for-grammardef-connection-allowlist-webrtc-block①">block</a> if the value is the
+<a data-link-type="dfn" href="https://www.rfc-editor.org/rfc/rfc9651#name-tokens" id="ref-for-name-tokens⑤">token</a> <code>block</code>, and
+<a data-link-type="grammar" href="#grammardef-connection-allowlist-webrtc-allow" id="ref-for-grammardef-connection-allowlist-webrtc-allow">allow</a> otherwise.</p>
    </ul>
    <p>All other parameters will be ignored.</p>
    <h3 class="heading settled" data-level="3.1" id="parsing"><span class="secno">3.1. </span><span class="content">Parsing</span><a class="self-link" href="#parsing"></a></h3>
@@ -1032,7 +1050,7 @@ To <dfn class="dfn-paneled" data-dfn-type="abstract-op" data-export data-local-l
        <li data-md>
         <p>Let <var>serialized pattern</var> be <code>null</code>.</p>
        <li data-md>
-        <p>If <var>item</var> is the <a data-link-type="dfn" href="https://www.rfc-editor.org/rfc/rfc9651#name-tokens" id="ref-for-name-tokens④">token</a> <a data-link-type="grammar" href="#grammardef-connection-allowlist-response-origin" id="ref-for-grammardef-connection-allowlist-response-origin"><code>response-origin</code></a>:</p>
+        <p>If <var>item</var> is the <a data-link-type="dfn" href="https://www.rfc-editor.org/rfc/rfc9651#name-tokens" id="ref-for-name-tokens⑥">token</a> <a data-link-type="grammar" href="#grammardef-connection-allowlist-response-origin" id="ref-for-grammardef-connection-allowlist-response-origin"><code>response-origin</code></a>:</p>
         <ol>
          <li data-md>
           <p>Set <var>serialized pattern</var> to the <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/browsers.html#ascii-serialisation-of-an-origin" id="ref-for-ascii-serialisation-of-an-origin">ASCII serialization</a>
@@ -1053,11 +1071,11 @@ of <var>response-url</var>’s <a data-link-type="dfn" href="https://url.spec.wh
       <ol>
        <li data-md>
         <p>If <var>key</var> is <a data-link-type="grammar" href="#grammardef-connection-allowlist-report-to" id="ref-for-grammardef-connection-allowlist-report-to"><code>report-to</code></a> and <var>value</var> is a
-<a data-link-type="dfn" href="https://www.rfc-editor.org/rfc/rfc9651#name-tokens" id="ref-for-name-tokens⑤">token</a>, set <var>allowlist</var>’s <a data-link-type="dfn" href="#connection-allowlist-reporting-endpoint" id="ref-for-connection-allowlist-reporting-endpoint">reporting endpoint</a>
+<a data-link-type="dfn" href="https://www.rfc-editor.org/rfc/rfc9651#name-tokens" id="ref-for-name-tokens⑦">token</a>, set <var>allowlist</var>’s <a data-link-type="dfn" href="#connection-allowlist-reporting-endpoint" id="ref-for-connection-allowlist-reporting-endpoint">reporting endpoint</a>
 to <var>value</var>.</p>
        <li data-md>
         <p>If <var>key</var> is <a data-link-type="grammar" href="#grammardef-connection-allowlist-redirects" id="ref-for-grammardef-connection-allowlist-redirects"><code>redirects</code></a> and <var>value</var> is a
-<a data-link-type="dfn" href="https://www.rfc-editor.org/rfc/rfc9651#name-tokens" id="ref-for-name-tokens⑥">token</a>:</p>
+<a data-link-type="dfn" href="https://www.rfc-editor.org/rfc/rfc9651#name-tokens" id="ref-for-name-tokens⑧">token</a>:</p>
         <ol>
          <li data-md>
           <p>If <var>value</var> is "<code>block</code>", set <var>allowlist</var>’s <a data-link-type="dfn" href="#connection-allowlist-redirects" id="ref-for-connection-allowlist-redirects①">redirects</a> to
@@ -1065,6 +1083,17 @@ to <var>value</var>.</p>
          <li data-md>
           <p>Else, set <var>allowlist</var>’s <a data-link-type="dfn" href="#connection-allowlist-redirects" id="ref-for-connection-allowlist-redirects②">redirects</a> to
 <a data-link-type="grammar" href="#grammardef-connection-allowlist-redirects-allow" id="ref-for-grammardef-connection-allowlist-redirects-allow①">allow</a>.</p>
+        </ol>
+       <li data-md>
+        <p>If <var>key</var> is <a data-link-type="grammar" href="#grammardef-connection-allowlist-webrtc" id="ref-for-grammardef-connection-allowlist-webrtc"><code>webrtc</code></a> and <var>value</var> is a
+<a data-link-type="dfn" href="https://www.rfc-editor.org/rfc/rfc9651#name-tokens" id="ref-for-name-tokens⑨">token</a>:</p>
+        <ol>
+         <li data-md>
+          <p>If <var>value</var> is "<code>block</code>", set <var>allowlist</var>’s <a data-link-type="dfn" href="#connection-allowlist-webrtc" id="ref-for-connection-allowlist-webrtc①">webrtc</a> to
+<a data-link-type="grammar" href="#grammardef-connection-allowlist-webrtc-block" id="ref-for-grammardef-connection-allowlist-webrtc-block②">block</a>.</p>
+         <li data-md>
+          <p>Else, set <var>allowlist</var>’s <a data-link-type="dfn" href="#connection-allowlist-webrtc" id="ref-for-connection-allowlist-webrtc②">webrtc</a> to
+<a data-link-type="grammar" href="#grammardef-connection-allowlist-webrtc-allow" id="ref-for-grammardef-connection-allowlist-webrtc-allow①">allow</a>.</p>
         </ol>
       </ol>
      <li data-md>
@@ -1142,8 +1171,7 @@ The <dfn class="dfn-paneled" data-dfn-type="abstract-op" data-export id="abstrac
       <p><a data-link-type="dfn" href="https://infra.spec.whatwg.org/#list-iterate" id="ref-for-list-iterate④">For each</a> <var>connection allowlist</var> in <var>connection allowlists</var>:</p>
       <ol>
        <li data-md>
-        <p>If <u class="link-error" data-lt="match a URL to a Connection Allowlist" title="LINK ERROR: No &apos;dfn&apos; refs found for &apos;match a url to a connection allowlist&apos;.">match a URL to a Connection Allowlist</u> given <var>url</var> and <var>connection allowlist</var> returns <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#success" id="ref-for-success④">success</a>,
-<a data-link-type="dfn" href="https://infra.spec.whatwg.org/#iteration-continue" id="ref-for-iteration-continue②">continue</a>.</p>
+        <p>If <var>url</var> <a data-link-type="dfn" href="https://webbluetoothcg.github.io/web-bluetooth/#bluetoothdatafilterinit-matches" id="ref-for-bluetoothdatafilterinit-matches">matches</a> <var>connection allowlist</var>, <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#iteration-continue" id="ref-for-iteration-continue②">continue</a>.</p>
        <li data-md>
         <p><a data-link-type="abstract-op" href="#abstract-opdef-report-a-violation" id="ref-for-abstract-opdef-report-a-violation">Report a violation</a> given <var>url</var>, <var>environment</var>, and
 <var>connection allowlist</var>.</p>
@@ -1187,8 +1215,7 @@ than necessary about redirect targets.</p>
           <p><a data-link-type="dfn" href="https://infra.spec.whatwg.org/#iteration-continue" id="ref-for-iteration-continue④">Continue</a>.</p>
         </ol>
        <li data-md>
-        <p>If <u class="link-error" data-lt="match a URL to a Connection Allowlist" title="LINK ERROR: No &apos;dfn&apos; refs found for &apos;match a url to a connection allowlist&apos;.">match a URL to a Connection Allowlist</u> given <var>request</var>’s <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-request-url" id="ref-for-concept-request-url②">url</a> and
-<var>allowlist</var> returns <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#success" id="ref-for-success⑤">success</a>, <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#iteration-continue" id="ref-for-iteration-continue⑤">continue</a>.</p>
+        <p>If <var>request</var>’s <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-request-url" id="ref-for-concept-request-url②">url</a> <a data-link-type="dfn" href="https://webbluetoothcg.github.io/web-bluetooth/#bluetoothdatafilterinit-matches" id="ref-for-bluetoothdatafilterinit-matches①">matches</a> <var>allowlist</var>, <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#iteration-continue" id="ref-for-iteration-continue⑤">continue</a>.</p>
        <li data-md>
         <p><a data-link-type="abstract-op" href="#abstract-opdef-report-a-violation" id="ref-for-abstract-opdef-report-a-violation②">Report a violation</a> given <var>request</var>’s <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-request-url" id="ref-for-concept-request-url③">url</a>, <var>request</var>’s
 <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-request-client" id="ref-for-concept-request-client①">client</a>, and <var>allowlist</var>.</p>
@@ -1224,6 +1251,32 @@ a <a data-link-type="dfn" href="https://url.spec.whatwg.org/#concept-host" id="r
       <p>Return <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#allowed" id="ref-for-allowed⑤">allowed</a>.</p>
     </ol>
    </div>
+   <div class="algorithm" data-algorithm="should WebRTC be blocked by Connection Allowlists">
+    
+The <dfn class="dfn-paneled" data-dfn-type="abstract-op" data-export id="abstract-opdef-should-webrtc-be-blocked-by-connection-allowlists">should WebRTC be blocked by Connection Allowlists</dfn> algorithm takes
+an <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#environment-settings-object" id="ref-for-environment-settings-object">environment settings object</a> (<var>environment</var>) and returns either <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#allowed" id="ref-for-allowed⑥">allowed</a> or <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#blocked" id="ref-for-blocked⑦">blocked</a>:
+
+
+    <ol>
+     <li data-md>
+      <p>Let <var>allowlists</var> be <var>environment</var>’s <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#concept-settings-object-policy-container" id="ref-for-concept-settings-object-policy-container">policy container</a>’s
+<a data-link-type="dfn" href="#policy-container-connection-allowlists" id="ref-for-policy-container-connection-allowlists③">connection allowlists</a>.</p>
+     <li data-md>
+      <p><a data-link-type="dfn" href="https://infra.spec.whatwg.org/#list-iterate" id="ref-for-list-iterate⑦">For each</a> <var>allowlist</var> in <var>allowlists</var>:</p>
+      <ol>
+       <li data-md>
+        <p>If <var>allowlist</var>’s <a data-link-type="dfn" href="#connection-allowlist-webrtc" id="ref-for-connection-allowlist-webrtc③">webrtc</a> is
+<a data-link-type="grammar" href="#grammardef-connection-allowlist-webrtc-allow" id="ref-for-grammardef-connection-allowlist-webrtc-allow②">allow</a>, <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#iteration-continue" id="ref-for-iteration-continue⑦">continue</a>.</p>
+       <li data-md>
+        <p><a data-link-type="abstract-op" href="#abstract-opdef-report-a-violation" id="ref-for-abstract-opdef-report-a-violation④">Report a violation</a> given "<code>webrtc</code>", <var>environment</var>, and <var>allowlist</var>.</p>
+       <li data-md>
+        <p>If <var>allowlist</var>’s <a data-link-type="dfn" href="#connection-allowlist-disposition" id="ref-for-connection-allowlist-disposition⑥">disposition</a> is
+<a data-link-type="grammar" href="#grammardef-connection-allowlist-disposition-enforce" id="ref-for-grammardef-connection-allowlist-disposition-enforce⑤">enforce</a>, return <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#blocked" id="ref-for-blocked⑧">blocked</a>.</p>
+      </ol>
+     <li data-md>
+      <p>Return <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#allowed" id="ref-for-allowed⑦">allowed</a>.</p>
+    </ol>
+   </div>
    <h3 class="heading settled" data-level="3.3" id="reporting"><span class="secno">3.3. </span><span class="content">Reporting</span><a class="self-link" href="#reporting"></a></h3>
    <p>Like other policy mechanisms, Connection Allowlists will report each violation to a Reporting API
 endpoint specified in the allowlist headers. Violations are represented by the following dictionary
@@ -1242,11 +1295,12 @@ serialized <a data-link-type="dfn" href="https://url.spec.whatwg.org/#concept-ur
    <p><code class="idl"><a data-link-type="idl" href="#dictdef-connectionallowlistviolationreport" id="ref-for-dictdef-connectionallowlistviolationreport①">ConnectionAllowlistViolationReport</a></code>’s <code class="idl"><a data-link-type="idl" href="#dom-connectionallowlistviolationreport-allowlist" id="ref-for-dom-connectionallowlistviolationreport-allowlist">allowlist</a></code> is the
 <a data-link-type="dfn" href="#connection-allowlist-allowlist" id="ref-for-connection-allowlist-allowlist③">allowlist</a> which was violated.</p>
    <p><code class="idl"><a data-link-type="idl" href="#dictdef-connectionallowlistviolationreport" id="ref-for-dictdef-connectionallowlistviolationreport②">ConnectionAllowlistViolationReport</a></code>’s <code class="idl"><a data-link-type="idl" href="#dom-connectionallowlistviolationreport-disposition" id="ref-for-dom-connectionallowlistviolationreport-disposition">disposition</a></code>
-is the <code class="idl"><a data-link-type="idl" href="#dom-connectionallowlistviolationreport-allowlist" id="ref-for-dom-connectionallowlistviolationreport-allowlist①">allowlist</a></code>’s <a data-link-type="dfn" href="#connection-allowlist-disposition" id="ref-for-connection-allowlist-disposition⑥">disposition</a>.</p>
+is the <code class="idl"><a data-link-type="idl" href="#dom-connectionallowlistviolationreport-allowlist" id="ref-for-dom-connectionallowlistviolationreport-allowlist①">allowlist</a></code>’s <a data-link-type="dfn" href="#connection-allowlist-disposition" id="ref-for-connection-allowlist-disposition⑦">disposition</a>.</p>
    <div class="algorithm" data-algorithm="report a violation">
     
-To <dfn class="dfn-paneled" data-dfn-type="abstract-op" data-export data-local-lt="report" id="abstract-opdef-report-a-violation">report a violation</dfn> given a <a data-link-type="dfn" href="https://url.spec.whatwg.org/#concept-url" id="ref-for-concept-url⑤">URL</a> (<var>resource URL</var>),
-an <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#environment" id="ref-for-environment②">environment</a> (<var>environment</var>), and a <a data-link-type="dfn" href="#connection-allowlist" id="ref-for-connection-allowlist③">connection allowlist</a> (<var>allowlist</var>):
+To <dfn class="dfn-paneled" data-dfn-type="abstract-op" data-export data-local-lt="report" id="abstract-opdef-report-a-violation">report a violation</dfn> given a <a data-link-type="dfn" href="https://url.spec.whatwg.org/#concept-url" id="ref-for-concept-url⑤">URL</a> or the <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#string" id="ref-for-string①">string</a>
+"<code>webrtc</code>" (<var>resource URL</var>), an <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#environment" id="ref-for-environment②">environment</a> (<var>environment</var>), and a
+<a data-link-type="dfn" href="#connection-allowlist" id="ref-for-connection-allowlist③">connection allowlist</a> (<var>allowlist</var>):
 
 
     <ol>
@@ -1256,15 +1310,20 @@ an <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappap
       <p>Let <var>violation</var> be a new <code class="idl"><a data-link-type="idl" href="#dictdef-connectionallowlistviolationreport" id="ref-for-dictdef-connectionallowlistviolationreport③">ConnectionAllowlistViolationReport</a></code>, initialized as follows:</p>
     </ol>
     <dl>
+     <dt data-md><code class="idl"><a data-link-type="idl" href="#dom-connectionallowlistviolationreport-url" id="ref-for-dom-connectionallowlistviolationreport-url">url</a></code>
+     <dd data-md>
+      <p><var>environment</var>’s <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#concept-environment-creation-url" id="ref-for-concept-environment-creation-url">creation URL</a>, <a data-link-type="dfn" href="https://w3c.github.io/reporting/#strip-url-for-use-in-reports" id="ref-for-strip-url-for-use-in-reports">stripped for use in reports</a>.</p>
      <dt data-md><code class="idl"><a data-link-type="idl" href="#dom-connectionallowlistviolationreport-connection" id="ref-for-dom-connectionallowlistviolationreport-connection①">connection</a></code>
      <dd data-md>
-      <p><var>resource URL</var>, <a data-link-type="dfn" href="https://w3c.github.io/reporting/#strip-url-for-use-in-reports" id="ref-for-strip-url-for-use-in-reports">stripped for use in reports</a>.</p>
+      <p>If <var>resource URL</var> is a <a data-link-type="dfn" href="https://url.spec.whatwg.org/#concept-url" id="ref-for-concept-url⑥">URL</a>, then <var>resource URL</var>, <a data-link-type="dfn" href="https://w3c.github.io/reporting/#strip-url-for-use-in-reports" id="ref-for-strip-url-for-use-in-reports①">stripped for use in reports</a>.</p>
+     <dd data-md>
+      <p>Otherwise, <var>resource URL</var>.</p>
      <dt data-md><code class="idl"><a data-link-type="idl" href="#dom-connectionallowlistviolationreport-allowlist" id="ref-for-dom-connectionallowlistviolationreport-allowlist②">allowlist</a></code>
      <dd data-md>
       <p>A new list containing the result of serializing each pattern in <var>allowlist</var>’s <a data-link-type="dfn" href="#connection-allowlist-allowlist" id="ref-for-connection-allowlist-allowlist④">allowlist</a></p>
      <dt data-md><code class="idl"><a data-link-type="idl" href="#dom-connectionallowlistviolationreport-disposition" id="ref-for-dom-connectionallowlistviolationreport-disposition①">disposition</a></code>
      <dd data-md>
-      <p><var>allowlist</var>’s <a data-link-type="dfn" href="#connection-allowlist-disposition" id="ref-for-connection-allowlist-disposition⑦">disposition</a>.</p>
+      <p><var>allowlist</var>’s <a data-link-type="dfn" href="#connection-allowlist-disposition" id="ref-for-connection-allowlist-disposition⑧">disposition</a>.</p>
     </dl>
     <ol start="3">
      <li data-md>
@@ -1304,7 +1363,7 @@ which aren’t based on <a data-link-type="dfn" href="https://fetch.spec.whatwg.
 
     <ol>
      <li data-md>
-      <ins>If <a data-link-type="abstract-op" href="#abstract-opdef-should-host-be-blocked-by-connection-allowlists" id="ref-for-abstract-opdef-should-host-be-blocked-by-connection-allowlists">should host be blocked by Connection Allowlists</a> returns <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#blocked" id="ref-for-blocked⑦">blocked</a> when executed
+      <ins>If <a data-link-type="abstract-op" href="#abstract-opdef-should-host-be-blocked-by-connection-allowlists" id="ref-for-abstract-opdef-should-host-be-blocked-by-connection-allowlists">should host be blocked by Connection Allowlists</a> returns <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#blocked" id="ref-for-blocked⑨">blocked</a> when executed
  upon <var>origin</var>’s <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/browsers.html#concept-origin-host" id="ref-for-concept-origin-host">host</a>, <var>environment</var>, and
  <var>allowlists</var>, then return <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#failure" id="ref-for-failure④">failure</a>.</ins>
     </ol>
@@ -1316,7 +1375,7 @@ which aren’t based on <a data-link-type="dfn" href="https://fetch.spec.whatwg.
   
     <ol start="2">
      <li data-md>
-      <ins>If <a data-link-type="abstract-op" href="#abstract-opdef-should-url-be-blocked-by-connection-allowlists" id="ref-for-abstract-opdef-should-url-be-blocked-by-connection-allowlists">should url be blocked by Connection Allowlists</a> returns <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#blocked" id="ref-for-blocked⑧">blocked</a> when executed
+      <ins>If <a data-link-type="abstract-op" href="#abstract-opdef-should-url-be-blocked-by-connection-allowlists" id="ref-for-abstract-opdef-should-url-be-blocked-by-connection-allowlists">should url be blocked by Connection Allowlists</a> returns <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#blocked" id="ref-for-blocked①⓪">blocked</a> when executed
 upon <var>url</var>, <var>environment</var>, and <var>allowlists</var>,
 then return <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#failure" id="ref-for-failure⑤">failure</a>.</ins>
     </ol>
@@ -1329,14 +1388,14 @@ take a piecemeal approach.</p>
    <h3 class="heading settled" data-level="4.2" id="html"><span class="secno">4.2. </span><span class="content">Integration with HTML</span><a class="self-link" href="#html"></a></h3>
    <p>To integrate the above into HTML, we’ll add a new
 <dfn class="dfn-paneled" data-dfn-for="policy container" data-dfn-type="dfn" data-noexport id="policy-container-connection-allowlists">connection allowlists</dfn> item to the <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/browsers.html#policy-container" id="ref-for-policy-container①">policy container</a>
-<a data-link-type="dfn" href="https://infra.spec.whatwg.org/#struct" id="ref-for-struct①">struct</a>, containing a <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#list" id="ref-for-list④">list</a> of <a data-link-type="dfn" href="#policy-container-connection-allowlists" id="ref-for-policy-container-connection-allowlists③">connection allowlists</a>. This will be populated by adding a
+<a data-link-type="dfn" href="https://infra.spec.whatwg.org/#struct" id="ref-for-struct①">struct</a>, containing a <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#list" id="ref-for-list④">list</a> of <a data-link-type="dfn" href="#policy-container-connection-allowlists" id="ref-for-policy-container-connection-allowlists④">connection allowlists</a>. This will be populated by adding a
 step to the <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/browsers.html#creating-a-policy-container-from-a-fetch-response" id="ref-for-creating-a-policy-container-from-a-fetch-response">create a policy container from a fetch response</a> algorithm:</p>
    <div class="algorithm" data-algorithm="monkey patching policy container creation">
     <ol start="6">
      <li data-md>
       <p>Parse Integrity-Policy headers with <var>response</var> and <var>result</var>.</p>
      <li data-md>
-      <ins>Set <var>result</var>’s <a data-link-type="dfn" href="#policy-container-connection-allowlists" id="ref-for-policy-container-connection-allowlists④">connection allowlists</a> to the result of
+      <ins>Set <var>result</var>’s <a data-link-type="dfn" href="#policy-container-connection-allowlists" id="ref-for-policy-container-connection-allowlists⑤">connection allowlists</a> to the result of
 <a data-link-type="abstract-op" href="#abstract-opdef-parse-a-responses-connection-allowlists" id="ref-for-abstract-opdef-parse-a-responses-connection-allowlists">parsing a response’s Connection Allowlists</a>
 given <var>response</var>.</ins>
      <li data-md>
@@ -1344,7 +1403,8 @@ given <var>response</var>.</ins>
     </ol>
    </div>
    <h3 class="heading settled" data-level="4.3" id="rtc"><span class="secno">4.3. </span><span class="content">Integration with WebRTC</span><a class="self-link" href="#rtc"></a></h3>
-   <p class="issue" id="issue-098c64d7"><a class="self-link" href="#issue-098c64d7"></a> I need to read more, as I have no idea how any of this works from a spec perspective. :)</p>
+   <p>To constrain WebRTC connections, <a data-link-type="biblio" href="#biblio-webrtc" title="WebRTC: Real-Time Communication in Browsers">[webrtc]</a> can call into the <a data-link-type="abstract-op" href="#abstract-opdef-should-webrtc-be-blocked-by-connection-allowlists" id="ref-for-abstract-opdef-should-webrtc-be-blocked-by-connection-allowlists">should WebRTC be blocked by Connection Allowlists</a>
+algorithm while determining whether candidates are <a data-link-type="dfn" href="https://w3c.github.io/webrtc-pc/#dfn-administratively-prohibited" id="ref-for-dfn-administratively-prohibited">administratively prohibited</a>.</p>
    <h2 class="heading settled" data-level="5" id="security"><span class="secno">5. </span><span class="content">Security and Privacy Considerations</span><a class="self-link" href="#security"></a></h2>
    <h3 class="heading settled" data-level="5.1" id="security-same-origin"><span class="secno">5.1. </span><span class="content">Same-Origin Contexts</span><a class="self-link" href="#security-same-origin"></a></h3>
    <p>The threat model described in <a href="#threat-model">§ 1.1 Threat Model</a> is intentionally narrow, and developers will need
@@ -1430,6 +1490,29 @@ trusted endpoints to handle redirects correctly.</p>
   the possibility of introducing additional behaviors in the future without breaking existing
   sites.</p>
    </div>
+   <h3 class="heading settled" data-level="5.6" id="webrtc"><span class="secno">5.6. </span><span class="content">WebRTC</span><a class="self-link" href="#webrtc"></a></h3>
+   <p>By default, Connection Allowlists block all WebRTC connections. This is a conservative posture
+intended to mitigate the risk of data exfiltration through WebRTC’s unique networking
+characteristics, which can be difficult to constrain via URL patterns alone.</p>
+   <p>The <a data-link-type="grammar" href="#grammardef-connection-allowlist-webrtc" id="ref-for-grammardef-connection-allowlist-webrtc①"><code>webrtc</code></a> parameter allows developers to control
+this behavior.</p>
+   <p>If set to <a data-link-type="grammar" href="#grammardef-connection-allowlist-webrtc-block" id="ref-for-grammardef-connection-allowlist-webrtc-block③"><code>block</code></a> (the default), any attempt to
+establish a WebRTC connection will be blocked.</p>
+   <p>If set to <a data-link-type="grammar" href="#grammardef-connection-allowlist-webrtc-allow" id="ref-for-grammardef-connection-allowlist-webrtc-allow③"><code>allow</code></a>, WebRTC connections will be
+allowed.</p>
+   <div class="example" id="example-webrtc">
+    <a class="self-link" href="#example-webrtc"></a>
+  Consider a document with the following header:
+
+  
+<pre class="highlight language-http">Connection-Allowlist: ("https://api.example")
+</pre>
+    <p>Any attempt to establish a WebRTC connection will be <strong>blocked</strong>, as WebRTC is blocked by default.</p>
+    <p>If the header is instead:</p>
+<pre class="highlight language-http">Connection-Allowlist: ("https://api.example"); webrtc=allow
+</pre>
+    <p>WebRTC connections will be <strong>allowed</strong>.</p>
+   </div>
   </main>
   <div data-fill-with="conformance">
    <h2 class="heading no-num no-ref settled" id="w3c-conformance"><span class="content">Conformance</span><a class="self-link" href="#w3c-conformance"></a></h2>
@@ -1472,14 +1555,24 @@ trusted endpoints to handle redirects correctly.</p>
   <h2 class="heading no-num no-ref settled" id="index"><span class="content">Index</span><a class="self-link" href="#index"></a></h2>
   <h3 class="heading no-num no-ref settled" id="index-defined-here"><span class="content">Terms defined by this specification</span><a class="self-link" href="#index-defined-here"></a></h3>
   <ul class="index">
-   <li><a href="#grammardef-connection-allowlist-redirects-allow">allow</a><span>, in § 2</span>
+   <li>
+    allow
+    <ul>
+     <li><a href="#grammardef-connection-allowlist-redirects-allow">grammar for Connection Allowlist/redirects</a><span>, in § 2</span>
+     <li><a href="#grammardef-connection-allowlist-webrtc-allow">grammar for Connection Allowlist/webrtc</a><span>, in § 2</span>
+    </ul>
    <li>
     allowlist
     <ul>
      <li><a href="#connection-allowlist-allowlist">dfn for Connection Allowlist</a><span>, in § 2</span>
      <li><a href="#dom-connectionallowlistviolationreport-allowlist">dict-member for ConnectionAllowlistViolationReport</a><span>, in § 3.3</span>
     </ul>
-   <li><a href="#grammardef-connection-allowlist-redirects-block">block</a><span>, in § 2</span>
+   <li>
+    block
+    <ul>
+     <li><a href="#grammardef-connection-allowlist-redirects-block">grammar for Connection Allowlist/redirects</a><span>, in § 2</span>
+     <li><a href="#grammardef-connection-allowlist-webrtc-block">grammar for Connection Allowlist/webrtc</a><span>, in § 2</span>
+    </ul>
    <li><a href="#dom-connectionallowlistviolationreport-connection">connection</a><span>, in § 3.3</span>
    <li><a href="#connection-allowlist">Connection Allowlist</a><span>, in § 2</span>
    <li><a href="#http-headerdef-connection-allowlist">Connection-Allowlist</a><span>, in § 3</span>
@@ -1522,7 +1615,14 @@ trusted endpoints to handle redirects correctly.</p>
    <li><a href="#abstract-opdef-should-host-be-blocked-by-connection-allowlists">should host be blocked by Connection Allowlists</a><span>, in § 3.2</span>
    <li><a href="#abstract-opdef-should-request-be-blocked-by-connection-allowlists">should request be blocked by Connection Allowlists</a><span>, in § 3.2</span>
    <li><a href="#abstract-opdef-should-url-be-blocked-by-connection-allowlists">should url be blocked by Connection Allowlists</a><span>, in § 3.2</span>
+   <li><a href="#abstract-opdef-should-webrtc-be-blocked-by-connection-allowlists">should WebRTC be blocked by Connection Allowlists</a><span>, in § 3.2</span>
    <li><a href="#dom-connectionallowlistviolationreport-url">url</a><span>, in § 3.3</span>
+   <li>
+    webrtc
+    <ul>
+     <li><a href="#connection-allowlist-webrtc">dfn for Connection Allowlist</a><span>, in § 2</span>
+     <li><a href="#grammardef-connection-allowlist-webrtc">grammar for Connection-Allowlist</a><span>, in § 3</span>
+    </ul>
   </ul>
   <h3 class="heading no-num no-ref settled" id="index-defined-elsewhere"><span class="content">Terms defined by reference</span><a class="self-link" href="#index-defined-elsewhere"></a></h3>
   <ul class="index">
@@ -1563,10 +1663,13 @@ trusted endpoints to handle redirects correctly.</p>
      <li><span class="dfn-paneled" id="02fb8691">MessageChannel</span>
      <li><span class="dfn-paneled" id="b410a6ef">ASCII serialization of an origin</span>
      <li><span class="dfn-paneled" id="cfb6031b">creating a policy container from a fetch response</span>
+     <li><span class="dfn-paneled" id="fa5ee9c5">creation URL</span>
      <li><span class="dfn-paneled" id="1abc08f1">dns-prefetch</span>
      <li><span class="dfn-paneled" id="24cf98a1">environment</span>
+     <li><span class="dfn-paneled" id="3e12e042">environment settings object</span>
      <li><span class="dfn-paneled" id="77a2ee6e">host</span>
      <li><span class="dfn-paneled" id="b33787b2">policy container</span>
+     <li><span class="dfn-paneled" id="bd1db03d">policy container <small>(for environment settings object)</small></span>
      <li><span class="dfn-paneled" id="8a7dfd23">postMessage(message, options)</span>
      <li><span class="dfn-paneled" id="5c35dd47">sandbox</span>
     </ul>
@@ -1632,11 +1735,21 @@ trusted endpoints to handle redirects correctly.</p>
      <li><span class="dfn-paneled" id="60393e82">URL pattern</span>
     </ul>
    <li>
+    <a data-link-type="biblio">[WEB-BLUETOOTH]</a> defines the following terms:
+    <ul>
+     <li><span class="dfn-paneled" id="4d372bae">matches</span>
+    </ul>
+   <li>
     <a data-link-type="biblio">[WEBIDL]</a> defines the following terms:
     <ul>
      <li><span class="dfn-paneled" id="8855a9aa">DOMString</span>
      <li><span class="dfn-paneled" id="b0d7f3c3">USVString</span>
      <li><span class="dfn-paneled" id="9cce47fd">sequence</span>
+    </ul>
+   <li>
+    <a data-link-type="biblio">[WEBRTC]</a> defines the following terms:
+    <ul>
+     <li><span class="dfn-paneled" id="75f3e163">administratively prohibited</span>
     </ul>
    <li>
     <a data-link-type="biblio">[XHR]</a> defines the following terms:
@@ -1669,8 +1782,12 @@ trusted endpoints to handle redirects correctly.</p>
    <dd>Anne van Kesteren. <a href="https://url.spec.whatwg.org/"><cite>URL Standard</cite></a>. Living Standard. URL: <a href="https://url.spec.whatwg.org/">https://url.spec.whatwg.org/</a>
    <dt id="biblio-urlpattern">[URLPATTERN]
    <dd>Ben Kelly; Jeremy Roman; 宍戸俊哉 (Shunya Shishido). <a href="https://urlpattern.spec.whatwg.org/"><cite>URL Pattern Standard</cite></a>. Living Standard. URL: <a href="https://urlpattern.spec.whatwg.org/">https://urlpattern.spec.whatwg.org/</a>
+   <dt id="biblio-web-bluetooth">[WEB-BLUETOOTH]
+   <dd>Jeffrey Yasskin. <a href="https://webbluetoothcg.github.io/web-bluetooth/"><cite>Web Bluetooth</cite></a>. URL: <a href="https://webbluetoothcg.github.io/web-bluetooth/">https://webbluetoothcg.github.io/web-bluetooth/</a>
    <dt id="biblio-webidl">[WEBIDL]
    <dd>Edgar Chen; Timothy Gu. <a href="https://webidl.spec.whatwg.org/"><cite>Web IDL Standard</cite></a>. Living Standard. URL: <a href="https://webidl.spec.whatwg.org/">https://webidl.spec.whatwg.org/</a>
+   <dt id="biblio-webrtc">[WEBRTC]
+   <dd>Cullen Jennings; et al. <a href="https://w3c.github.io/webrtc-pc/"><cite>WebRTC: Real-Time Communication in Browsers</cite></a>. URL: <a href="https://w3c.github.io/webrtc-pc/">https://w3c.github.io/webrtc-pc/</a>
    <dt id="biblio-xhr">[XHR]
    <dd>Anne van Kesteren. <a href="https://xhr.spec.whatwg.org/"><cite>XMLHttpRequest Standard</cite></a>. Living Standard. URL: <a href="https://xhr.spec.whatwg.org/">https://xhr.spec.whatwg.org/</a>
   </dl>
@@ -1697,7 +1814,6 @@ algorithms' callsites to identify the allowlist which ought to be used and the c
 for reporting. It might be better to instead ask those callsites to perform the checks themselves.
 My feeling is that we’ll be more successful by centralizing the logic, but it might be simpler to
 take a piecemeal approach. <a class="issue-return" href="#issue-dcabf3fa" title="Jump to section">↵</a></div>
-   <div class="issue"> I need to read more, as I have no idea how any of this works from a spec perspective. :) <a class="issue-return" href="#issue-098c64d7" title="Jump to section">↵</a></div>
    <div class="issue"> It would also be ideal to give developers control over
 their dependencies' allowlists to some extent. An opt-in mechanism rooted in something like
 <a data-link-type="dfn" href="https://wicg.github.io/document-policy/#required-document-policy">required document policy</a> or <a data-link-type="biblio" href="#biblio-csp-embedded-enforcement" title="Content Security Policy: Embedded Enforcement">[csp-embedded-enforcement]</a>] might
@@ -1907,18 +2023,20 @@ function parseHTML(markup) {
 let dfnPanelData = {
 "0204d188": {"dfnID":"0204d188","dfnText":"size","external":true,"refSections":[{"refs":[{"id":"ref-for-list-size"}],"title":"3.1. Parsing"},{"refs":[{"id":"ref-for-list-size\u2460"}],"title":"3.2. Matching"}],"url":"https://infra.spec.whatwg.org/#list-size"},
 "02fb8691": {"dfnID":"02fb8691","dfnText":"MessageChannel","external":true,"refSections":[{"refs":[{"id":"ref-for-messagechannel"}],"title":"5.4. postMessage(...)"}],"url":"https://html.spec.whatwg.org/multipage/web-messaging.html#messagechannel"},
-"0698d556": {"dfnID":"0698d556","dfnText":"string","external":true,"refSections":[{"refs":[{"id":"ref-for-string"}],"title":"3.1. Parsing"}],"url":"https://infra.spec.whatwg.org/#string"},
-"093a0772": {"dfnID":"093a0772","dfnText":"strip URL for use in reports","external":true,"refSections":[{"refs":[{"id":"ref-for-strip-url-for-use-in-reports"}],"title":"3.3. Reporting"}],"url":"https://w3c.github.io/reporting/#strip-url-for-use-in-reports"},
+"0698d556": {"dfnID":"0698d556","dfnText":"string","external":true,"refSections":[{"refs":[{"id":"ref-for-string"}],"title":"3.1. Parsing"},{"refs":[{"id":"ref-for-string\u2460"}],"title":"3.3. Reporting"}],"url":"https://infra.spec.whatwg.org/#string"},
+"093a0772": {"dfnID":"093a0772","dfnText":"strip URL for use in reports","external":true,"refSections":[{"refs":[{"id":"ref-for-strip-url-for-use-in-reports"},{"id":"ref-for-strip-url-for-use-in-reports\u2460"}],"title":"3.3. Reporting"}],"url":"https://w3c.github.io/reporting/#strip-url-for-use-in-reports"},
 "0950067d": {"dfnID":"0950067d","dfnText":"host-source","external":true,"refSections":[{"refs":[{"id":"ref-for-grammardef-host-source"}],"title":"1.2. Overlap with Content Security Policy"}],"url":"https://w3c.github.io/webappsec-csp/#grammardef-host-source"},
 "188c6617": {"dfnID":"188c6617","dfnText":"ReportBody","external":true,"refSections":[{"refs":[{"id":"ref-for-reportbody"}],"title":"3.3. Reporting"}],"url":"https://w3c.github.io/reporting/#reportbody"},
 "1abc08f1": {"dfnID":"1abc08f1","dfnText":"dns-prefetch","external":true,"refSections":[{"refs":[{"id":"ref-for-link-type-dns-prefetch"}],"title":"3.2. Matching"}],"url":"https://html.spec.whatwg.org/multipage/links.html#link-type-dns-prefetch"},
 "24cf98a1": {"dfnID":"24cf98a1","dfnText":"environment","external":true,"refSections":[{"refs":[{"id":"ref-for-environment"},{"id":"ref-for-environment\u2460"}],"title":"3.2. Matching"},{"refs":[{"id":"ref-for-environment\u2461"}],"title":"3.3. Reporting"}],"url":"https://html.spec.whatwg.org/multipage/webappapis.html#environment"},
 "2ce6f6bb": {"dfnID":"2ce6f6bb","dfnText":"fetch(input)","external":true,"refSections":[{"refs":[{"id":"ref-for-dom-global-fetch"}],"title":"1.1. Threat Model"}],"url":"https://fetch.spec.whatwg.org/#dom-global-fetch"},
 "3268a8eb": {"dfnID":"3268a8eb","dfnText":"URL (for response)","external":true,"refSections":[{"refs":[{"id":"ref-for-concept-response-url"}],"title":"3. Connection Allowlist Headers"},{"refs":[{"id":"ref-for-concept-response-url\u2460"},{"id":"ref-for-concept-response-url\u2461"}],"title":"3.1. Parsing"}],"url":"https://fetch.spec.whatwg.org/#concept-response-url"},
+"3e12e042": {"dfnID":"3e12e042","dfnText":"environment settings object","external":true,"refSections":[{"refs":[{"id":"ref-for-environment-settings-object"}],"title":"3.2. Matching"}],"url":"https://html.spec.whatwg.org/multipage/webappapis.html#environment-settings-object"},
 "3f2ca4de": {"dfnID":"3f2ca4de","dfnText":"current URL","external":true,"refSections":[{"refs":[{"id":"ref-for-concept-request-current-url"}],"title":"3.2. Matching"}],"url":"https://fetch.spec.whatwg.org/#concept-request-current-url"},
 "3fca5a9e": {"dfnID":"3fca5a9e","dfnText":"map","external":true,"refSections":[{"refs":[{"id":"ref-for-ordered-map"}],"title":"3.2. Matching"}],"url":"https://infra.spec.whatwg.org/#ordered-map"},
 "45d80b74": {"dfnID":"45d80b74","dfnText":"hostname component","external":true,"refSections":[{"refs":[{"id":"ref-for-url-pattern-hostname-component"}],"title":"3.2. Matching"}],"url":"https://urlpattern.spec.whatwg.org/#url-pattern-hostname-component"},
-"4acd57ce": {"dfnID":"4acd57ce","dfnText":"token","external":true,"refSections":[{"refs":[{"id":"ref-for-name-tokens"},{"id":"ref-for-name-tokens\u2460"},{"id":"ref-for-name-tokens\u2461"},{"id":"ref-for-name-tokens\u2462"}],"title":"3. Connection Allowlist Headers"},{"refs":[{"id":"ref-for-name-tokens\u2463"},{"id":"ref-for-name-tokens\u2464"},{"id":"ref-for-name-tokens\u2465"}],"title":"3.1. Parsing"}],"url":"https://www.rfc-editor.org/rfc/rfc9651#name-tokens"},
+"4acd57ce": {"dfnID":"4acd57ce","dfnText":"token","external":true,"refSections":[{"refs":[{"id":"ref-for-name-tokens"},{"id":"ref-for-name-tokens\u2460"},{"id":"ref-for-name-tokens\u2461"},{"id":"ref-for-name-tokens\u2462"},{"id":"ref-for-name-tokens\u2463"},{"id":"ref-for-name-tokens\u2464"}],"title":"3. Connection Allowlist Headers"},{"refs":[{"id":"ref-for-name-tokens\u2465"},{"id":"ref-for-name-tokens\u2466"},{"id":"ref-for-name-tokens\u2467"},{"id":"ref-for-name-tokens\u2468"}],"title":"3.1. Parsing"}],"url":"https://www.rfc-editor.org/rfc/rfc9651#name-tokens"},
+"4d372bae": {"dfnID":"4d372bae","dfnText":"matches","external":true,"refSections":[{"refs":[{"id":"ref-for-bluetoothdatafilterinit-matches"},{"id":"ref-for-bluetoothdatafilterinit-matches\u2460"}],"title":"3.2. Matching"}],"url":"https://webbluetoothcg.github.io/web-bluetooth/#bluetoothdatafilterinit-matches"},
 "53275e46": {"dfnID":"53275e46","dfnText":"append","external":true,"refSections":[{"refs":[{"id":"ref-for-list-append"}],"title":"3.1. Parsing"}],"url":"https://infra.spec.whatwg.org/#list-append"},
 "55213b5b": {"dfnID":"55213b5b","dfnText":"request","external":true,"refSections":[{"refs":[{"id":"ref-for-concept-request"},{"id":"ref-for-concept-request\u2460"}],"title":"3.2. Matching"},{"refs":[{"id":"ref-for-concept-request\u2461"},{"id":"ref-for-concept-request\u2462"}],"title":"4.1. Integration with Fetch"}],"url":"https://fetch.spec.whatwg.org/#concept-request"},
 "56ad2aed": {"dfnID":"56ad2aed","dfnText":"insert","external":true,"refSections":[{"refs":[{"id":"ref-for-list-insert"},{"id":"ref-for-list-insert\u2460"}],"title":"3.1. Parsing"}],"url":"https://infra.spec.whatwg.org/#list-insert"},
@@ -1930,10 +2048,11 @@ let dfnPanelData = {
 "61c338be": {"dfnID":"61c338be","dfnText":"resolve an origin","external":true,"refSections":[{"refs":[{"id":"ref-for-resolve-an-origin"},{"id":"ref-for-resolve-an-origin\u2460"}],"title":"4.1. Integration with Fetch"}],"url":"https://fetch.spec.whatwg.org/#resolve-an-origin"},
 "649608b9": {"dfnID":"649608b9","dfnText":"list","external":true,"refSections":[{"refs":[{"id":"ref-for-list"}],"title":"2. Connection Allowlists"},{"refs":[{"id":"ref-for-list\u2460"}],"title":"3.1. Parsing"},{"refs":[{"id":"ref-for-list\u2461"},{"id":"ref-for-list\u2462"}],"title":"3.2. Matching"},{"refs":[{"id":"ref-for-list\u2463"}],"title":"4.2. Integration with HTML"}],"url":"https://infra.spec.whatwg.org/#list"},
 "752d140b": {"dfnID":"752d140b","dfnText":"host","external":true,"refSections":[{"refs":[{"id":"ref-for-concept-host"},{"id":"ref-for-concept-host\u2460"}],"title":"3.2. Matching"},{"refs":[{"id":"ref-for-concept-host\u2461"}],"title":"5.3. DNS"}],"url":"https://url.spec.whatwg.org/#concept-host"},
+"75f3e163": {"dfnID":"75f3e163","dfnText":"administratively prohibited","external":true,"refSections":[{"refs":[{"id":"ref-for-dfn-administratively-prohibited"}],"title":"4.3. Integration with WebRTC"}],"url":"https://w3c.github.io/webrtc-pc/#dfn-administratively-prohibited"},
 "7660bec4": {"dfnID":"7660bec4","dfnText":"parameters","external":true,"refSections":[{"refs":[{"id":"ref-for-name-parameters"}],"title":"3. Connection Allowlist Headers"}],"url":"https://www.rfc-editor.org/rfc/rfc9651#name-parameters"},
 "77a2ee6e": {"dfnID":"77a2ee6e","dfnText":"host","external":true,"refSections":[{"refs":[{"id":"ref-for-concept-origin-host"}],"title":"4.1. Integration with Fetch"}],"url":"https://html.spec.whatwg.org/multipage/browsers.html#concept-origin-host"},
 "7ed9d314": {"dfnID":"7ed9d314","dfnText":"generate and queue a report","external":true,"refSections":[{"refs":[{"id":"ref-for-generate-and-queue-a-report"}],"title":"3.3. Reporting"}],"url":"https://w3c.github.io/reporting/#generate-and-queue-a-report"},
-"83af367f": {"dfnID":"83af367f","dfnText":"blocked","external":true,"refSections":[{"refs":[{"id":"ref-for-blocked"},{"id":"ref-for-blocked\u2460"},{"id":"ref-for-blocked\u2461"},{"id":"ref-for-blocked\u2462"},{"id":"ref-for-blocked\u2463"},{"id":"ref-for-blocked\u2464"},{"id":"ref-for-blocked\u2465"}],"title":"3.2. Matching"},{"refs":[{"id":"ref-for-blocked\u2466"},{"id":"ref-for-blocked\u2467"}],"title":"4.1. Integration with Fetch"}],"url":"https://infra.spec.whatwg.org/#blocked"},
+"83af367f": {"dfnID":"83af367f","dfnText":"blocked","external":true,"refSections":[{"refs":[{"id":"ref-for-blocked"},{"id":"ref-for-blocked\u2460"},{"id":"ref-for-blocked\u2461"},{"id":"ref-for-blocked\u2462"},{"id":"ref-for-blocked\u2463"},{"id":"ref-for-blocked\u2464"},{"id":"ref-for-blocked\u2465"},{"id":"ref-for-blocked\u2466"},{"id":"ref-for-blocked\u2467"}],"title":"3.2. Matching"},{"refs":[{"id":"ref-for-blocked\u2468"},{"id":"ref-for-blocked\u2460\u24ea"}],"title":"4.1. Integration with Fetch"}],"url":"https://infra.spec.whatwg.org/#blocked"},
 "857d5516": {"dfnID":"857d5516","dfnText":"client","external":true,"refSections":[{"refs":[{"id":"ref-for-concept-request-client"},{"id":"ref-for-concept-request-client\u2460"}],"title":"3.2. Matching"}],"url":"https://fetch.spec.whatwg.org/#concept-request-client"},
 "86efadaf": {"dfnID":"86efadaf","dfnText":"policy container","external":true,"refSections":[{"refs":[{"id":"ref-for-concept-request-policy-container"}],"title":"3.2. Matching"}],"url":"https://fetch.spec.whatwg.org/#concept-request-policy-container"},
 "8855a9aa": {"dfnID":"8855a9aa","dfnText":"DOMString","external":true,"refSections":[{"refs":[{"id":"ref-for-idl-DOMString"}],"title":"3.3. Reporting"}],"url":"https://webidl.spec.whatwg.org/#idl-DOMString"},
@@ -1944,7 +2063,7 @@ let dfnPanelData = {
 "9239678f": {"dfnID":"9239678f","dfnText":"endpoint","external":true,"refSections":[{"refs":[{"id":"ref-for-endpoint"}],"title":"1. Introduction"},{"refs":[{"id":"ref-for-endpoint\u2460"}],"title":"2. Connection Allowlists"},{"refs":[{"id":"ref-for-endpoint\u2461"}],"title":"3. Connection Allowlist Headers"}],"url":"https://w3c.github.io/reporting/#endpoint"},
 "959ad97b": {"dfnID":"959ad97b","dfnText":"origin","external":true,"refSections":[{"refs":[{"id":"ref-for-concept-url-origin"}],"title":"3. Connection Allowlist Headers"},{"refs":[{"id":"ref-for-concept-url-origin\u2460"}],"title":"3.1. Parsing"}],"url":"https://url.spec.whatwg.org/#concept-url-origin"},
 "984221ca": {"dfnID":"984221ca","dfnText":"struct","external":true,"refSections":[{"refs":[{"id":"ref-for-struct"}],"title":"2. Connection Allowlists"},{"refs":[{"id":"ref-for-struct\u2460"}],"title":"4.2. Integration with HTML"}],"url":"https://infra.spec.whatwg.org/#struct"},
-"98b32dd9": {"dfnID":"98b32dd9","dfnText":"success","external":true,"refSections":[{"refs":[{"id":"ref-for-success"},{"id":"ref-for-success\u2460"},{"id":"ref-for-success\u2461"},{"id":"ref-for-success\u2462"},{"id":"ref-for-success\u2463"},{"id":"ref-for-success\u2464"}],"title":"3.2. Matching"}],"url":"https://infra.spec.whatwg.org/#success"},
+"98b32dd9": {"dfnID":"98b32dd9","dfnText":"success","external":true,"refSections":[{"refs":[{"id":"ref-for-success"},{"id":"ref-for-success\u2460"},{"id":"ref-for-success\u2461"},{"id":"ref-for-success\u2462"}],"title":"3.2. Matching"}],"url":"https://infra.spec.whatwg.org/#success"},
 "9a15e8d7": {"dfnID":"9a15e8d7","dfnText":"build a URL pattern from an HTTP structured field value","external":true,"refSections":[{"refs":[{"id":"ref-for-build-a-url-pattern-from-an-http-structured-field-value"}],"title":"3.1. Parsing"}],"url":"https://urlpattern.spec.whatwg.org/#build-a-url-pattern-from-an-http-structured-field-value"},
 "9b40f5cd": {"dfnID":"9b40f5cd","dfnText":"fetch directives","external":true,"refSections":[{"refs":[{"id":"ref-for-fetch-directives"}],"title":"1.2. Overlap with Content Security Policy"}],"url":"https://w3c.github.io/webappsec-csp/#fetch-directives"},
 "9cce47fd": {"dfnID":"9cce47fd","dfnText":"sequence","external":true,"refSections":[{"refs":[{"id":"ref-for-idl-sequence"}],"title":"3.3. Reporting"}],"url":"https://webidl.spec.whatwg.org/#idl-sequence"},
@@ -1954,14 +2073,16 @@ let dfnPanelData = {
 "abstract-opdef-match-a-url-to-a-connection-allowlist": {"dfnID":"abstract-opdef-match-a-url-to-a-connection-allowlist","dfnText":"match a URL to a Connection Allowlist","external":false,"refSections":[],"url":"#abstract-opdef-match-a-url-to-a-connection-allowlist"},
 "abstract-opdef-parse-a-connection-allowlist-header": {"dfnID":"abstract-opdef-parse-a-connection-allowlist-header","dfnText":"parse a Connection Allowlist header","external":false,"refSections":[{"refs":[{"id":"ref-for-abstract-opdef-parse-a-connection-allowlist-header"},{"id":"ref-for-abstract-opdef-parse-a-connection-allowlist-header\u2460"}],"title":"3.1. Parsing"}],"url":"#abstract-opdef-parse-a-connection-allowlist-header"},
 "abstract-opdef-parse-a-responses-connection-allowlists": {"dfnID":"abstract-opdef-parse-a-responses-connection-allowlists","dfnText":"parse a response\u2019s Connection Allowlists","external":false,"refSections":[{"refs":[{"id":"ref-for-abstract-opdef-parse-a-responses-connection-allowlists"}],"title":"4.2. Integration with HTML"}],"url":"#abstract-opdef-parse-a-responses-connection-allowlists"},
-"abstract-opdef-report-a-violation": {"dfnID":"abstract-opdef-report-a-violation","dfnText":"report a violation","external":false,"refSections":[{"refs":[{"id":"ref-for-abstract-opdef-report-a-violation"},{"id":"ref-for-abstract-opdef-report-a-violation\u2460"},{"id":"ref-for-abstract-opdef-report-a-violation\u2461"},{"id":"ref-for-abstract-opdef-report-a-violation\u2462"}],"title":"3.2. Matching"}],"url":"#abstract-opdef-report-a-violation"},
+"abstract-opdef-report-a-violation": {"dfnID":"abstract-opdef-report-a-violation","dfnText":"report a violation","external":false,"refSections":[{"refs":[{"id":"ref-for-abstract-opdef-report-a-violation"},{"id":"ref-for-abstract-opdef-report-a-violation\u2460"},{"id":"ref-for-abstract-opdef-report-a-violation\u2461"},{"id":"ref-for-abstract-opdef-report-a-violation\u2462"},{"id":"ref-for-abstract-opdef-report-a-violation\u2463"}],"title":"3.2. Matching"}],"url":"#abstract-opdef-report-a-violation"},
 "abstract-opdef-should-host-be-blocked-by-connection-allowlists": {"dfnID":"abstract-opdef-should-host-be-blocked-by-connection-allowlists","dfnText":"should host be blocked by Connection Allowlists","external":false,"refSections":[{"refs":[{"id":"ref-for-abstract-opdef-should-host-be-blocked-by-connection-allowlists"}],"title":"4.1. Integration with Fetch"}],"url":"#abstract-opdef-should-host-be-blocked-by-connection-allowlists"},
 "abstract-opdef-should-request-be-blocked-by-connection-allowlists": {"dfnID":"abstract-opdef-should-request-be-blocked-by-connection-allowlists","dfnText":"should request be blocked by Connection Allowlists","external":false,"refSections":[{"refs":[{"id":"ref-for-abstract-opdef-should-request-be-blocked-by-connection-allowlists"}],"title":"4.1. Integration with Fetch"}],"url":"#abstract-opdef-should-request-be-blocked-by-connection-allowlists"},
 "abstract-opdef-should-url-be-blocked-by-connection-allowlists": {"dfnID":"abstract-opdef-should-url-be-blocked-by-connection-allowlists","dfnText":"should url be blocked by Connection Allowlists","external":false,"refSections":[{"refs":[{"id":"ref-for-abstract-opdef-should-url-be-blocked-by-connection-allowlists"}],"title":"4.1. Integration with Fetch"}],"url":"#abstract-opdef-should-url-be-blocked-by-connection-allowlists"},
+"abstract-opdef-should-webrtc-be-blocked-by-connection-allowlists": {"dfnID":"abstract-opdef-should-webrtc-be-blocked-by-connection-allowlists","dfnText":"should WebRTC be blocked by Connection Allowlists","external":false,"refSections":[{"refs":[{"id":"ref-for-abstract-opdef-should-webrtc-be-blocked-by-connection-allowlists"}],"title":"4.3. Integration with WebRTC"}],"url":"#abstract-opdef-should-webrtc-be-blocked-by-connection-allowlists"},
 "ae56d57e": {"dfnID":"ae56d57e","dfnText":"URL list","external":true,"refSections":[{"refs":[{"id":"ref-for-concept-request-url-list"}],"title":"3.2. Matching"}],"url":"https://fetch.spec.whatwg.org/#concept-request-url-list"},
 "b0d7f3c3": {"dfnID":"b0d7f3c3","dfnText":"USVString","external":true,"refSections":[{"refs":[{"id":"ref-for-idl-USVString"},{"id":"ref-for-idl-USVString\u2460"}],"title":"3.3. Reporting"}],"url":"https://webidl.spec.whatwg.org/#idl-USVString"},
 "b33787b2": {"dfnID":"b33787b2","dfnText":"policy container","external":true,"refSections":[{"refs":[{"id":"ref-for-policy-container"}],"title":"1.1. Threat Model"},{"refs":[{"id":"ref-for-policy-container\u2460"}],"title":"4.2. Integration with HTML"},{"refs":[{"id":"ref-for-policy-container\u2461"}],"title":"5.1. Same-Origin Contexts"},{"refs":[{"id":"ref-for-policy-container\u2462"}],"title":"5.2. Service Workers"}],"url":"https://html.spec.whatwg.org/multipage/browsers.html#policy-container"},
 "b410a6ef": {"dfnID":"b410a6ef","dfnText":"ASCII serialization of an origin","external":true,"refSections":[{"refs":[{"id":"ref-for-ascii-serialisation-of-an-origin"}],"title":"3.1. Parsing"}],"url":"https://html.spec.whatwg.org/multipage/browsers.html#ascii-serialisation-of-an-origin"},
+"bd1db03d": {"dfnID":"bd1db03d","dfnText":"policy container (for environment settings object)","external":true,"refSections":[{"refs":[{"id":"ref-for-concept-settings-object-policy-container"}],"title":"3.2. Matching"}],"url":"https://html.spec.whatwg.org/multipage/webappapis.html#concept-settings-object-policy-container"},
 "bf8d9616": {"dfnID":"bf8d9616","dfnText":"failure","external":true,"refSections":[{"refs":[{"id":"ref-for-failure"},{"id":"ref-for-failure\u2460"},{"id":"ref-for-failure\u2461"},{"id":"ref-for-failure\u2462"}],"title":"3.2. Matching"},{"refs":[{"id":"ref-for-failure\u2463"},{"id":"ref-for-failure\u2464"}],"title":"4.1. Integration with Fetch"}],"url":"https://infra.spec.whatwg.org/#failure"},
 "bf9f0d4e": {"dfnID":"bf9f0d4e","dfnText":"create","external":true,"refSections":[{"refs":[{"id":"ref-for-url-pattern-create"}],"title":"3.2. Matching"}],"url":"https://urlpattern.spec.whatwg.org/#url-pattern-create"},
 "c60ed63a": {"dfnID":"c60ed63a","dfnText":"service worker","external":true,"refSections":[{"refs":[{"id":"ref-for-dfn-service-worker"}],"title":"5.2. Service Workers"}],"url":"https://w3c.github.io/ServiceWorker/#dfn-service-worker"},
@@ -1973,14 +2094,15 @@ let dfnPanelData = {
 "cfe36e16": {"dfnID":"cfe36e16","dfnText":"Reporting-Endpoints","external":true,"refSections":[{"refs":[{"id":"ref-for-reporting-endpoints"}],"title":"1. Introduction"}],"url":"https://w3c.github.io/reporting/#reporting-endpoints"},
 "connection-allowlist": {"dfnID":"connection-allowlist","dfnText":"Connection Allowlist","external":false,"refSections":[{"refs":[{"id":"ref-for-connection-allowlist"}],"title":"3.1. Parsing"},{"refs":[{"id":"ref-for-connection-allowlist\u2460"},{"id":"ref-for-connection-allowlist\u2461"}],"title":"3.2. Matching"},{"refs":[{"id":"ref-for-connection-allowlist\u2462"}],"title":"3.3. Reporting"}],"url":"#connection-allowlist"},
 "connection-allowlist-allowlist": {"dfnID":"connection-allowlist-allowlist","dfnText":"allowlist","external":false,"refSections":[{"refs":[{"id":"ref-for-connection-allowlist-allowlist"}],"title":"3.1. Parsing"},{"refs":[{"id":"ref-for-connection-allowlist-allowlist\u2460"},{"id":"ref-for-connection-allowlist-allowlist\u2461"}],"title":"3.2. Matching"},{"refs":[{"id":"ref-for-connection-allowlist-allowlist\u2462"},{"id":"ref-for-connection-allowlist-allowlist\u2463"}],"title":"3.3. Reporting"}],"url":"#connection-allowlist-allowlist"},
-"connection-allowlist-disposition": {"dfnID":"connection-allowlist-disposition","dfnText":"disposition","external":false,"refSections":[{"refs":[{"id":"ref-for-connection-allowlist-disposition"},{"id":"ref-for-connection-allowlist-disposition\u2460"}],"title":"3.1. Parsing"},{"refs":[{"id":"ref-for-connection-allowlist-disposition\u2461"},{"id":"ref-for-connection-allowlist-disposition\u2462"},{"id":"ref-for-connection-allowlist-disposition\u2463"},{"id":"ref-for-connection-allowlist-disposition\u2464"}],"title":"3.2. Matching"},{"refs":[{"id":"ref-for-connection-allowlist-disposition\u2465"},{"id":"ref-for-connection-allowlist-disposition\u2466"}],"title":"3.3. Reporting"}],"url":"#connection-allowlist-disposition"},
+"connection-allowlist-disposition": {"dfnID":"connection-allowlist-disposition","dfnText":"disposition","external":false,"refSections":[{"refs":[{"id":"ref-for-connection-allowlist-disposition"},{"id":"ref-for-connection-allowlist-disposition\u2460"}],"title":"3.1. Parsing"},{"refs":[{"id":"ref-for-connection-allowlist-disposition\u2461"},{"id":"ref-for-connection-allowlist-disposition\u2462"},{"id":"ref-for-connection-allowlist-disposition\u2463"},{"id":"ref-for-connection-allowlist-disposition\u2464"},{"id":"ref-for-connection-allowlist-disposition\u2465"}],"title":"3.2. Matching"},{"refs":[{"id":"ref-for-connection-allowlist-disposition\u2466"},{"id":"ref-for-connection-allowlist-disposition\u2467"}],"title":"3.3. Reporting"}],"url":"#connection-allowlist-disposition"},
 "connection-allowlist-redirects": {"dfnID":"connection-allowlist-redirects","dfnText":"redirects","external":false,"refSections":[{"refs":[{"id":"ref-for-connection-allowlist-redirects"}],"title":"3. Connection Allowlist Headers"},{"refs":[{"id":"ref-for-connection-allowlist-redirects\u2460"},{"id":"ref-for-connection-allowlist-redirects\u2461"}],"title":"3.1. Parsing"},{"refs":[{"id":"ref-for-connection-allowlist-redirects\u2462"}],"title":"3.2. Matching"}],"url":"#connection-allowlist-redirects"},
 "connection-allowlist-reporting-endpoint": {"dfnID":"connection-allowlist-reporting-endpoint","dfnText":"reporting endpoint","external":false,"refSections":[{"refs":[{"id":"ref-for-connection-allowlist-reporting-endpoint"}],"title":"3.1. Parsing"},{"refs":[{"id":"ref-for-connection-allowlist-reporting-endpoint\u2460"},{"id":"ref-for-connection-allowlist-reporting-endpoint\u2461"}],"title":"3.3. Reporting"}],"url":"#connection-allowlist-reporting-endpoint"},
+"connection-allowlist-webrtc": {"dfnID":"connection-allowlist-webrtc","dfnText":"webrtc","external":false,"refSections":[{"refs":[{"id":"ref-for-connection-allowlist-webrtc"}],"title":"3. Connection Allowlist Headers"},{"refs":[{"id":"ref-for-connection-allowlist-webrtc\u2460"},{"id":"ref-for-connection-allowlist-webrtc\u2461"}],"title":"3.1. Parsing"},{"refs":[{"id":"ref-for-connection-allowlist-webrtc\u2462"}],"title":"3.2. Matching"}],"url":"#connection-allowlist-webrtc"},
 "d06b2b8c": {"dfnID":"d06b2b8c","dfnText":"XMLHttpRequest","external":true,"refSections":[{"refs":[{"id":"ref-for-xmlhttprequest"}],"title":"1.1. Threat Model"}],"url":"https://xhr.spec.whatwg.org/#xmlhttprequest"},
 "d762bbef": {"dfnID":"d762bbef","dfnText":"hostname","external":true,"refSections":[{"refs":[{"id":"ref-for-dom-urlpatterninit-hostname"}],"title":"3.2. Matching"}],"url":"https://urlpattern.spec.whatwg.org/#dom-urlpatterninit-hostname"},
-"daf5c14d": {"dfnID":"daf5c14d","dfnText":"allowed","external":true,"refSections":[{"refs":[{"id":"ref-for-allowed"},{"id":"ref-for-allowed\u2460"},{"id":"ref-for-allowed\u2461"},{"id":"ref-for-allowed\u2462"},{"id":"ref-for-allowed\u2463"},{"id":"ref-for-allowed\u2464"}],"title":"3.2. Matching"}],"url":"https://infra.spec.whatwg.org/#allowed"},
+"daf5c14d": {"dfnID":"daf5c14d","dfnText":"allowed","external":true,"refSections":[{"refs":[{"id":"ref-for-allowed"},{"id":"ref-for-allowed\u2460"},{"id":"ref-for-allowed\u2461"},{"id":"ref-for-allowed\u2462"},{"id":"ref-for-allowed\u2463"},{"id":"ref-for-allowed\u2464"},{"id":"ref-for-allowed\u2465"},{"id":"ref-for-allowed\u2466"}],"title":"3.2. Matching"}],"url":"https://infra.spec.whatwg.org/#allowed"},
 "dc1cd39b": {"dfnID":"dc1cd39b","dfnText":"URL (for request)","external":true,"refSections":[{"refs":[{"id":"ref-for-concept-request-url"},{"id":"ref-for-concept-request-url\u2460"},{"id":"ref-for-concept-request-url\u2461"},{"id":"ref-for-concept-request-url\u2462"}],"title":"3.2. Matching"}],"url":"https://fetch.spec.whatwg.org/#concept-request-url"},
-"dcffbccd": {"dfnID":"dcffbccd","dfnText":"URL","external":true,"refSections":[{"refs":[{"id":"ref-for-concept-url"}],"title":"3.1. Parsing"},{"refs":[{"id":"ref-for-concept-url\u2460"},{"id":"ref-for-concept-url\u2461"},{"id":"ref-for-concept-url\u2462"}],"title":"3.2. Matching"},{"refs":[{"id":"ref-for-concept-url\u2463"},{"id":"ref-for-concept-url\u2464"}],"title":"3.3. Reporting"}],"url":"https://url.spec.whatwg.org/#concept-url"},
+"dcffbccd": {"dfnID":"dcffbccd","dfnText":"URL","external":true,"refSections":[{"refs":[{"id":"ref-for-concept-url"}],"title":"3.1. Parsing"},{"refs":[{"id":"ref-for-concept-url\u2460"},{"id":"ref-for-concept-url\u2461"},{"id":"ref-for-concept-url\u2462"}],"title":"3.2. Matching"},{"refs":[{"id":"ref-for-concept-url\u2463"},{"id":"ref-for-concept-url\u2464"},{"id":"ref-for-concept-url\u2465"}],"title":"3.3. Reporting"}],"url":"https://url.spec.whatwg.org/#concept-url"},
 "de2211fe": {"dfnID":"de2211fe","dfnText":"structured header","external":true,"refSections":[{"refs":[{"id":"ref-for-name-introduction"}],"title":"3. Connection Allowlist Headers"},{"refs":[{"id":"ref-for-name-introduction\u2460"},{"id":"ref-for-name-introduction\u2461"}],"title":"3.1. Parsing"}],"url":"https://www.rfc-editor.org/rfc/rfc9651#name-introduction"},
 "dictdef-connectionallowlistviolationreport": {"dfnID":"dictdef-connectionallowlistviolationreport","dfnText":"ConnectionAllowlistViolationReport","external":false,"refSections":[{"refs":[{"id":"ref-for-dictdef-connectionallowlistviolationreport"},{"id":"ref-for-dictdef-connectionallowlistviolationreport\u2460"},{"id":"ref-for-dictdef-connectionallowlistviolationreport\u2461"},{"id":"ref-for-dictdef-connectionallowlistviolationreport\u2462"}],"title":"3.3. Reporting"}],"url":"#dictdef-connectionallowlistviolationreport"},
 "dom-connectionallowlistdisposition-enforce": {"dfnID":"dom-connectionallowlistdisposition-enforce","dfnText":"\"enforce\"","external":false,"refSections":[],"url":"#dom-connectionallowlistdisposition-enforce"},
@@ -1988,23 +2110,27 @@ let dfnPanelData = {
 "dom-connectionallowlistviolationreport-allowlist": {"dfnID":"dom-connectionallowlistviolationreport-allowlist","dfnText":"allowlist","external":false,"refSections":[{"refs":[{"id":"ref-for-dom-connectionallowlistviolationreport-allowlist"},{"id":"ref-for-dom-connectionallowlistviolationreport-allowlist\u2460"},{"id":"ref-for-dom-connectionallowlistviolationreport-allowlist\u2461"}],"title":"3.3. Reporting"}],"url":"#dom-connectionallowlistviolationreport-allowlist"},
 "dom-connectionallowlistviolationreport-connection": {"dfnID":"dom-connectionallowlistviolationreport-connection","dfnText":"connection","external":false,"refSections":[{"refs":[{"id":"ref-for-dom-connectionallowlistviolationreport-connection"},{"id":"ref-for-dom-connectionallowlistviolationreport-connection\u2460"}],"title":"3.3. Reporting"}],"url":"#dom-connectionallowlistviolationreport-connection"},
 "dom-connectionallowlistviolationreport-disposition": {"dfnID":"dom-connectionallowlistviolationreport-disposition","dfnText":"disposition","external":false,"refSections":[{"refs":[{"id":"ref-for-dom-connectionallowlistviolationreport-disposition"},{"id":"ref-for-dom-connectionallowlistviolationreport-disposition\u2460"}],"title":"3.3. Reporting"}],"url":"#dom-connectionallowlistviolationreport-disposition"},
-"dom-connectionallowlistviolationreport-url": {"dfnID":"dom-connectionallowlistviolationreport-url","dfnText":"url","external":false,"refSections":[],"url":"#dom-connectionallowlistviolationreport-url"},
+"dom-connectionallowlistviolationreport-url": {"dfnID":"dom-connectionallowlistviolationreport-url","dfnText":"url","external":false,"refSections":[{"refs":[{"id":"ref-for-dom-connectionallowlistviolationreport-url"}],"title":"3.3. Reporting"}],"url":"#dom-connectionallowlistviolationreport-url"},
 "ec2b473d": {"dfnID":"ec2b473d","dfnText":"required document policy","external":true,"refSections":[{"refs":[{"id":"ref-for-required-document-policy"}],"title":"5.1. Same-Origin Contexts"}],"url":"https://wicg.github.io/document-policy/#required-document-policy"},
 "ee7bba09": {"dfnID":"ee7bba09","dfnText":"response","external":true,"refSections":[{"refs":[{"id":"ref-for-concept-response"}],"title":"3. Connection Allowlist Headers"},{"refs":[{"id":"ref-for-concept-response\u2460"}],"title":"3.1. Parsing"}],"url":"https://fetch.spec.whatwg.org/#concept-response"},
 "enumdef-connectionallowlistdisposition": {"dfnID":"enumdef-connectionallowlistdisposition","dfnText":"ConnectionAllowlistDisposition","external":false,"refSections":[{"refs":[{"id":"ref-for-enumdef-connectionallowlistdisposition"}],"title":"3.3. Reporting"}],"url":"#enumdef-connectionallowlistdisposition"},
-"f02cd417": {"dfnID":"f02cd417","dfnText":"iterate","external":true,"refSections":[{"refs":[{"id":"ref-for-list-iterate"},{"id":"ref-for-list-iterate\u2460"}],"title":"3.1. Parsing"},{"refs":[{"id":"ref-for-list-iterate\u2461"},{"id":"ref-for-list-iterate\u2462"},{"id":"ref-for-list-iterate\u2463"},{"id":"ref-for-list-iterate\u2464"},{"id":"ref-for-list-iterate\u2465"}],"title":"3.2. Matching"}],"url":"https://infra.spec.whatwg.org/#list-iterate"},
+"f02cd417": {"dfnID":"f02cd417","dfnText":"iterate","external":true,"refSections":[{"refs":[{"id":"ref-for-list-iterate"},{"id":"ref-for-list-iterate\u2460"}],"title":"3.1. Parsing"},{"refs":[{"id":"ref-for-list-iterate\u2461"},{"id":"ref-for-list-iterate\u2462"},{"id":"ref-for-list-iterate\u2463"},{"id":"ref-for-list-iterate\u2464"},{"id":"ref-for-list-iterate\u2465"},{"id":"ref-for-list-iterate\u2466"}],"title":"3.2. Matching"}],"url":"https://infra.spec.whatwg.org/#list-iterate"},
 "f7b00a8b": {"dfnID":"f7b00a8b","dfnText":"header list","external":true,"refSections":[{"refs":[{"id":"ref-for-concept-response-header-list"},{"id":"ref-for-concept-response-header-list\u2460"}],"title":"3.1. Parsing"}],"url":"https://fetch.spec.whatwg.org/#concept-response-header-list"},
-"f937b7b6": {"dfnID":"f937b7b6","dfnText":"continue","external":true,"refSections":[{"refs":[{"id":"ref-for-iteration-continue"},{"id":"ref-for-iteration-continue\u2460"}],"title":"3.1. Parsing"},{"refs":[{"id":"ref-for-iteration-continue\u2461"},{"id":"ref-for-iteration-continue\u2462"},{"id":"ref-for-iteration-continue\u2463"},{"id":"ref-for-iteration-continue\u2464"},{"id":"ref-for-iteration-continue\u2465"}],"title":"3.2. Matching"}],"url":"https://infra.spec.whatwg.org/#iteration-continue"},
-"grammardef-connection-allowlist-disposition-enforce": {"dfnID":"grammardef-connection-allowlist-disposition-enforce","dfnText":"enforce","external":false,"refSections":[{"refs":[{"id":"ref-for-grammardef-connection-allowlist-disposition-enforce"}],"title":"3.1. Parsing"},{"refs":[{"id":"ref-for-grammardef-connection-allowlist-disposition-enforce\u2460"},{"id":"ref-for-grammardef-connection-allowlist-disposition-enforce\u2461"},{"id":"ref-for-grammardef-connection-allowlist-disposition-enforce\u2462"},{"id":"ref-for-grammardef-connection-allowlist-disposition-enforce\u2463"}],"title":"3.2. Matching"}],"url":"#grammardef-connection-allowlist-disposition-enforce"},
+"f937b7b6": {"dfnID":"f937b7b6","dfnText":"continue","external":true,"refSections":[{"refs":[{"id":"ref-for-iteration-continue"},{"id":"ref-for-iteration-continue\u2460"}],"title":"3.1. Parsing"},{"refs":[{"id":"ref-for-iteration-continue\u2461"},{"id":"ref-for-iteration-continue\u2462"},{"id":"ref-for-iteration-continue\u2463"},{"id":"ref-for-iteration-continue\u2464"},{"id":"ref-for-iteration-continue\u2465"},{"id":"ref-for-iteration-continue\u2466"}],"title":"3.2. Matching"}],"url":"https://infra.spec.whatwg.org/#iteration-continue"},
+"fa5ee9c5": {"dfnID":"fa5ee9c5","dfnText":"creation URL","external":true,"refSections":[{"refs":[{"id":"ref-for-concept-environment-creation-url"}],"title":"3.3. Reporting"}],"url":"https://html.spec.whatwg.org/multipage/webappapis.html#concept-environment-creation-url"},
+"grammardef-connection-allowlist-disposition-enforce": {"dfnID":"grammardef-connection-allowlist-disposition-enforce","dfnText":"enforce","external":false,"refSections":[{"refs":[{"id":"ref-for-grammardef-connection-allowlist-disposition-enforce"}],"title":"3.1. Parsing"},{"refs":[{"id":"ref-for-grammardef-connection-allowlist-disposition-enforce\u2460"},{"id":"ref-for-grammardef-connection-allowlist-disposition-enforce\u2461"},{"id":"ref-for-grammardef-connection-allowlist-disposition-enforce\u2462"},{"id":"ref-for-grammardef-connection-allowlist-disposition-enforce\u2463"},{"id":"ref-for-grammardef-connection-allowlist-disposition-enforce\u2464"}],"title":"3.2. Matching"}],"url":"#grammardef-connection-allowlist-disposition-enforce"},
 "grammardef-connection-allowlist-disposition-report": {"dfnID":"grammardef-connection-allowlist-disposition-report","dfnText":"report","external":false,"refSections":[{"refs":[{"id":"ref-for-grammardef-connection-allowlist-disposition-report"}],"title":"3.1. Parsing"}],"url":"#grammardef-connection-allowlist-disposition-report"},
 "grammardef-connection-allowlist-redirects": {"dfnID":"grammardef-connection-allowlist-redirects","dfnText":"redirects","external":false,"refSections":[{"refs":[{"id":"ref-for-grammardef-connection-allowlist-redirects"}],"title":"3.1. Parsing"},{"refs":[{"id":"ref-for-grammardef-connection-allowlist-redirects\u2460"}],"title":"5.5. Redirects"}],"url":"#grammardef-connection-allowlist-redirects"},
 "grammardef-connection-allowlist-redirects-allow": {"dfnID":"grammardef-connection-allowlist-redirects-allow","dfnText":"allow","external":false,"refSections":[{"refs":[{"id":"ref-for-grammardef-connection-allowlist-redirects-allow"}],"title":"3. Connection Allowlist Headers"},{"refs":[{"id":"ref-for-grammardef-connection-allowlist-redirects-allow\u2460"}],"title":"3.1. Parsing"},{"refs":[{"id":"ref-for-grammardef-connection-allowlist-redirects-allow\u2461"}],"title":"3.2. Matching"},{"refs":[{"id":"ref-for-grammardef-connection-allowlist-redirects-allow\u2462"}],"title":"5.5. Redirects"}],"url":"#grammardef-connection-allowlist-redirects-allow"},
 "grammardef-connection-allowlist-redirects-block": {"dfnID":"grammardef-connection-allowlist-redirects-block","dfnText":"block","external":false,"refSections":[{"refs":[{"id":"ref-for-grammardef-connection-allowlist-redirects-block"}],"title":"2. Connection Allowlists"},{"refs":[{"id":"ref-for-grammardef-connection-allowlist-redirects-block\u2460"}],"title":"3. Connection Allowlist Headers"},{"refs":[{"id":"ref-for-grammardef-connection-allowlist-redirects-block\u2461"}],"title":"3.1. Parsing"},{"refs":[{"id":"ref-for-grammardef-connection-allowlist-redirects-block\u2462"}],"title":"5.5. Redirects"}],"url":"#grammardef-connection-allowlist-redirects-block"},
 "grammardef-connection-allowlist-report-to": {"dfnID":"grammardef-connection-allowlist-report-to","dfnText":"report-to","external":false,"refSections":[{"refs":[{"id":"ref-for-grammardef-connection-allowlist-report-to"}],"title":"3.1. Parsing"}],"url":"#grammardef-connection-allowlist-report-to"},
 "grammardef-connection-allowlist-response-origin": {"dfnID":"grammardef-connection-allowlist-response-origin","dfnText":"response-origin","external":false,"refSections":[{"refs":[{"id":"ref-for-grammardef-connection-allowlist-response-origin"}],"title":"3.1. Parsing"},{"refs":[{"id":"ref-for-grammardef-connection-allowlist-response-origin\u2460"}],"title":"5.1. Same-Origin Contexts"}],"url":"#grammardef-connection-allowlist-response-origin"},
+"grammardef-connection-allowlist-webrtc": {"dfnID":"grammardef-connection-allowlist-webrtc","dfnText":"webrtc","external":false,"refSections":[{"refs":[{"id":"ref-for-grammardef-connection-allowlist-webrtc"}],"title":"3.1. Parsing"},{"refs":[{"id":"ref-for-grammardef-connection-allowlist-webrtc\u2460"}],"title":"5.6. WebRTC"}],"url":"#grammardef-connection-allowlist-webrtc"},
+"grammardef-connection-allowlist-webrtc-allow": {"dfnID":"grammardef-connection-allowlist-webrtc-allow","dfnText":"allow","external":false,"refSections":[{"refs":[{"id":"ref-for-grammardef-connection-allowlist-webrtc-allow"}],"title":"3. Connection Allowlist Headers"},{"refs":[{"id":"ref-for-grammardef-connection-allowlist-webrtc-allow\u2460"}],"title":"3.1. Parsing"},{"refs":[{"id":"ref-for-grammardef-connection-allowlist-webrtc-allow\u2461"}],"title":"3.2. Matching"},{"refs":[{"id":"ref-for-grammardef-connection-allowlist-webrtc-allow\u2462"}],"title":"5.6. WebRTC"}],"url":"#grammardef-connection-allowlist-webrtc-allow"},
+"grammardef-connection-allowlist-webrtc-block": {"dfnID":"grammardef-connection-allowlist-webrtc-block","dfnText":"block","external":false,"refSections":[{"refs":[{"id":"ref-for-grammardef-connection-allowlist-webrtc-block"}],"title":"2. Connection Allowlists"},{"refs":[{"id":"ref-for-grammardef-connection-allowlist-webrtc-block\u2460"}],"title":"3. Connection Allowlist Headers"},{"refs":[{"id":"ref-for-grammardef-connection-allowlist-webrtc-block\u2461"}],"title":"3.1. Parsing"},{"refs":[{"id":"ref-for-grammardef-connection-allowlist-webrtc-block\u2462"}],"title":"5.6. WebRTC"}],"url":"#grammardef-connection-allowlist-webrtc-block"},
 "http-headerdef-connection-allowlist": {"dfnID":"http-headerdef-connection-allowlist","dfnText":"Connection-Allowlist","external":false,"refSections":[{"refs":[{"id":"ref-for-http-headerdef-connection-allowlist"}],"title":"1. Introduction"},{"refs":[{"id":"ref-for-http-headerdef-connection-allowlist\u2460"}],"title":"3.1. Parsing"}],"url":"#http-headerdef-connection-allowlist"},
 "http-headerdef-connection-allowlist-report-only": {"dfnID":"http-headerdef-connection-allowlist-report-only","dfnText":"Connection-Allowlist-Report-Only","external":false,"refSections":[{"refs":[{"id":"ref-for-http-headerdef-connection-allowlist-report-only"}],"title":"3.1. Parsing"}],"url":"#http-headerdef-connection-allowlist-report-only"},
-"policy-container-connection-allowlists": {"dfnID":"policy-container-connection-allowlists","dfnText":"connection allowlists","external":false,"refSections":[{"refs":[{"id":"ref-for-policy-container-connection-allowlists"},{"id":"ref-for-policy-container-connection-allowlists\u2460"},{"id":"ref-for-policy-container-connection-allowlists\u2461"}],"title":"3.2. Matching"},{"refs":[{"id":"ref-for-policy-container-connection-allowlists\u2462"},{"id":"ref-for-policy-container-connection-allowlists\u2463"}],"title":"4.2. Integration with HTML"}],"url":"#policy-container-connection-allowlists"},
+"policy-container-connection-allowlists": {"dfnID":"policy-container-connection-allowlists","dfnText":"connection allowlists","external":false,"refSections":[{"refs":[{"id":"ref-for-policy-container-connection-allowlists"},{"id":"ref-for-policy-container-connection-allowlists\u2460"},{"id":"ref-for-policy-container-connection-allowlists\u2461"},{"id":"ref-for-policy-container-connection-allowlists\u2462"}],"title":"3.2. Matching"},{"refs":[{"id":"ref-for-policy-container-connection-allowlists\u2463"},{"id":"ref-for-policy-container-connection-allowlists\u2464"}],"title":"4.2. Integration with HTML"}],"url":"#policy-container-connection-allowlists"},
 };
 
 document.addEventListener("DOMContentLoaded", ()=>{
@@ -2400,15 +2526,18 @@ let refsData = {
 "#abstract-opdef-should-host-be-blocked-by-connection-allowlists": {"displayText":"should host be blocked by Connection Allowlists","export":true,"for_":[],"level":"1","normative":true,"shortname":"connection-allowlists","spec":"connection-allowlists-1","status":"local","text":"should host be blocked by Connection Allowlists","type":"abstract-op","url":"#abstract-opdef-should-host-be-blocked-by-connection-allowlists"},
 "#abstract-opdef-should-request-be-blocked-by-connection-allowlists": {"displayText":"should request be blocked by Connection Allowlists","export":true,"for_":[],"level":"1","normative":true,"shortname":"connection-allowlists","spec":"connection-allowlists-1","status":"local","text":"should request be blocked by Connection Allowlists","type":"abstract-op","url":"#abstract-opdef-should-request-be-blocked-by-connection-allowlists"},
 "#abstract-opdef-should-url-be-blocked-by-connection-allowlists": {"displayText":"should url be blocked by Connection Allowlists","export":true,"for_":[],"level":"1","normative":true,"shortname":"connection-allowlists","spec":"connection-allowlists-1","status":"local","text":"should url be blocked by Connection Allowlists","type":"abstract-op","url":"#abstract-opdef-should-url-be-blocked-by-connection-allowlists"},
+"#abstract-opdef-should-webrtc-be-blocked-by-connection-allowlists": {"displayText":"should WebRTC be blocked by Connection Allowlists","export":true,"for_":[],"level":"1","normative":true,"shortname":"connection-allowlists","spec":"connection-allowlists-1","status":"local","text":"should WebRTC be blocked by Connection Allowlists","type":"abstract-op","url":"#abstract-opdef-should-webrtc-be-blocked-by-connection-allowlists"},
 "#connection-allowlist": {"displayText":"connection allowlist","export":true,"for_":[],"level":"1","normative":true,"shortname":"connection-allowlists","spec":"connection-allowlists-1","status":"local","text":"connection allowlist","type":"dfn","url":"#connection-allowlist"},
 "#connection-allowlist-allowlist": {"displayText":"allowlist","export":true,"for_":["Connection Allowlist"],"level":"1","normative":true,"shortname":"connection-allowlists","spec":"connection-allowlists-1","status":"local","text":"allowlist","type":"dfn","url":"#connection-allowlist-allowlist"},
 "#connection-allowlist-disposition": {"displayText":"disposition","export":true,"for_":["Connection Allowlist"],"level":"1","normative":true,"shortname":"connection-allowlists","spec":"connection-allowlists-1","status":"local","text":"disposition","type":"dfn","url":"#connection-allowlist-disposition"},
 "#connection-allowlist-redirects": {"displayText":"redirects","export":true,"for_":["Connection Allowlist"],"level":"1","normative":true,"shortname":"connection-allowlists","spec":"connection-allowlists-1","status":"local","text":"redirects","type":"dfn","url":"#connection-allowlist-redirects"},
 "#connection-allowlist-reporting-endpoint": {"displayText":"reporting endpoint","export":true,"for_":["Connection Allowlist"],"level":"1","normative":true,"shortname":"connection-allowlists","spec":"connection-allowlists-1","status":"local","text":"reporting endpoint","type":"dfn","url":"#connection-allowlist-reporting-endpoint"},
+"#connection-allowlist-webrtc": {"displayText":"webrtc","export":true,"for_":["Connection Allowlist"],"level":"1","normative":true,"shortname":"connection-allowlists","spec":"connection-allowlists-1","status":"local","text":"webrtc","type":"dfn","url":"#connection-allowlist-webrtc"},
 "#dictdef-connectionallowlistviolationreport": {"displayText":"ConnectionAllowlistViolationReport","export":true,"for_":[],"level":"1","normative":true,"shortname":"connection-allowlists","spec":"connection-allowlists-1","status":"local","text":"ConnectionAllowlistViolationReport","type":"dictionary","url":"#dictdef-connectionallowlistviolationreport"},
 "#dom-connectionallowlistviolationreport-allowlist": {"displayText":"allowlist","export":true,"for_":["ConnectionAllowlistViolationReport"],"level":"1","normative":true,"shortname":"connection-allowlists","spec":"connection-allowlists-1","status":"local","text":"allowlist","type":"dict-member","url":"#dom-connectionallowlistviolationreport-allowlist"},
 "#dom-connectionallowlistviolationreport-connection": {"displayText":"connection","export":true,"for_":["ConnectionAllowlistViolationReport"],"level":"1","normative":true,"shortname":"connection-allowlists","spec":"connection-allowlists-1","status":"local","text":"connection","type":"dict-member","url":"#dom-connectionallowlistviolationreport-connection"},
 "#dom-connectionallowlistviolationreport-disposition": {"displayText":"disposition","export":true,"for_":["ConnectionAllowlistViolationReport"],"level":"1","normative":true,"shortname":"connection-allowlists","spec":"connection-allowlists-1","status":"local","text":"disposition","type":"dict-member","url":"#dom-connectionallowlistviolationreport-disposition"},
+"#dom-connectionallowlistviolationreport-url": {"displayText":"url","export":true,"for_":["ConnectionAllowlistViolationReport"],"level":"1","normative":true,"shortname":"connection-allowlists","spec":"connection-allowlists-1","status":"local","text":"url","type":"dict-member","url":"#dom-connectionallowlistviolationreport-url"},
 "#enumdef-connectionallowlistdisposition": {"displayText":"ConnectionAllowlistDisposition","export":true,"for_":[],"level":"1","normative":true,"shortname":"connection-allowlists","spec":"connection-allowlists-1","status":"local","text":"ConnectionAllowlistDisposition","type":"enum","url":"#enumdef-connectionallowlistdisposition"},
 "#grammardef-connection-allowlist-disposition-enforce": {"displayText":"enforce","export":true,"for_":["Connection Allowlist/disposition"],"level":"1","normative":true,"shortname":"connection-allowlists","spec":"connection-allowlists-1","status":"local","text":"enforce","type":"grammar","url":"#grammardef-connection-allowlist-disposition-enforce"},
 "#grammardef-connection-allowlist-disposition-report": {"displayText":"report","export":true,"for_":["Connection Allowlist/disposition"],"level":"1","normative":true,"shortname":"connection-allowlists","spec":"connection-allowlists-1","status":"local","text":"report","type":"grammar","url":"#grammardef-connection-allowlist-disposition-report"},
@@ -2417,6 +2546,9 @@ let refsData = {
 "#grammardef-connection-allowlist-redirects-block": {"displayText":"block","export":true,"for_":["Connection Allowlist/redirects"],"level":"1","normative":true,"shortname":"connection-allowlists","spec":"connection-allowlists-1","status":"local","text":"block","type":"grammar","url":"#grammardef-connection-allowlist-redirects-block"},
 "#grammardef-connection-allowlist-report-to": {"displayText":"report-to","export":true,"for_":["Connection-Allowlist"],"level":"1","normative":true,"shortname":"connection-allowlists","spec":"connection-allowlists-1","status":"local","text":"report-to","type":"grammar","url":"#grammardef-connection-allowlist-report-to"},
 "#grammardef-connection-allowlist-response-origin": {"displayText":"response-origin","export":true,"for_":["Connection-Allowlist"],"level":"1","normative":true,"shortname":"connection-allowlists","spec":"connection-allowlists-1","status":"local","text":"response-origin","type":"grammar","url":"#grammardef-connection-allowlist-response-origin"},
+"#grammardef-connection-allowlist-webrtc": {"displayText":"webrtc","export":true,"for_":["Connection-Allowlist"],"level":"1","normative":true,"shortname":"connection-allowlists","spec":"connection-allowlists-1","status":"local","text":"webrtc","type":"grammar","url":"#grammardef-connection-allowlist-webrtc"},
+"#grammardef-connection-allowlist-webrtc-allow": {"displayText":"allow","export":true,"for_":["Connection Allowlist/webrtc"],"level":"1","normative":true,"shortname":"connection-allowlists","spec":"connection-allowlists-1","status":"local","text":"allow","type":"grammar","url":"#grammardef-connection-allowlist-webrtc-allow"},
+"#grammardef-connection-allowlist-webrtc-block": {"displayText":"block","export":true,"for_":["Connection Allowlist/webrtc"],"level":"1","normative":true,"shortname":"connection-allowlists","spec":"connection-allowlists-1","status":"local","text":"block","type":"grammar","url":"#grammardef-connection-allowlist-webrtc-block"},
 "#http-headerdef-connection-allowlist": {"displayText":"connection-allowlist","export":true,"for_":[],"level":"1","normative":true,"shortname":"connection-allowlists","spec":"connection-allowlists-1","status":"local","text":"connection-allowlist","type":"http-header","url":"#http-headerdef-connection-allowlist"},
 "#http-headerdef-connection-allowlist-report-only": {"displayText":"connection-allowlist-report-only","export":true,"for_":[],"level":"1","normative":true,"shortname":"connection-allowlists","spec":"connection-allowlists-1","status":"local","text":"connection-allowlist-report-only","type":"http-header","url":"#http-headerdef-connection-allowlist-report-only"},
 "#policy-container-connection-allowlists": {"displayText":"connection allowlists","export":true,"for_":["policy container"],"level":"1","normative":true,"shortname":"connection-allowlists","spec":"connection-allowlists-1","status":"local","text":"connection allowlists","type":"dfn","url":"#policy-container-connection-allowlists"},
@@ -2443,7 +2575,10 @@ let refsData = {
 "https://html.spec.whatwg.org/multipage/web-messaging.html#broadcastchannel": {"displayText":"BroadcastChannel","export":true,"for_":[],"level":"1","normative":true,"shortname":"html","spec":"html","status":"current","text":"BroadcastChannel","type":"interface","url":"https://html.spec.whatwg.org/multipage/web-messaging.html#broadcastchannel"},
 "https://html.spec.whatwg.org/multipage/web-messaging.html#dom-window-postmessage-options": {"displayText":"postMessage(message, options)","export":true,"for_":["Window"],"level":"1","normative":true,"shortname":"html","spec":"html","status":"current","text":"postMessage(message, options)","type":"method","url":"https://html.spec.whatwg.org/multipage/web-messaging.html#dom-window-postmessage-options"},
 "https://html.spec.whatwg.org/multipage/web-messaging.html#messagechannel": {"displayText":"MessageChannel","export":true,"for_":[],"level":"1","normative":true,"shortname":"html","spec":"html","status":"current","text":"MessageChannel","type":"interface","url":"https://html.spec.whatwg.org/multipage/web-messaging.html#messagechannel"},
+"https://html.spec.whatwg.org/multipage/webappapis.html#concept-environment-creation-url": {"displayText":"creation URL","export":true,"for_":["environment"],"level":"1","normative":true,"shortname":"html","spec":"html","status":"current","text":"creation url","type":"dfn","url":"https://html.spec.whatwg.org/multipage/webappapis.html#concept-environment-creation-url"},
+"https://html.spec.whatwg.org/multipage/webappapis.html#concept-settings-object-policy-container": {"displayText":"policy container","export":true,"for_":["environment settings object"],"level":"1","normative":true,"shortname":"html","spec":"html","status":"current","text":"policy container","type":"dfn","url":"https://html.spec.whatwg.org/multipage/webappapis.html#concept-settings-object-policy-container"},
 "https://html.spec.whatwg.org/multipage/webappapis.html#environment": {"displayText":"environment","export":true,"for_":[],"level":"1","normative":true,"shortname":"html","spec":"html","status":"current","text":"environment","type":"dfn","url":"https://html.spec.whatwg.org/multipage/webappapis.html#environment"},
+"https://html.spec.whatwg.org/multipage/webappapis.html#environment-settings-object": {"displayText":"environment settings object","export":true,"for_":[],"level":"1","normative":true,"shortname":"html","spec":"html","status":"current","text":"environment settings object","type":"dfn","url":"https://html.spec.whatwg.org/multipage/webappapis.html#environment-settings-object"},
 "https://infra.spec.whatwg.org/#allowed": {"displayText":"allowed","export":true,"for_":[],"level":"1","normative":true,"shortname":"infra","spec":"infra","status":"current","text":"allowed","type":"dfn","url":"https://infra.spec.whatwg.org/#allowed"},
 "https://infra.spec.whatwg.org/#blocked": {"displayText":"blocked","export":true,"for_":[],"level":"1","normative":true,"shortname":"infra","spec":"infra","status":"current","text":"blocked","type":"dfn","url":"https://infra.spec.whatwg.org/#blocked"},
 "https://infra.spec.whatwg.org/#failure": {"displayText":"failure","export":true,"for_":[],"level":"1","normative":true,"shortname":"infra","spec":"infra","status":"current","text":"failure","type":"dfn","url":"https://infra.spec.whatwg.org/#failure"},
@@ -2478,6 +2613,8 @@ let refsData = {
 "https://w3c.github.io/webappsec-csp/#fetch-directives": {"displayText":"fetch directives","export":true,"for_":[],"level":"3","normative":true,"shortname":"csp","spec":"csp3","status":"current","text":"fetch directives","type":"dfn","url":"https://w3c.github.io/webappsec-csp/#fetch-directives"},
 "https://w3c.github.io/webappsec-csp/#grammardef-host-source": {"displayText":"host-source","export":true,"for_":[],"level":"3","normative":true,"shortname":"csp","spec":"csp3","status":"current","text":"host-source","type":"grammar","url":"https://w3c.github.io/webappsec-csp/#grammardef-host-source"},
 "https://w3c.github.io/webappsec-csp/#sandbox": {"displayText":"sandbox","export":true,"for_":[],"level":"3","normative":true,"shortname":"csp","spec":"csp3","status":"current","text":"sandbox","type":"dfn","url":"https://w3c.github.io/webappsec-csp/#sandbox"},
+"https://w3c.github.io/webrtc-pc/#dfn-administratively-prohibited": {"displayText":"administratively prohibited","export":false,"for_":[],"level":"1","normative":true,"shortname":"webrtc","spec":"webrtc","status":"current","text":"administratively prohibited","type":"dfn","url":"https://w3c.github.io/webrtc-pc/#dfn-administratively-prohibited"},
+"https://webbluetoothcg.github.io/web-bluetooth/#bluetoothdatafilterinit-matches": {"displayText":"matches","export":true,"for_":["BluetoothDataFilterInit"],"level":"1","normative":true,"shortname":"web-bluetooth","spec":"web-bluetooth","status":"current","text":"matches","type":"dfn","url":"https://webbluetoothcg.github.io/web-bluetooth/#bluetoothdatafilterinit-matches"},
 "https://webidl.spec.whatwg.org/#idl-DOMString": {"displayText":"DOMString","export":true,"for_":[],"level":"1","normative":true,"shortname":"webidl","spec":"webidl","status":"current","text":"DOMString","type":"interface","url":"https://webidl.spec.whatwg.org/#idl-DOMString"},
 "https://webidl.spec.whatwg.org/#idl-USVString": {"displayText":"USVString","export":true,"for_":[],"level":"1","normative":true,"shortname":"webidl","spec":"webidl","status":"current","text":"USVString","type":"interface","url":"https://webidl.spec.whatwg.org/#idl-USVString"},
 "https://webidl.spec.whatwg.org/#idl-sequence": {"displayText":"sequence","export":true,"for_":[],"level":"1","normative":true,"shortname":"webidl","spec":"webidl","status":"current","text":"sequence","type":"dfn","url":"https://webidl.spec.whatwg.org/#idl-sequence"},
