@@ -593,7 +593,7 @@ Integration with WebRTC {#rtc}
 -----------------------
 
 To constrain WebRTC connections, [[webrtc]] can call into the [$should WebRTC be blocked by Connection Allowlists$]
-algorithm while determining whether candidates are <a spec="webrtc">administratively prohibited</a>.
+algorithm during the invocation of the {{RTCPeerConnection}} {{RTCPeerConnection/constructor}}.
 
 
 Security and Privacy Considerations {#security}
