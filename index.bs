@@ -102,9 +102,9 @@ and/or misconfigurations:
     certainly includes the clear cases of {{fetch(input)|fetch()}} and {{XMLHttpRequest}}, along with resource
     requests generally. It also includes network connections established through channels that are
     less explicitly "requests": manifests fetched through the Web Install API, connections to
-    TURN/STUN servers via WebRTC, Web Transport channels, navigations, and so on. These are all in
-    scope, while more esoteric channels like memory or CPU consumption, socket exhaustion, and
-    XSLeaks in general are not.
+    TURN/STUN servers via WebRTC, Web Transport channels, DNS prefetch, navigations, and so on.
+    These are all in scope, while more esoteric channels like memory or CPU consumption, socket
+    exhaustion, and XSLeaks in general are not.
 
 *   This proposal addresses only communication channels. It does not aim to prevent (or even
     substantially mitigate) threats like content injection or cross-site scripting. It only can
@@ -641,10 +641,18 @@ of the allowlists of any document it might service.
 DNS {#security-dns}
 ---
 
-Connection Allowlists rely on URL matching to determine whether a given endpoint is acceptable. This
-approach, like any other name-based mechanism, can be subverted if the name maps to an unexpected
-server. The allowlist depends on an accurate mapping of [=/hosts=] to servers in order for the
-constraints it imposes to be meaningful.
+Connection Allowlists aim to mitigate the risk of exfiltration through DNS lookups, altering Fetch's
+[=resolve an origin=] algorithm to check the allowlist before sending a DNS request. This will
+address both the implicit lookups resulting from the use of elements and APIs that send requests
+(<{img}> tags, {{fetch()}}, etc), but also explicit lookups triggered by mechanisms like
+<a attr-value for="link/rel">`dns-prefetch`</a>.
+
+That said, the allowlist relies on URL-based matching to determine whether a given endpoint is
+acceptable. It is not a defense against DNS manipulation, it does not limit the DNS servers which
+are involved in a request (including the recursive nature of DNS resolution's potential
+communication with multiple servers), nor does it restrict constructs like CNAME from causing
+additional lookups for domains outside the allowlist. Likewise, the allowlist cannot guarantee
+that the server DNS points towards is the server you might expect. 
 
 Developers should mitigate the risk of DNS hijacking and/or rebinding by relying upon authenticated
 connections: allowlisting only secure protocols will make it much more difficult for an attacker in
