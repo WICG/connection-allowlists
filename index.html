@@ -6,7 +6,7 @@
   <link href="https://www.w3.org/StyleSheets/TR/2021/W3C-UD" rel="stylesheet">
   <meta content="Bikeshed version 0ef803fdf, updated Tue Jan 6 11:59:39 2026 -0800" name="generator">
   <link href="https://wicg.github.io/connection-allowlists/" rel="canonical">
-  <meta content="5b5fcb595f2e3c41edd49e002eea6559e3e45cfe" name="revision">
+  <meta content="6978e25c731b650a7caa7089b4793edee62f45b0" name="revision">
   <meta content="dark light" name="color-scheme">
   <link href="https://www.w3.org/StyleSheets/TR/2021/dark.css" media="(prefers-color-scheme: dark)" rel="stylesheet" type="text/css">
 <style>/* Boilerplate: style-autolinks */
@@ -737,7 +737,7 @@ var[data-var-color="6"] { --var-vg: #FFBCF2; }
   <div class="head">
    <h1 class="no-ref p-name" id="title">Connection Allowlists</h1>
    <p id="w3c-state"><a href="https://www.w3.org/standards/types/#UD">Unofficial Proposal Draft</a>,
-    <time class="dt-updated" datetime="2026-03-11">11 March 2026</time></p>
+    <time class="dt-updated" datetime="2026-03-20">20 March 2026</time></p>
    <div data-fill-with="spec-metadata">
     <dl>
      <dt>This version:
@@ -887,9 +887,9 @@ those requests or connections explicitly initiated by the user agent on a page�
 certainly includes the clear cases of <code class="idl"><a data-link-type="idl" href="https://fetch.spec.whatwg.org/#dom-global-fetch" id="ref-for-dom-global-fetch">fetch()</a></code> and <code class="idl"><a data-link-type="idl" href="https://xhr.spec.whatwg.org/#xmlhttprequest" id="ref-for-xmlhttprequest">XMLHttpRequest</a></code>, along with resource
 requests generally. It also includes network connections established through channels that are
 less explicitly "requests": manifests fetched through the Web Install API, connections to
-TURN/STUN servers via WebRTC, Web Transport channels, navigations, and so on. These are all in
-scope, while more esoteric channels like memory or CPU consumption, socket exhaustion, and
-XSLeaks in general are not.</p>
+TURN/STUN servers via WebRTC, Web Transport channels, DNS prefetch, navigations, and so on.
+These are all in scope, while more esoteric channels like memory or CPU consumption, socket
+exhaustion, and XSLeaks in general are not.</p>
     <li data-md>
      <p>This proposal addresses only communication channels. It does not aim to prevent (or even
 substantially mitigate) threats like content injection or cross-site scripting. It only can
@@ -1435,10 +1435,17 @@ for these differences in capability.</p>
 allowlist along with the worker script, but they’ll need to ensure that this allowlist is a superset
 of the allowlists of any document it might service.</p>
    <h3 class="heading settled" data-level="5.3" id="security-dns"><span class="secno">5.3. </span><span class="content">DNS</span><a class="self-link" href="#security-dns"></a></h3>
-   <p>Connection Allowlists rely on URL matching to determine whether a given endpoint is acceptable. This
-approach, like any other name-based mechanism, can be subverted if the name maps to an unexpected
-server. The allowlist depends on an accurate mapping of <a data-link-type="dfn" href="https://url.spec.whatwg.org/#concept-host" id="ref-for-concept-host②">hosts</a> to servers in order for the
-constraints it imposes to be meaningful.</p>
+   <p>Connection Allowlists aim to mitigate the risk of exfiltration through DNS lookups, altering Fetch’s
+<a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#resolve-an-origin" id="ref-for-resolve-an-origin②">resolve an origin</a> algorithm to check the allowlist before sending a DNS request. This will
+address both the implicit lookups resulting from the use of elements and APIs that send requests
+(<code><a data-link-type="element" href="https://html.spec.whatwg.org/multipage/embedded-content.html#the-img-element" id="ref-for-the-img-element">img</a></code> tags, <code class="idl"><a data-link-type="idl" href="https://wicg.github.io/background-fetch/#dom-backgroundfetchmanager-fetch" id="ref-for-dom-backgroundfetchmanager-fetch">fetch()</a></code>, etc), but also explicit lookups triggered by mechanisms like
+<a data-link-type="attr-value" href="https://html.spec.whatwg.org/multipage/links.html#link-type-dns-prefetch" id="ref-for-link-type-dns-prefetch①"><code>dns-prefetch</code></a>.</p>
+   <p>That said, the allowlist relies on URL-based matching to determine whether a given endpoint is
+acceptable. It is not a defense against DNS manipulation, it does not limit the DNS servers which
+are involved in a request (including the recursive nature of DNS resolution’s potential
+communication with multiple servers), nor does it restrict constructs like CNAME from causing
+additional lookups for domains outside the allowlist. Likewise, the allowlist cannot guarantee
+that the server DNS points towards is the server you might expect.</p>
    <p>Developers should mitigate the risk of DNS hijacking and/or rebinding by relying upon authenticated
 connections: allowlisting only secure protocols will make it much more difficult for an attacker in
 control over DNS to shift traffic to an arbitrary endpoint, as the TLS handshake will require
@@ -1627,6 +1634,11 @@ allowed.</p>
   <h3 class="heading no-num no-ref settled" id="index-defined-elsewhere"><span class="content">Terms defined by reference</span><a class="self-link" href="#index-defined-elsewhere"></a></h3>
   <ul class="index">
    <li>
+    <a data-link-type="biblio">[BACKGROUND-FETCH]</a> defines the following terms:
+    <ul>
+     <li><span class="dfn-paneled" id="22bab20d">fetch(id, requests)</span>
+    </ul>
+   <li>
     <a data-link-type="biblio">[CSP]</a> defines the following terms:
     <ul>
      <li><span class="dfn-paneled" id="9b40f5cd">fetch directives</span>
@@ -1668,6 +1680,7 @@ allowed.</p>
      <li><span class="dfn-paneled" id="24cf98a1">environment</span>
      <li><span class="dfn-paneled" id="3e12e042">environment settings object</span>
      <li><span class="dfn-paneled" id="77a2ee6e">host</span>
+     <li><span class="dfn-paneled" id="f0811ff8">img</span>
      <li><span class="dfn-paneled" id="b33787b2">policy container</span>
      <li><span class="dfn-paneled" id="bd1db03d">policy container <small>(for environment settings object)</small></span>
      <li><span class="dfn-paneled" id="8a7dfd23">postMessage(message, options)</span>
@@ -1760,6 +1773,8 @@ allowed.</p>
   <h2 class="heading no-num no-ref settled" id="references"><span class="content">References</span><a class="self-link" href="#references"></a></h2>
   <h3 class="heading no-num no-ref settled" id="normative"><span class="content">Normative References</span><a class="self-link" href="#normative"></a></h3>
   <dl>
+   <dt id="biblio-background-fetch">[BACKGROUND-FETCH]
+   <dd><a href="https://wicg.github.io/background-fetch/"><cite>Background Fetch</cite></a>. Draft Community Group Report. URL: <a href="https://wicg.github.io/background-fetch/">https://wicg.github.io/background-fetch/</a>
    <dt id="biblio-csp">[CSP]
    <dd>Mike West; Antonio Sartori. <a href="https://w3c.github.io/webappsec-csp/"><cite>Content Security Policy Level 3</cite></a>. URL: <a href="https://w3c.github.io/webappsec-csp/">https://w3c.github.io/webappsec-csp/</a>
    <dt id="biblio-document-policy">[DOCUMENT-POLICY]
@@ -2027,7 +2042,8 @@ let dfnPanelData = {
 "093a0772": {"dfnID":"093a0772","dfnText":"strip URL for use in reports","external":true,"refSections":[{"refs":[{"id":"ref-for-strip-url-for-use-in-reports"},{"id":"ref-for-strip-url-for-use-in-reports\u2460"}],"title":"3.3. Reporting"}],"url":"https://w3c.github.io/reporting/#strip-url-for-use-in-reports"},
 "0950067d": {"dfnID":"0950067d","dfnText":"host-source","external":true,"refSections":[{"refs":[{"id":"ref-for-grammardef-host-source"}],"title":"1.2. Overlap with Content Security Policy"}],"url":"https://w3c.github.io/webappsec-csp/#grammardef-host-source"},
 "188c6617": {"dfnID":"188c6617","dfnText":"ReportBody","external":true,"refSections":[{"refs":[{"id":"ref-for-reportbody"}],"title":"3.3. Reporting"}],"url":"https://w3c.github.io/reporting/#reportbody"},
-"1abc08f1": {"dfnID":"1abc08f1","dfnText":"dns-prefetch","external":true,"refSections":[{"refs":[{"id":"ref-for-link-type-dns-prefetch"}],"title":"3.2. Matching"}],"url":"https://html.spec.whatwg.org/multipage/links.html#link-type-dns-prefetch"},
+"1abc08f1": {"dfnID":"1abc08f1","dfnText":"dns-prefetch","external":true,"refSections":[{"refs":[{"id":"ref-for-link-type-dns-prefetch"}],"title":"3.2. Matching"},{"refs":[{"id":"ref-for-link-type-dns-prefetch\u2460"}],"title":"5.3. DNS"}],"url":"https://html.spec.whatwg.org/multipage/links.html#link-type-dns-prefetch"},
+"22bab20d": {"dfnID":"22bab20d","dfnText":"fetch(id, requests)","external":true,"refSections":[{"refs":[{"id":"ref-for-dom-backgroundfetchmanager-fetch"}],"title":"5.3. DNS"}],"url":"https://wicg.github.io/background-fetch/#dom-backgroundfetchmanager-fetch"},
 "24cf98a1": {"dfnID":"24cf98a1","dfnText":"environment","external":true,"refSections":[{"refs":[{"id":"ref-for-environment"},{"id":"ref-for-environment\u2460"}],"title":"3.2. Matching"},{"refs":[{"id":"ref-for-environment\u2461"}],"title":"3.3. Reporting"}],"url":"https://html.spec.whatwg.org/multipage/webappapis.html#environment"},
 "2ce6f6bb": {"dfnID":"2ce6f6bb","dfnText":"fetch(input)","external":true,"refSections":[{"refs":[{"id":"ref-for-dom-global-fetch"}],"title":"1.1. Threat Model"}],"url":"https://fetch.spec.whatwg.org/#dom-global-fetch"},
 "3268a8eb": {"dfnID":"3268a8eb","dfnText":"URL (for response)","external":true,"refSections":[{"refs":[{"id":"ref-for-concept-response-url"}],"title":"3. Connection Allowlist Headers"},{"refs":[{"id":"ref-for-concept-response-url\u2460"},{"id":"ref-for-concept-response-url\u2461"}],"title":"3.1. Parsing"}],"url":"https://fetch.spec.whatwg.org/#concept-response-url"},
@@ -2045,9 +2061,9 @@ let dfnPanelData = {
 "5c4f772b": {"dfnID":"5c4f772b","dfnText":"match","external":true,"refSections":[{"refs":[{"id":"ref-for-url-pattern-match"},{"id":"ref-for-url-pattern-match\u2460"}],"title":"3.2. Matching"}],"url":"https://urlpattern.spec.whatwg.org/#url-pattern-match"},
 "5c66de35": {"dfnID":"5c66de35","dfnText":"get a structured field value","external":true,"refSections":[{"refs":[{"id":"ref-for-concept-header-list-get-structured-header"},{"id":"ref-for-concept-header-list-get-structured-header\u2460"}],"title":"3.1. Parsing"}],"url":"https://fetch.spec.whatwg.org/#concept-header-list-get-structured-header"},
 "60393e82": {"dfnID":"60393e82","dfnText":"URL pattern","external":true,"refSections":[{"refs":[{"id":"ref-for-url-pattern"},{"id":"ref-for-url-pattern\u2460"}],"title":"2. Connection Allowlists"}],"url":"https://urlpattern.spec.whatwg.org/#url-pattern"},
-"61c338be": {"dfnID":"61c338be","dfnText":"resolve an origin","external":true,"refSections":[{"refs":[{"id":"ref-for-resolve-an-origin"},{"id":"ref-for-resolve-an-origin\u2460"}],"title":"4.1. Integration with Fetch"}],"url":"https://fetch.spec.whatwg.org/#resolve-an-origin"},
+"61c338be": {"dfnID":"61c338be","dfnText":"resolve an origin","external":true,"refSections":[{"refs":[{"id":"ref-for-resolve-an-origin"},{"id":"ref-for-resolve-an-origin\u2460"}],"title":"4.1. Integration with Fetch"},{"refs":[{"id":"ref-for-resolve-an-origin\u2461"}],"title":"5.3. DNS"}],"url":"https://fetch.spec.whatwg.org/#resolve-an-origin"},
 "649608b9": {"dfnID":"649608b9","dfnText":"list","external":true,"refSections":[{"refs":[{"id":"ref-for-list"}],"title":"2. Connection Allowlists"},{"refs":[{"id":"ref-for-list\u2460"}],"title":"3.1. Parsing"},{"refs":[{"id":"ref-for-list\u2461"},{"id":"ref-for-list\u2462"}],"title":"3.2. Matching"},{"refs":[{"id":"ref-for-list\u2463"}],"title":"4.2. Integration with HTML"}],"url":"https://infra.spec.whatwg.org/#list"},
-"752d140b": {"dfnID":"752d140b","dfnText":"host","external":true,"refSections":[{"refs":[{"id":"ref-for-concept-host"},{"id":"ref-for-concept-host\u2460"}],"title":"3.2. Matching"},{"refs":[{"id":"ref-for-concept-host\u2461"}],"title":"5.3. DNS"}],"url":"https://url.spec.whatwg.org/#concept-host"},
+"752d140b": {"dfnID":"752d140b","dfnText":"host","external":true,"refSections":[{"refs":[{"id":"ref-for-concept-host"},{"id":"ref-for-concept-host\u2460"}],"title":"3.2. Matching"}],"url":"https://url.spec.whatwg.org/#concept-host"},
 "75f3e163": {"dfnID":"75f3e163","dfnText":"administratively prohibited","external":true,"refSections":[{"refs":[{"id":"ref-for-dfn-administratively-prohibited"}],"title":"4.3. Integration with WebRTC"}],"url":"https://w3c.github.io/webrtc-pc/#dfn-administratively-prohibited"},
 "7660bec4": {"dfnID":"7660bec4","dfnText":"parameters","external":true,"refSections":[{"refs":[{"id":"ref-for-name-parameters"}],"title":"3. Connection Allowlist Headers"}],"url":"https://www.rfc-editor.org/rfc/rfc9651#name-parameters"},
 "77a2ee6e": {"dfnID":"77a2ee6e","dfnText":"host","external":true,"refSections":[{"refs":[{"id":"ref-for-concept-origin-host"}],"title":"4.1. Integration with Fetch"}],"url":"https://html.spec.whatwg.org/multipage/browsers.html#concept-origin-host"},
@@ -2115,6 +2131,7 @@ let dfnPanelData = {
 "ee7bba09": {"dfnID":"ee7bba09","dfnText":"response","external":true,"refSections":[{"refs":[{"id":"ref-for-concept-response"}],"title":"3. Connection Allowlist Headers"},{"refs":[{"id":"ref-for-concept-response\u2460"}],"title":"3.1. Parsing"}],"url":"https://fetch.spec.whatwg.org/#concept-response"},
 "enumdef-connectionallowlistdisposition": {"dfnID":"enumdef-connectionallowlistdisposition","dfnText":"ConnectionAllowlistDisposition","external":false,"refSections":[{"refs":[{"id":"ref-for-enumdef-connectionallowlistdisposition"}],"title":"3.3. Reporting"}],"url":"#enumdef-connectionallowlistdisposition"},
 "f02cd417": {"dfnID":"f02cd417","dfnText":"iterate","external":true,"refSections":[{"refs":[{"id":"ref-for-list-iterate"},{"id":"ref-for-list-iterate\u2460"}],"title":"3.1. Parsing"},{"refs":[{"id":"ref-for-list-iterate\u2461"},{"id":"ref-for-list-iterate\u2462"},{"id":"ref-for-list-iterate\u2463"},{"id":"ref-for-list-iterate\u2464"},{"id":"ref-for-list-iterate\u2465"},{"id":"ref-for-list-iterate\u2466"}],"title":"3.2. Matching"}],"url":"https://infra.spec.whatwg.org/#list-iterate"},
+"f0811ff8": {"dfnID":"f0811ff8","dfnText":"img","external":true,"refSections":[{"refs":[{"id":"ref-for-the-img-element"}],"title":"5.3. DNS"}],"url":"https://html.spec.whatwg.org/multipage/embedded-content.html#the-img-element"},
 "f7b00a8b": {"dfnID":"f7b00a8b","dfnText":"header list","external":true,"refSections":[{"refs":[{"id":"ref-for-concept-response-header-list"},{"id":"ref-for-concept-response-header-list\u2460"}],"title":"3.1. Parsing"}],"url":"https://fetch.spec.whatwg.org/#concept-response-header-list"},
 "f937b7b6": {"dfnID":"f937b7b6","dfnText":"continue","external":true,"refSections":[{"refs":[{"id":"ref-for-iteration-continue"},{"id":"ref-for-iteration-continue\u2460"}],"title":"3.1. Parsing"},{"refs":[{"id":"ref-for-iteration-continue\u2461"},{"id":"ref-for-iteration-continue\u2462"},{"id":"ref-for-iteration-continue\u2463"},{"id":"ref-for-iteration-continue\u2464"},{"id":"ref-for-iteration-continue\u2465"},{"id":"ref-for-iteration-continue\u2466"}],"title":"3.2. Matching"}],"url":"https://infra.spec.whatwg.org/#iteration-continue"},
 "fa5ee9c5": {"dfnID":"fa5ee9c5","dfnText":"creation URL","external":true,"refSections":[{"refs":[{"id":"ref-for-concept-environment-creation-url"}],"title":"3.3. Reporting"}],"url":"https://html.spec.whatwg.org/multipage/webappapis.html#concept-environment-creation-url"},
@@ -2570,6 +2587,7 @@ let refsData = {
 "https://html.spec.whatwg.org/multipage/browsers.html#concept-origin-host": {"displayText":"host","export":true,"for_":["origin"],"level":"1","normative":true,"shortname":"html","spec":"html","status":"current","text":"host","type":"dfn","url":"https://html.spec.whatwg.org/multipage/browsers.html#concept-origin-host"},
 "https://html.spec.whatwg.org/multipage/browsers.html#creating-a-policy-container-from-a-fetch-response": {"displayText":"creating a policy container from a fetch response","export":true,"for_":[],"level":"1","normative":true,"shortname":"html","spec":"html","status":"current","text":"creating a policy container from a fetch response","type":"dfn","url":"https://html.spec.whatwg.org/multipage/browsers.html#creating-a-policy-container-from-a-fetch-response"},
 "https://html.spec.whatwg.org/multipage/browsers.html#policy-container": {"displayText":"policy container","export":true,"for_":[],"level":"1","normative":true,"shortname":"html","spec":"html","status":"current","text":"policy container","type":"dfn","url":"https://html.spec.whatwg.org/multipage/browsers.html#policy-container"},
+"https://html.spec.whatwg.org/multipage/embedded-content.html#the-img-element": {"displayText":"img","export":true,"for_":[],"level":"1","normative":true,"shortname":"html","spec":"html","status":"current","text":"img","type":"element","url":"https://html.spec.whatwg.org/multipage/embedded-content.html#the-img-element"},
 "https://html.spec.whatwg.org/multipage/iframe-embed-object.html#attr-iframe-sandbox": {"displayText":"sandbox","export":true,"for_":["iframe"],"level":"1","normative":true,"shortname":"html","spec":"html","status":"current","text":"sandbox","type":"element-attr","url":"https://html.spec.whatwg.org/multipage/iframe-embed-object.html#attr-iframe-sandbox"},
 "https://html.spec.whatwg.org/multipage/links.html#link-type-dns-prefetch": {"displayText":"dns-prefetch","export":true,"for_":["link/rel"],"level":"1","normative":true,"shortname":"html","spec":"html","status":"current","text":"dns-prefetch","type":"attr-value","url":"https://html.spec.whatwg.org/multipage/links.html#link-type-dns-prefetch"},
 "https://html.spec.whatwg.org/multipage/web-messaging.html#broadcastchannel": {"displayText":"BroadcastChannel","export":true,"for_":[],"level":"1","normative":true,"shortname":"html","spec":"html","status":"current","text":"BroadcastChannel","type":"interface","url":"https://html.spec.whatwg.org/multipage/web-messaging.html#broadcastchannel"},
@@ -2618,6 +2636,7 @@ let refsData = {
 "https://webidl.spec.whatwg.org/#idl-DOMString": {"displayText":"DOMString","export":true,"for_":[],"level":"1","normative":true,"shortname":"webidl","spec":"webidl","status":"current","text":"DOMString","type":"interface","url":"https://webidl.spec.whatwg.org/#idl-DOMString"},
 "https://webidl.spec.whatwg.org/#idl-USVString": {"displayText":"USVString","export":true,"for_":[],"level":"1","normative":true,"shortname":"webidl","spec":"webidl","status":"current","text":"USVString","type":"interface","url":"https://webidl.spec.whatwg.org/#idl-USVString"},
 "https://webidl.spec.whatwg.org/#idl-sequence": {"displayText":"sequence","export":true,"for_":[],"level":"1","normative":true,"shortname":"webidl","spec":"webidl","status":"current","text":"sequence","type":"dfn","url":"https://webidl.spec.whatwg.org/#idl-sequence"},
+"https://wicg.github.io/background-fetch/#dom-backgroundfetchmanager-fetch": {"displayText":"fetch(id, requests)","export":true,"for_":["BackgroundFetchManager"],"level":"1","normative":true,"shortname":"background-fetch","spec":"background-fetch","status":"current","text":"fetch(id, requests)","type":"method","url":"https://wicg.github.io/background-fetch/#dom-backgroundfetchmanager-fetch"},
 "https://wicg.github.io/document-policy/#required-document-policy": {"displayText":"required document policy","export":false,"for_":[],"level":"1","normative":true,"shortname":"document-policy","spec":"document-policy","status":"current","text":"required document policy","type":"dfn","url":"https://wicg.github.io/document-policy/#required-document-policy"},
 "https://www.rfc-editor.org/rfc/rfc9651#name-inner-list": {"displayText":"inner list","export":true,"for_":["structured header"],"level":"","normative":true,"shortname":"rfc9651","spec":"rfc9651","status":"anchor-block","text":"inner list","type":"dfn","url":"https://www.rfc-editor.org/rfc/rfc9651#name-inner-list"},
 "https://www.rfc-editor.org/rfc/rfc9651#name-introduction": {"displayText":"structured header","export":true,"for_":[],"level":"","normative":true,"shortname":"rfc9651","spec":"rfc9651","status":"anchor-block","text":"structured header","type":"dfn","url":"https://www.rfc-editor.org/rfc/rfc9651#name-introduction"},
