@@ -27,19 +27,24 @@ urlPrefix: https://www.rfc-editor.org/rfc/rfc9651; spec: RFC9651
             text: dictionary; url: #name-dictionary
             text: parameters; url: #name-parameters
     type: abstract-op
-        text: parsing structured fields; url: text-parse
+        text: parsing structured fields; url: #name-parsing-structured-fields
+        text: serializing a structured field value; url: #name-serializing-a-structured-field-v
 </pre>
 <pre class="link-defaults">
 spec:fetch; type:dfn; for:/; text:request
+spec:fetch; type:dfn; for:/; text:header list
 spec:fetch; type:method; text:fetch(input)
 spec:html; type:dfn; for:/; text:environment
 spec:html; type:dfn; for:/; text:policy container
+spec:html; type:dfn; for:/; text:navigable
+spec:html; type:dfn; for:/; text:valid attribute value
+spec:html; type:dfn; for:/; text:create a new child navigable
+spec:html; type:dfn; for:/; text:create navigation params by fetching
 spec:html; type:interface; text:BroadcastChannel
 spec:infra; type:dfn; for:/; text:list
 spec:infra; type:dfn; for:/; text:string
 spec:infra; type:dfn; text:success
 spec:url; type:dfn; for:/; text:url
-
 </pre>
 
 Introduction {#intro}
@@ -180,6 +185,40 @@ is allowed to connect. It is a [=struct=] with the following [=struct/items=]:
     <a grammar for="Connection Allowlist/webrtc">block</a> unless otherwise specified.
 
 
+Required Connection Allowlists {#required-allowlists}
+==============================
+
+A <dfn export>Required Connection Allowlist</dfn> is a [=Connection Allowlist=]. It represents the set of
+constraints that an embedder requires an embedded document to opt-into.
+
+A [=Connection Allowlist=] (|embedee|) <dfn abstract-op local-lt="subsumes">is subsumed by</dfn> a
+[=Required Connection Allowlist=] (|requirement|) if the following statements are true:
+
+1.  For each |pattern| in |embedee|'s [=Connection Allowlist/allowlist=]:
+
+    1.  If |pattern| is not in |requirement|'s [=Connection Allowlist/allowlist=], return false.
+
+    Note: We're using a strict string-based subset check here to avoid the complexity of comparing
+    {{URLPattern}} objects. This means that even if a pattern is logically a subset of another, it
+    <span class="allow-2119">must</span> be explicitly present in the requirement to be considered subsumed.
+
+    Note: The <a grammar>`response-origin`</a> token is safe to include in a requirement because
+    the response's origin <span class="allow-2119">must</span> already be allowed by the embedder's own connection allowlist in
+    order for the navigation to have been initiated.
+
+2.  If |requirement|'s [=Connection Allowlist/redirects=] is
+    <a grammar for="Connection Allowlist/redirects">block</a> and |embedee|'s
+    [=Connection Allowlist/redirects=] is <a grammar for="Connection Allowlist/redirects">allow</a>,
+    return false.
+
+3.  If |requirement|'s [=Connection Allowlist/webrtc=] is
+    <a grammar for="Connection Allowlist/webrtc">block</a> and |embedee|'s
+    [=Connection Allowlist/webrtc=] is <a grammar for="Connection Allowlist/webrtc">allow</a>,
+    return false.
+
+4.  Return true.
+
+
 Connection Allowlist Headers {#headers}
 ============================
 
@@ -189,6 +228,10 @@ connect. This allowlist is enforced for a given context, blocking outgoing conne
 match the asserted patterns. The <dfn http-header export>Connection-Allowlist-Report-Only</dfn>
 response [=header=] is a report-only variant, parsed in the same way, but only sending violation
 reports without blocking outgoing connections.
+
+The <dfn http-header export>Sec-Required-Connection-Allowlist</dfn> request [=header=] is sent along
+with [=navigation requests=] to communicate an embedder's [=Required Connection Allowlist=] to the
+server.
 
 These Connection Allowlist headers are [=structured headers=] whose values are a
 [=structured header/list=] of [=structured header/inner lists=]. Servers may deliver a list with
@@ -311,6 +354,36 @@ To <dfn abstract-op local-lt="parse header">parse a Connection Allowlist header<
 
 Note: We're skipping over any invalid input in the parsing algorithm. We could plausibly be more
 draconian in our parsing, but that would likely limit our future flexibility.
+</div>
+
+<div algorithm>
+To <dfn abstract-op local-lt="serialize">serialize a Connection Allowlist</dfn> given a
+[=Connection Allowlist=] (|allowlist|):
+
+1.  Let |inner list| be an empty [=list=].
+
+2.  [=list/iterate|For each=] |pattern| in |allowlist|'s [=Connection Allowlist/allowlist=]:
+
+    1.  [=list/Append=] [=URL pattern/serialize|serializing=] |pattern| to |inner list|.
+
+3.  Let |parameters| be an empty [=map=].
+
+4.  If |allowlist|'s [=Connection Allowlist/reporting endpoint=] is not `null`, set
+    |parameters|["`report-to`"] to |allowlist|'s [=Connection Allowlist/reporting endpoint=].
+
+5.  If |allowlist|'s [=Connection Allowlist/redirects=] is not
+    <a grammar for="Connection Allowlist/redirects">block</a>, set
+    |parameters|["`redirects`"] to "`allow`".
+
+6.  If |allowlist|'s [=Connection Allowlist/webrtc=] is not
+    <a grammar for="Connection Allowlist/webrtc">block</a>, set
+    |parameters|["`webrtc`"] to "`allow`".
+
+7.  Let |list| be a new [=structured header/list=] containing |inner list| with |parameters| as
+    its [=structured header/parameters=].
+
+8.  Return the result of [=serializing a structured field value=] given |list|.
+
 </div>
 
 
@@ -574,10 +647,19 @@ take a piecemeal approach.
 Integration with HTML {#html}
 ---------------------
 
-To integrate the above into HTML, we'll add a new
-<dfn for="policy container">connection allowlists</dfn> item to the [=/policy container=]
-[=struct=], containing a [=list=] of [=connection allowlists=]. This will be populated by adding a
-step to the [=create a policy container from a fetch response=] algorithm:
+To integrate the above into HTML, we'll make the following changes:
+
+### Policy Containers ### {#patch-policy-container}
+
+We'll add the following items to the [=/policy container=] [=struct=]:
+
+*   A <dfn for="policy container">connection allowlists</dfn> item, which is a [=list=] of
+    [=connection allowlists=]. It is initially empty.
+*   A <dfn for="policy container">required connection allowlist</dfn> item, which is a
+    [=Required Connection Allowlist=] or `null`. It is initially `null`.
+
+We'll update the [=create a policy container from a fetch response=] algorithm by adding the
+following steps:
 
 <div algorithm="monkey patching policy container creation">
   <ol start="6">
@@ -588,6 +670,75 @@ step to the [=create a policy container from a fetch response=] algorithm:
     8.  Return |result|.
   </ol>
 </div>
+
+Note: <span class="allow-2119">The [=policy container/required connection allowlist=] is not set from the response directly,
+but is instead propagated from the [=navigable=] during navigation, as described below.</span>
+
+### `<iframe>` Elements ### {#patch-iframe}
+
+We'll add an <dfn element-attr for="iframe">allowlist</dfn> attribute to the <{iframe}> element.
+Its value must be a [=valid attribute value=] for a [=Connection Allowlist=] header.
+
+We'll also update the {{HTMLIFrameElement}} interface:
+
+<xmp class="idl">
+partial interface HTMLIFrameElement {
+  [CEReactions, Reflect] attribute DOMString allowlist;
+};
+</xmp>
+
+When an <{iframe}> element's [=node document=] has a [=policy container/required connection 
+allowlist=] (|requirement|), the value of its <{iframe/allowlist}> attribute <span class="allow-2119">must</span> be
+[=subsumes|subsumed=] by |requirement|.
+
+### Navigables ### {#patch-navigable}
+
+We'll add a <dfn for="navigable">required connection allowlist</dfn> item to the [=navigable=]
+[=struct=], which is a [=Required Connection Allowlist=] or `null`. It is initially `null`.
+
+We'll update the [=create a new child navigable=] algorithm to initialize this value:
+
+1.  If the <var ignore>container</var> (the <{iframe}> element) has an
+    <{iframe/allowlist}> attribute, let |attrValue| be the result of [=parsing=] it as a
+    [=Connection Allowlist=] header.
+
+2.  If |attrValue| is not `null`, set the new [=navigable=]'s
+    [=navigable/required connection allowlist=] to |attrValue|.
+
+3.  Otherwise, if the <var ignore>container</var>'s [=node document=] has a
+    [=policy container/required connection allowlist=] (|parentRequirement|), set the new
+    [=navigable=]'s [=navigable/required connection allowlist=] to |parentRequirement|.
+
+### Navigation Lifecycle ### {#patch-navigation}
+
+We'll update the [=create navigation params by fetching=] algorithm:
+
+1.  If the [=navigable=] has a non-null [=navigable/required connection allowlist=] (|requirement|):
+
+    1.  Let |serialized| be the result of [$serialize|serializing$] |requirement|.
+
+    2.  <a for="header list">Append</a> a header named
+        "<a http-header>`Sec-Required-Connection-Allowlist`</a>" with a value of |serialized| to
+        <var ignore>request</var>'s [=header list=].
+
+We'll update the [=create navigation params by fetching=] algorithm's response processing:
+
+1.  Let |response allowlist| be the result of [$parse a response's Connection Allowlists|parsing
+    a response's Connection Allowlists$] given the <var ignore>response</var>.
+
+2.  If the [=navigable=] has a non-null [=navigable/required connection allowlist=] (|requirement|):
+
+    1.  If |response allowlist| is empty, or if none of its items [=subsumes|subsume=] |requirement|,
+        then:
+
+        1.  [$report|Report a violation$] (using the embedder's reporting endpoint).
+
+        2.  Return a network error.
+
+3.  When creating the [=policy container=] for the new `Document`:
+
+    1.  Set its [=policy container/required connection allowlist=] to the [=navigable=]'s
+        [=navigable/required connection allowlist=].
 
 
 Integration with WebRTC {#rtc}
@@ -645,7 +796,7 @@ DNS {#security-dns}
 Connection Allowlists aim to mitigate the risk of exfiltration through DNS lookups, altering Fetch's
 [=resolve an origin=] algorithm to check the allowlist before sending a DNS request. This will
 address both the implicit lookups resulting from the use of elements and APIs that send requests
-(<{img}> tags, {{fetch(input)|fetch()}}, etc), but also explicit lookups triggered by mechanisms like
+(<{img}> tags, {{fetch()}}, etc), but also explicit lookups triggered by mechanisms like
 <a attr-value for="link/rel">`dns-prefetch`</a>.
 
 That said, the allowlist relies on URL-based matching to determine whether a given endpoint is
@@ -762,5 +913,3 @@ allowed.
 
   WebRTC connections will be **allowed**.
 </div>
-
-
