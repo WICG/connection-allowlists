@@ -39,6 +39,7 @@ spec:infra; type:dfn; for:/; text:list
 spec:infra; type:dfn; for:/; text:string
 spec:infra; type:dfn; text:success
 spec:url; type:dfn; for:/; text:url
+
 </pre>
 
 Introduction {#intro}
@@ -644,7 +645,7 @@ DNS {#security-dns}
 Connection Allowlists aim to mitigate the risk of exfiltration through DNS lookups, altering Fetch's
 [=resolve an origin=] algorithm to check the allowlist before sending a DNS request. This will
 address both the implicit lookups resulting from the use of elements and APIs that send requests
-(<{img}> tags, {{fetch()}}, etc), but also explicit lookups triggered by mechanisms like
+(<{img}> tags, {{fetch(input)|fetch()}}, etc), but also explicit lookups triggered by mechanisms like
 <a attr-value for="link/rel">`dns-prefetch`</a>.
 
 That said, the allowlist relies on URL-based matching to determine whether a given endpoint is
