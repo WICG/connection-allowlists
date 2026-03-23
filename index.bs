@@ -27,8 +27,8 @@ urlPrefix: https://www.rfc-editor.org/rfc/rfc9651; spec: RFC9651
             text: dictionary; url: #name-dictionary
             text: parameters; url: #name-parameters
     type: abstract-op
+        text: serializing a list; url: #name-serializing-a-list
         text: parsing structured fields; url: #name-parsing-structured-fields
-        text: serializing a structured field value; url: #name-serializing-a-structured-field-v
 </pre>
 <pre class="link-defaults">
 spec:fetch; type:dfn; for:/; text:request
@@ -185,40 +185,6 @@ is allowed to connect. It is a [=struct=] with the following [=struct/items=]:
     <a grammar for="Connection Allowlist/webrtc">block</a> unless otherwise specified.
 
 
-Required Connection Allowlists {#required-allowlists}
-==============================
-
-A <dfn export>Required Connection Allowlist</dfn> is a [=Connection Allowlist=]. It represents the set of
-constraints that an embedder requires an embedded document to opt-into.
-
-A [=Connection Allowlist=] (|embedee|) <dfn abstract-op local-lt="subsumes">is subsumed by</dfn> a
-[=Required Connection Allowlist=] (|requirement|) if the following statements are true:
-
-1.  For each |pattern| in |embedee|'s [=Connection Allowlist/allowlist=]:
-
-    1.  If |pattern| is not in |requirement|'s [=Connection Allowlist/allowlist=], return false.
-
-    Note: We're using a strict string-based subset check here to avoid the complexity of comparing
-    {{URLPattern}} objects. This means that even if a pattern is logically a subset of another, it
-    <span class="allow-2119">must</span> be explicitly present in the requirement to be considered subsumed.
-
-    Note: The <a grammar>`response-origin`</a> token is safe to include in a requirement because
-    the response's origin <span class="allow-2119">must</span> already be allowed by the embedder's own connection allowlist in
-    order for the navigation to have been initiated.
-
-2.  If |requirement|'s [=Connection Allowlist/redirects=] is
-    <a grammar for="Connection Allowlist/redirects">block</a> and |embedee|'s
-    [=Connection Allowlist/redirects=] is <a grammar for="Connection Allowlist/redirects">allow</a>,
-    return false.
-
-3.  If |requirement|'s [=Connection Allowlist/webrtc=] is
-    <a grammar for="Connection Allowlist/webrtc">block</a> and |embedee|'s
-    [=Connection Allowlist/webrtc=] is <a grammar for="Connection Allowlist/webrtc">allow</a>,
-    return false.
-
-4.  Return true.
-
-
 Connection Allowlist Headers {#headers}
 ============================
 
@@ -228,10 +194,6 @@ connect. This allowlist is enforced for a given context, blocking outgoing conne
 match the asserted patterns. The <dfn http-header export>Connection-Allowlist-Report-Only</dfn>
 response [=header=] is a report-only variant, parsed in the same way, but only sending violation
 reports without blocking outgoing connections.
-
-The <dfn http-header export>Sec-Required-Connection-Allowlist</dfn> request [=header=] is sent along
-with [=navigation requests=] to communicate an embedder's [=Required Connection Allowlist=] to the
-server.
 
 These Connection Allowlist headers are [=structured headers=] whose values are a
 [=structured header/list=] of [=structured header/inner lists=]. Servers may deliver a list with
@@ -364,7 +326,10 @@ To <dfn abstract-op local-lt="serialize">serialize a Connection Allowlist</dfn> 
 
 2.  [=list/iterate|For each=] |pattern| in |allowlist|'s [=Connection Allowlist/allowlist=]:
 
-    1.  [=list/Append=] [=URL pattern/serialize|serializing=] |pattern| to |inner list|.
+    1.  [=list/Append=] the result of serializing |pattern| to |inner list|.
+
+        ISSUE: I don't think serialization of URLPatterns is a thing. We might need to invent
+        something here, or store the original, serialized header contents?
 
 3.  Let |parameters| be an empty [=map=].
 
@@ -382,7 +347,7 @@ To <dfn abstract-op local-lt="serialize">serialize a Connection Allowlist</dfn> 
 7.  Let |list| be a new [=structured header/list=] containing |inner list| with |parameters| as
     its [=structured header/parameters=].
 
-8.  Return the result of [=serializing a structured field value=] given |list|.
+8.  Return the result of [$serializing a list$] given |list|.
 
 </div>
 
@@ -591,9 +556,96 @@ To <dfn abstract-op local-lt="report">report a violation</dfn> given a [=URL=] o
 
 </div>
 
+
+Required Connection Allowlists {#required-allowlists}
+==============================
+
+A <dfn export>Required Connection Allowlist</dfn> is a [=Connection Allowlist=] representing a set
+of constraints that an embedder requires an embedded document to opt-into.
+
+An embedder may assert these constraints by adding a <{iframe/connection-allowlist}> attribute to
+an <{iframe}> element, which will apply the requirement to the specified frame as well as any
+frames nested within that frame. During navigation to [=local scheme=] documents, valid requirements
+will be applied by subsetting the embedder's [=policy container/connection allowlist=]. Navigation
+to documents from non-[=local schemes=] will fail entirely unless the response asserts an allowlist
+that [=satisfies=] the specified requirements.
+
+These mechanisms are described in the monkey-patches below.
+
+Connection Allowlist Requirement Headers {#required-allowlist-headers}
+----------------------------------------
+
+The <dfn http-header export>Sec-Required-Connection-Allowlist</dfn> request [=header=] is sent along
+with [=navigation requests=] for which a [=Required Connection Allowlist=] is asserted. It is a 
+[=structured header=] whose value's type and grammar matches the [:Connection-Allowlist:] header. If
+no allowlist is required for a given navigation, the header will not be included in the request.
+
+The <dfn http-header export>Allow-Connection-Allowlist-From</dfn> response [=header=] can be sent by
+servers when responding to a request asserting a Connection Allowlist requirement. Its value is
+either a [=structured field/string=] representing a serialized origin from which Connection
+Allowlist requirements are accepted, or the [=structured field/token=] "`*`" which represents
+acceptance of any origin's Connection Allowlist requirements.
+
+
+
+
+
+Satisfying Requirements {#satisfaction}
+-----------------------
+
+<div algorithm="satisfies required connection allowlist">
+A [=Connection Allowlist=] (|allowlist|) <dfn abstract-op local-lt="satisfies">satisfies Connection
+Allowlist requirements</dfn> of a [=Required Connection Allowlist=] (|requirement|) if the following
+algorithm returns [=success=]:
+
+1.  For each |pattern| in |allowlist|'s [=Connection Allowlist/allowlist=]:
+
+    1.  If |pattern| is not in |requirement|'s [=Connection Allowlist/allowlist=], return
+        [=failure=].
+
+        Note: We're performing strict equality checks here to avoid the complexity and ambiguity of
+        comparing {{URLPattern}} objects. This means that even if a pattern is logically a subset of
+        another, we'll only consider the requirement satisfied if the patterns exactly match.
+
+        Note: The <a grammar>`response-origin`</a> token is safe to include as an exact match even
+        though its meaning might differ between the embedder and embedee depending upon their origins.
+        The response's origin is only allowed to load in the first place if it's already allowed
+        by the embedder's allowlist, and allowing policies to contain
+        <a grammar>`response-origin`</a> improves developer ergonomics for some kinds of resources.
+        It seems worth the potential confusion to allow.
+
+2.  If |requirement|'s [=Connection Allowlist/redirects=] is
+    <a grammar for="Connection Allowlist/redirects">block</a> and |allowlist|'s
+    [=Connection Allowlist/redirects=] is <a grammar for="Connection Allowlist/redirects">allow</a>,
+    return [=failure=].
+
+3.  If |requirement|'s [=Connection Allowlist/webrtc=] is
+    <a grammar for="Connection Allowlist/webrtc">block</a> and |allowlist|'s
+    [=Connection Allowlist/webrtc=] is <a grammar for="Connection Allowlist/webrtc">allow</a>,
+    return [=failure=].
+
+4.  Return [=success=].
+
+<div class="example" id="does-satisfy-required-connection-allowlist">
+For the [=Required Connection Allowlist=] `("https://example.com" "https://allowed.*")`:
+
+*   `("https://example.com" "https://allowed.*")` satisfies the requirements, as it is an exact
+    match for the specified policy.
+
+*   `("https://example.com")` satisfies the requirements, as it is a strict subset of the specified
+    policy.
+
+*   `("https://example.com" "https://allowed.com")` _does not_ satisfy the requirements. Even though
+    `https://allowed.com` is a logical subset of `https://allowed.*`, we've decided to require exact
+    matches in order to avoids the potentially unexpected complexity of matching wildcards and/or
+    determining whether one regular expression is a logical subset of another.
+
+</div>
+</div>
+
+
 Monkey-Patches {#monkey-patching}
 ==============
-
 
 Integration with Fetch {#fetch}
 ----------------------
@@ -655,7 +707,7 @@ We'll add the following items to the [=/policy container=] [=struct=]:
 
 *   A <dfn for="policy container">connection allowlists</dfn> item, which is a [=list=] of
     [=connection allowlists=]. It is initially empty.
-*   A <dfn for="policy container">required connection allowlist</dfn> item, which is a
+*   A <dfn for="policy container">connection allowlist requirement</dfn> item, which is a
     [=Required Connection Allowlist=] or `null`. It is initially `null`.
 
 We'll update the [=create a policy container from a fetch response=] algorithm by adding the
@@ -671,13 +723,13 @@ following steps:
   </ol>
 </div>
 
-Note: <span class="allow-2119">The [=policy container/required connection allowlist=] is not set from the response directly,
-but is instead propagated from the [=navigable=] during navigation, as described below.</span>
+Note: The [=policy container/connection allowlist requirement=] item is not set from the response
+directly, but is instead propagated from the [=navigable=] during navigation, as described below.
 
 ### `<iframe>` Elements ### {#patch-iframe}
 
 We'll add an <dfn element-attr for="iframe">allowlist</dfn> attribute to the <{iframe}> element.
-Its value must be a [=valid attribute value=] for a [=Connection Allowlist=] header.
+Its value must be a <a href="https://www.w3.org/TR/CSP3/#attribute-value">valid attribute value</a> for a [=Connection Allowlist=] header.
 
 We'll also update the {{HTMLIFrameElement}} interface:
 
@@ -687,13 +739,12 @@ partial interface HTMLIFrameElement {
 };
 </xmp>
 
-When an <{iframe}> element's [=node document=] has a [=policy container/required connection 
-allowlist=] (|requirement|), the value of its <{iframe/allowlist}> attribute <span class="allow-2119">must</span> be
+When an <{iframe}> element's [=node document=] has a [=policy container/connection allowlist requirement=] (|requirement|), the value of its <{iframe/allowlist}> attribute <span class="allow-2119">must</span> be
 [=subsumes|subsumed=] by |requirement|.
 
 ### Navigables ### {#patch-navigable}
 
-We'll add a <dfn for="navigable">required connection allowlist</dfn> item to the [=navigable=]
+We'll add a <dfn for="navigable">connection allowlist requirement</dfn> item to the <a href="https://html.spec.whatwg.org/multipage/document-sequences.html#navigable">navigable</a>
 [=struct=], which is a [=Required Connection Allowlist=] or `null`. It is initially `null`.
 
 We'll update the [=create a new child navigable=] algorithm to initialize this value:
@@ -702,18 +753,18 @@ We'll update the [=create a new child navigable=] algorithm to initialize this v
     <{iframe/allowlist}> attribute, let |attrValue| be the result of [=parsing=] it as a
     [=Connection Allowlist=] header.
 
-2.  If |attrValue| is not `null`, set the new [=navigable=]'s
-    [=navigable/required connection allowlist=] to |attrValue|.
+2.  If |attrValue| is not `null`, set the new <a href="https://html.spec.whatwg.org/multipage/document-sequences.html#navigable">navigable</a>'s
+    [=navigable/connection allowlist requirement=] to |attrValue|.
 
 3.  Otherwise, if the <var ignore>container</var>'s [=node document=] has a
-    [=policy container/required connection allowlist=] (|parentRequirement|), set the new
-    [=navigable=]'s [=navigable/required connection allowlist=] to |parentRequirement|.
+    [=policy container/connection allowlist requirement=] (|parentRequirement|), set the new
+    <a href="https://html.spec.whatwg.org/multipage/document-sequences.html#navigable">navigable</a>'s [=navigable/connection allowlist requirement=] to |parentRequirement|.
 
 ### Navigation Lifecycle ### {#patch-navigation}
 
 We'll update the [=create navigation params by fetching=] algorithm:
 
-1.  If the [=navigable=] has a non-null [=navigable/required connection allowlist=] (|requirement|):
+1.  If the <a href="https://html.spec.whatwg.org/multipage/document-sequences.html#navigable">navigable</a> has a non-null [=navigable/connection allowlist requirement=] (|requirement|):
 
     1.  Let |serialized| be the result of [$serialize|serializing$] |requirement|.
 
@@ -726,7 +777,7 @@ We'll update the [=create navigation params by fetching=] algorithm's response p
 1.  Let |response allowlist| be the result of [$parse a response's Connection Allowlists|parsing
     a response's Connection Allowlists$] given the <var ignore>response</var>.
 
-2.  If the [=navigable=] has a non-null [=navigable/required connection allowlist=] (|requirement|):
+2.  If the <a href="https://html.spec.whatwg.org/multipage/document-sequences.html#navigable">navigable</a> has a non-null [=navigable/connection allowlist requirement=] (|requirement|):
 
     1.  If |response allowlist| is empty, or if none of its items [=subsumes|subsume=] |requirement|,
         then:
@@ -737,8 +788,8 @@ We'll update the [=create navigation params by fetching=] algorithm's response p
 
 3.  When creating the [=policy container=] for the new `Document`:
 
-    1.  Set its [=policy container/required connection allowlist=] to the [=navigable=]'s
-        [=navigable/required connection allowlist=].
+    1.  Set its [=policy container/connection allowlist requirement=] to the <a href="https://html.spec.whatwg.org/multipage/document-sequences.html#navigable">navigable</a>'s
+        [=navigable/connection allowlist requirement=].
 
 
 Integration with WebRTC {#rtc}
@@ -796,7 +847,7 @@ DNS {#security-dns}
 Connection Allowlists aim to mitigate the risk of exfiltration through DNS lookups, altering Fetch's
 [=resolve an origin=] algorithm to check the allowlist before sending a DNS request. This will
 address both the implicit lookups resulting from the use of elements and APIs that send requests
-(<{img}> tags, {{fetch()}}, etc), but also explicit lookups triggered by mechanisms like
+(<{img}> tags, {{fetch(input)|fetch()}}, etc), but also explicit lookups triggered by mechanisms like
 <a attr-value for="link/rel">`dns-prefetch`</a>.
 
 That said, the allowlist relies on URL-based matching to determine whether a given endpoint is
