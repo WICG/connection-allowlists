@@ -29,6 +29,9 @@ urlPrefix: https://www.rfc-editor.org/rfc/rfc9651; spec: RFC9651
     type: abstract-op
         text: serializing a list; url: #name-serializing-a-list
         text: parsing structured fields; url: #name-parsing-structured-fields
+urlPrefix: https://html.spec.whatwg.org/; spec: HTML
+    type: dfn
+        text: navigable; url: multipage/document-sequences.html#navigable
 </pre>
 <pre class="link-defaults">
 spec:fetch; type:dfn; for:/; text:request
@@ -563,12 +566,12 @@ Required Connection Allowlists {#required-allowlists}
 A <dfn export>Required Connection Allowlist</dfn> is a [=Connection Allowlist=] representing a set
 of constraints that an embedder requires an embedded document to opt-into.
 
-An embedder may assert these constraints by adding a <{iframe/connection-allowlist}> attribute to
+An embedder may assert these constraints by adding a <{iframe/connectionallowlist}> attribute to
 an <{iframe}> element, which will apply the requirement to the specified frame as well as any
 frames nested within that frame. During navigation to [=local scheme=] documents, valid requirements
 will be applied by subsetting the embedder's [=policy container/connection allowlist=]. Navigation
 to documents from non-[=local schemes=] will fail entirely unless the response asserts an allowlist
-that [=satisfies=] the specified requirements.
+that [$satisfies$] the specified requirements.
 
 These mechanisms are described in the monkey-patches below.
 
@@ -582,11 +585,31 @@ no allowlist is required for a given navigation, the header will not be included
 
 The <dfn http-header export>Allow-Connection-Allowlist-From</dfn> response [=header=] can be sent by
 servers when responding to a request asserting a Connection Allowlist requirement. Its value is
-either a [=structured field/string=] representing a serialized origin from which Connection
-Allowlist requirements are accepted, or the [=structured field/token=] "`*`" which represents
+either a [=structured header/string=] representing a serialized origin from which Connection
+Allowlist requirements are accepted, or the [=structured header/token=] "`*`" which represents
 acceptance of any origin's Connection Allowlist requirements.
 
+<div algorithm="parse accept">
+Parsing the [:Allow-Connection-Allowlist-From:] header from a [=/response=] will return either
+`null` if no valid header is present, `*` if the response accepts allowlists from any source, or
+an [=/origin=].
 
+To <dfn abstract-op>parse `Allow-Connection-Allowlist-From`</dfn> from a [=/response=] (|response|):
+
+1.  Let |accept| be the result of [=header list/get a structured field value|getting=]
+    [:Allow-Connection-Allowlist-From:] from |response|'s [=response/header list=] as an `item`.
+
+2.  If |accept| is the token `*`, return `*`.
+
+3.  If |accept| is a string:
+
+    1.  Let |parsed origin| be the result of [=basic URL parser|basic URL parsing=] |accept|.
+
+    2.  If |parsed origin| is not [=failure=], return |parsed origin|'s [=url/origin=].
+
+4.  Return `null`.
+
+</div>
 
 
 
@@ -594,11 +617,16 @@ Satisfying Requirements {#satisfaction}
 -----------------------
 
 <div algorithm="satisfies required connection allowlist">
-A [=Connection Allowlist=] (|allowlist|) <dfn abstract-op local-lt="satisfies">satisfies Connection
-Allowlist requirements</dfn> of a [=Required Connection Allowlist=] (|requirement|) if the following
+A [=Connection Allowlist=] (|allowlist|)
+<dfn abstract-op local-lt="satisfies" for="Connection Allowlist">satisfies Connection Allowlist
+requirements</dfn> of a [=Required Connection Allowlist=] (|requirement|) if the following
 algorithm returns [=success=]:
 
-1.  For each |pattern| in |allowlist|'s [=Connection Allowlist/allowlist=]:
+1.  If |requirement| is `null`, return [=success=].
+
+2.  If |allowlist| is `null`, return [=failure=].
+
+3.  For each |pattern| in |allowlist|'s [=Connection Allowlist/allowlist=]:
 
     1.  If |pattern| is not in |requirement|'s [=Connection Allowlist/allowlist=], return
         [=failure=].
@@ -614,17 +642,17 @@ algorithm returns [=success=]:
         <a grammar>`response-origin`</a> improves developer ergonomics for some kinds of resources.
         It seems worth the potential confusion to allow.
 
-2.  If |requirement|'s [=Connection Allowlist/redirects=] is
+4.  If |requirement|'s [=Connection Allowlist/redirects=] is
     <a grammar for="Connection Allowlist/redirects">block</a> and |allowlist|'s
     [=Connection Allowlist/redirects=] is <a grammar for="Connection Allowlist/redirects">allow</a>,
     return [=failure=].
 
-3.  If |requirement|'s [=Connection Allowlist/webrtc=] is
+5.  If |requirement|'s [=Connection Allowlist/webrtc=] is
     <a grammar for="Connection Allowlist/webrtc">block</a> and |allowlist|'s
     [=Connection Allowlist/webrtc=] is <a grammar for="Connection Allowlist/webrtc">allow</a>,
     return [=failure=].
 
-4.  Return [=success=].
+6.  Return [=success=].
 
 <div class="example" id="does-satisfy-required-connection-allowlist">
 For the [=Required Connection Allowlist=] `("https://example.com" "https://allowed.*")`:
@@ -641,6 +669,36 @@ For the [=Required Connection Allowlist=] `("https://example.com" "https://allow
     determining whether one regular expression is a logical subset of another.
 
 </div>
+</div>
+
+<div algorithm="response-satisfies-requirements">
+A [=/response=] (|response|) <dfn for="response" abstract-op>satisfies Connection Allowlist
+requirements</dfn> of a [=Required Connection Allowlist=] (|requirement|) and [=/origin=]
+(|origin|) if the following algorithm returns [=success=]:
+
+1.  If |requirement| is `null`, return [=success=].
+
+2.  If |response|'s [=response/header list=] [=header list/contains=] both the headers
+    [:Allow-Connection-Allowlist-From:] and [:Connection-Allowlist:], return [=failure=].
+
+    Note: The goal here is clarity: asserting a policy and asserting your acceptance of someone
+    else's policy makes it unclear what constraints you intend to operate under. Rejecting responses
+    that assert both simplifies the developer story.
+
+3.  Let |accept| be the result of
+    [$parse Allow-Connection-Allowlist-From|parsing the `Allow-Connection-Allowlist-From` header$]
+    from |response|.
+
+4.  If |accept| is `*`, return [=success=].
+
+5.  If |accept| is an [=/origin=] which is [=same origin=] with |origin|
+
+3.  Let |accept from| be the result of [=header list/getting=] [:Allow-Connection-Allowlist-From:]
+    from |response|.
+
+3.  Let |allowlist| be the result of
+
+
 </div>
 
 
@@ -728,19 +786,76 @@ directly, but is instead propagated from the [=navigable=] during navigation, as
 
 ### `<iframe>` Elements ### {#patch-iframe}
 
-We'll add an <dfn element-attr for="iframe">allowlist</dfn> attribute to the <{iframe}> element.
-Its value must be a <a href="https://www.w3.org/TR/CSP3/#attribute-value">valid attribute value</a> for a [=Connection Allowlist=] header.
+We'll add an <dfn element-attr for="iframe">connectionallowlist</dfn> attribute to the <{iframe}>
+element. Its value will be parsed just as we'd parse a [:Connection-Allowlist:]'s value. Invalid
+values have no effect, while valid values will be used as the [=required connection allowlist=] for
+the nested navigation.
 
-We'll also update the {{HTMLIFrameElement}} interface:
+We'll also update the {{HTMLIFrameElement}} interface to expose this value:
 
 <xmp class="idl">
 partial interface HTMLIFrameElement {
-  [CEReactions, Reflect] attribute DOMString allowlist;
+  [CEReactions, Reflect] attribute DOMString connectionAllowlist;
 };
 </xmp>
 
-When an <{iframe}> element's [=node document=] has a [=policy container/connection allowlist requirement=] (|requirement|), the value of its <{iframe/allowlist}> attribute <span class="allow-2119">must</span> be
-[=subsumes|subsumed=] by |requirement|.
+<div algorithm="parse iframe attribute">
+To <dfn abstract-op>obtain a Required Connection Allowlist</dfn> for an <{iframe}> (|iframe|):
+
+1.  Let |embedder requirement| be |iframe|'s [=node document=]'s [=Document/policy container=]'s
+    [=policy container/connection allowlist requirement=].
+
+2.  If |iframe| does not have a <{iframe/connectionallowlist}> attribute, return
+    |embedder requirement|.
+
+3.  Let |list| be the result of [$parsing structured fields$] with <var ignore>input_string</var>
+    set to |iframe|'s <{iframe/connectionallowlist}> attribute value, and
+    <var ignore>header_type</var> set to "`list`".
+
+4.  If parsing failed, return |embedder requirement|.
+
+5.  Let |element requirement| be the result of [$parse a Connection Allowlist header|parsing$]
+    |list|, |iframe|'s [=node document=]'s [=Document/URL=], and
+    <a grammar for="Connection Allowlist/disposition">enforce</a>.
+
+6.  If |element requirement| [$satisfies$] |embedder requirement|, return |element requirement|.
+
+7.  Return |embedder requirement|.
+
+NOTE: Regarding validity: we could fail open or we could fail closed when encountering an invalid
+allowlist value. Here, we've chosen to ignore invalid values by returning the embedder's requirement
+whenever an unparsable or unacceptably loose allowlist is encountered. It might be reasonable to
+take a more noticable approach by simply blocking navigation in such frames, but that could create
+forward compatibility risk. The approach above is safe, and less likely to bite us in the future.
+
+</div>
+
+### Navigation ### {#patch-navigation-algorithms}
+
+We'll make a few changes to the process of navigating documents within <{iframe}> elements in order
+to enforce the required connection allowlist:
+
+During [=create navigation params by fetching=], we'll alter the request to contain relevant
+headers, and add an enforcement step once a response has been obtained.
+
+Step 21.13 of [=create navigation params by fetching=] is altered as follows:
+
+<div algorithm="patch-navigation-params-by-fetching">
+<ol start="13">
+  13. If |response| is not a [=network error=], |navigable| is a [=child navigable=], and any of
+      the following conditions are true; set |response| to a [=network error=] and [=/break=]:
+
+      *  The result of performing a [=cross-origin resource policy check=] with |navigable|'s
+         [=navigable/container document=]'s [=Document/origin=], |navigable|'s
+         [=navigable/container document=]'s [=relevant settings object=], <var ignore>request</var>'s
+         [=request/destination=], |response|, and `true` is [=blocked=].
+
+      *  
+
+</ol>
+</div>
+
+
 
 ### Navigables ### {#patch-navigable}
 
@@ -750,7 +865,7 @@ We'll add a <dfn for="navigable">connection allowlist requirement</dfn> item to 
 We'll update the [=create a new child navigable=] algorithm to initialize this value:
 
 1.  If the <var ignore>container</var> (the <{iframe}> element) has an
-    <{iframe/allowlist}> attribute, let |attrValue| be the result of [=parsing=] it as a
+    <{iframe/connectionallowlist}> attribute, let |attrValue| be the result of [=parsing=] it as a
     [=Connection Allowlist=] header.
 
 2.  If |attrValue| is not `null`, set the new <a href="https://html.spec.whatwg.org/multipage/document-sequences.html#navigable">navigable</a>'s
