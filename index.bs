@@ -327,13 +327,15 @@ To <dfn abstract-op local-lt="matches">match a URL to a Connection Allowlist</df
 (|url|) and a [=connection allowlist=] (|connection allowlist|), execute the following steps,
 which return [=success=] or [=failure=].
 
-1.  [=list/iterate|For each=] |pattern| in |connection allowlist|'s
+1.  If |url| [=is local=], return [=success=].
+
+2.  [=list/iterate|For each=] |pattern| in |connection allowlist|'s
     [=Connection Allowlist/allowlist=]:
 
     1.  If [=URL pattern/match|URL pattern matching=] given |pattern| and |url| does not return
         `null`, return [=success=].
 
-2.  Return [=failure=].
+3.  Return [=failure=].
 
 </div>
 
