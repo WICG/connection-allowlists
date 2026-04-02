@@ -6,7 +6,7 @@
   <link href="https://www.w3.org/StyleSheets/TR/2021/W3C-UD" rel="stylesheet">
   <meta content="Bikeshed version 0ef803fdf, updated Tue Jan 6 11:59:39 2026 -0800" name="generator">
   <link href="https://wicg.github.io/connection-allowlists/" rel="canonical">
-  <meta content="669e4c2bfac23303d58f698cde88b8a65b29af16" name="revision">
+  <meta content="0e8ffa1bdb4724f7217a43b72b71bdac9f683ec0" name="revision">
   <meta content="dark light" name="color-scheme">
   <link href="https://www.w3.org/StyleSheets/TR/2021/dark.css" media="(prefers-color-scheme: dark)" rel="stylesheet" type="text/css">
 <style>/* Boilerplate: style-autolinks */
@@ -737,7 +737,7 @@ var[data-var-color="6"] { --var-vg: #FFBCF2; }
   <div class="head">
    <h1 class="no-ref p-name" id="title">Connection Allowlists</h1>
    <p id="w3c-state"><a href="https://www.w3.org/standards/types/#UD">Unofficial Proposal Draft</a>,
-    <time class="dt-updated" datetime="2026-03-23">23 March 2026</time></p>
+    <time class="dt-updated" datetime="2026-04-02">2 April 2026</time></p>
    <div data-fill-with="spec-metadata">
     <dl>
      <dt>This version:
@@ -1116,12 +1116,14 @@ which return <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#succes
 
     <ol>
      <li data-md>
+      <p>If <var>url</var> <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#is-local" id="ref-for-is-local">is local</a>, return <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#success" id="ref-for-success①">success</a>.</p>
+     <li data-md>
       <p><a data-link-type="dfn" href="https://infra.spec.whatwg.org/#list-iterate" id="ref-for-list-iterate②">For each</a> <var>pattern</var> in <var>connection allowlist</var>’s
 <a data-link-type="dfn" href="#connection-allowlist-allowlist" id="ref-for-connection-allowlist-allowlist①">allowlist</a>:</p>
       <ol>
        <li data-md>
         <p>If <a data-link-type="dfn" href="https://urlpattern.spec.whatwg.org/#url-pattern-match" id="ref-for-url-pattern-match">URL pattern matching</a> given <var>pattern</var> and <var>url</var> does not return
-<code>null</code>, return <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#success" id="ref-for-success①">success</a>.</p>
+<code>null</code>, return <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#success" id="ref-for-success②">success</a>.</p>
       </ol>
      <li data-md>
       <p>Return <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#failure" id="ref-for-failure①">failure</a>.</p>
@@ -1131,7 +1133,7 @@ which return <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#succes
     
 To <dfn class="dfn-paneled" data-dfn-type="abstract-op" data-export data-local-lt="match host" id="abstract-opdef-match-a-host-to-a-connection-allowlist">match a host to a Connection Allowlist</dfn> given a
 <a data-link-type="dfn" href="https://url.spec.whatwg.org/#concept-host" id="ref-for-concept-host">host</a> (<var>host</var>) and a <a data-link-type="dfn" href="#connection-allowlist" id="ref-for-connection-allowlist②">connection allowlist</a> (<var>connection allowlist</var>), execute the following
-steps, which return <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#success" id="ref-for-success②">success</a> or <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#failure" id="ref-for-failure②">failure</a>.
+steps, which return <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#success" id="ref-for-success③">success</a> or <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#failure" id="ref-for-failure②">failure</a>.
 
 
     <ol>
@@ -1150,7 +1152,7 @@ set to <var>pattern</var>’s <a data-link-type="dfn" href="https://urlpattern.s
 "https://" and <var>host</var> as a URL.</p>
        <li data-md>
         <p>If <a data-link-type="dfn" href="https://urlpattern.spec.whatwg.org/#url-pattern-match" id="ref-for-url-pattern-match①">URL pattern matching</a> given <var>host-only pattern</var> and <var>synthetic url</var> does not
-return <code>null</code>, return <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#success" id="ref-for-success③">success</a>.</p>
+return <code>null</code>, return <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#success" id="ref-for-success④">success</a>.</p>
       </ol>
      <li data-md>
       <p>Return <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#failure" id="ref-for-failure③">failure</a>.</p>
@@ -1654,6 +1656,7 @@ allowed.</p>
      <li><span class="dfn-paneled" id="5c66de35">get a structured field value</span>
      <li><span class="dfn-paneled" id="c9e7c11a">header</span>
      <li><span class="dfn-paneled" id="f7b00a8b">header list</span>
+     <li><span class="dfn-paneled" id="8f26de31">is local</span>
      <li><span class="dfn-paneled" id="8e1fb11c">obtain a connection</span>
      <li><span class="dfn-paneled" id="86efadaf">policy container</span>
      <li><span class="dfn-paneled" id="55213b5b">request</span>
@@ -2067,11 +2070,12 @@ let dfnPanelData = {
 "8a7dfd23": {"dfnID":"8a7dfd23","dfnText":"postMessage(message, options)","external":true,"refSections":[{"refs":[{"id":"ref-for-dom-window-postmessage-options"}],"title":"5.4. postMessage(...)"}],"url":"https://html.spec.whatwg.org/multipage/web-messaging.html#dom-window-postmessage-options"},
 "8e1fb11c": {"dfnID":"8e1fb11c","dfnText":"obtain a connection","external":true,"refSections":[{"refs":[{"id":"ref-for-concept-connection-obtain"},{"id":"ref-for-concept-connection-obtain\u2460"}],"title":"4.1. Integration with Fetch"}],"url":"https://fetch.spec.whatwg.org/#concept-connection-obtain"},
 "8ea172e9": {"dfnID":"8ea172e9","dfnText":"sandbox","external":true,"refSections":[{"refs":[{"id":"ref-for-sandbox"}],"title":"5.1. Same-Origin Contexts"}],"url":"https://w3c.github.io/webappsec-csp/#sandbox"},
+"8f26de31": {"dfnID":"8f26de31","dfnText":"is local","external":true,"refSections":[{"refs":[{"id":"ref-for-is-local"}],"title":"3.2. Matching"}],"url":"https://fetch.spec.whatwg.org/#is-local"},
 "90f4193a": {"dfnID":"90f4193a","dfnText":"URLPatternInit","external":true,"refSections":[{"refs":[{"id":"ref-for-dictdef-urlpatterninit"}],"title":"3.2. Matching"}],"url":"https://urlpattern.spec.whatwg.org/#dictdef-urlpatterninit"},
 "9239678f": {"dfnID":"9239678f","dfnText":"endpoint","external":true,"refSections":[{"refs":[{"id":"ref-for-endpoint"}],"title":"1. Introduction"},{"refs":[{"id":"ref-for-endpoint\u2460"}],"title":"2. Connection Allowlists"},{"refs":[{"id":"ref-for-endpoint\u2461"}],"title":"3. Connection Allowlist Headers"}],"url":"https://w3c.github.io/reporting/#endpoint"},
 "959ad97b": {"dfnID":"959ad97b","dfnText":"origin","external":true,"refSections":[{"refs":[{"id":"ref-for-concept-url-origin"}],"title":"3. Connection Allowlist Headers"},{"refs":[{"id":"ref-for-concept-url-origin\u2460"}],"title":"3.1. Parsing"}],"url":"https://url.spec.whatwg.org/#concept-url-origin"},
 "984221ca": {"dfnID":"984221ca","dfnText":"struct","external":true,"refSections":[{"refs":[{"id":"ref-for-struct"}],"title":"2. Connection Allowlists"},{"refs":[{"id":"ref-for-struct\u2460"}],"title":"4.2. Integration with HTML"}],"url":"https://infra.spec.whatwg.org/#struct"},
-"98b32dd9": {"dfnID":"98b32dd9","dfnText":"success","external":true,"refSections":[{"refs":[{"id":"ref-for-success"},{"id":"ref-for-success\u2460"},{"id":"ref-for-success\u2461"},{"id":"ref-for-success\u2462"}],"title":"3.2. Matching"}],"url":"https://infra.spec.whatwg.org/#success"},
+"98b32dd9": {"dfnID":"98b32dd9","dfnText":"success","external":true,"refSections":[{"refs":[{"id":"ref-for-success"},{"id":"ref-for-success\u2460"},{"id":"ref-for-success\u2461"},{"id":"ref-for-success\u2462"},{"id":"ref-for-success\u2463"}],"title":"3.2. Matching"}],"url":"https://infra.spec.whatwg.org/#success"},
 "9a15e8d7": {"dfnID":"9a15e8d7","dfnText":"build a URL pattern from an HTTP structured field value","external":true,"refSections":[{"refs":[{"id":"ref-for-build-a-url-pattern-from-an-http-structured-field-value"}],"title":"3.1. Parsing"}],"url":"https://urlpattern.spec.whatwg.org/#build-a-url-pattern-from-an-http-structured-field-value"},
 "9b40f5cd": {"dfnID":"9b40f5cd","dfnText":"fetch directives","external":true,"refSections":[{"refs":[{"id":"ref-for-fetch-directives"}],"title":"1.2. Overlap with Content Security Policy"}],"url":"https://w3c.github.io/webappsec-csp/#fetch-directives"},
 "9cce47fd": {"dfnID":"9cce47fd","dfnText":"sequence","external":true,"refSections":[{"refs":[{"id":"ref-for-idl-sequence"}],"title":"3.3. Reporting"}],"url":"https://webidl.spec.whatwg.org/#idl-sequence"},
@@ -2574,6 +2578,7 @@ let refsData = {
 "https://fetch.spec.whatwg.org/#concept-response-header-list": {"displayText":"header list","export":true,"for_":["response"],"level":"1","normative":true,"shortname":"fetch","spec":"fetch","status":"current","text":"header list","type":"dfn","url":"https://fetch.spec.whatwg.org/#concept-response-header-list"},
 "https://fetch.spec.whatwg.org/#concept-response-url": {"displayText":"URL","export":true,"for_":["response"],"level":"1","normative":true,"shortname":"fetch","spec":"fetch","status":"current","text":"url","type":"dfn","url":"https://fetch.spec.whatwg.org/#concept-response-url"},
 "https://fetch.spec.whatwg.org/#dom-global-fetch": {"displayText":"fetch(input)","export":true,"for_":["WindowOrWorkerGlobalScope"],"level":"1","normative":true,"shortname":"fetch","spec":"fetch","status":"current","text":"fetch(input)","type":"method","url":"https://fetch.spec.whatwg.org/#dom-global-fetch"},
+"https://fetch.spec.whatwg.org/#is-local": {"displayText":"is local","export":true,"for_":[],"level":"1","normative":true,"shortname":"fetch","spec":"fetch","status":"current","text":"is local","type":"dfn","url":"https://fetch.spec.whatwg.org/#is-local"},
 "https://fetch.spec.whatwg.org/#resolve-an-origin": {"displayText":"resolve an origin","export":true,"for_":[],"level":"1","normative":true,"shortname":"fetch","spec":"fetch","status":"current","text":"resolve an origin","type":"dfn","url":"https://fetch.spec.whatwg.org/#resolve-an-origin"},
 "https://html.spec.whatwg.org/multipage/browsers.html#ascii-serialisation-of-an-origin": {"displayText":"ASCII serialization of an origin","export":true,"for_":[],"level":"1","normative":true,"shortname":"html","spec":"html","status":"current","text":"ascii serialization of an origin","type":"dfn","url":"https://html.spec.whatwg.org/multipage/browsers.html#ascii-serialisation-of-an-origin"},
 "https://html.spec.whatwg.org/multipage/browsers.html#concept-origin-host": {"displayText":"host","export":true,"for_":["origin"],"level":"1","normative":true,"shortname":"html","spec":"html","status":"current","text":"host","type":"dfn","url":"https://html.spec.whatwg.org/multipage/browsers.html#concept-origin-host"},
