@@ -48,7 +48,7 @@ Introduction {#intro}
 Developers wish to have control over the resources loaded into their pages' contexts and the
 endpoints to which their pages can make requests. This control is necessary for several purposes,
 including limiting the ways in which users' data can flow through the user agent (mitigating
-exfiltration attacks) and ensuring control over a site's architecture and depedencies.
+exfiltration attacks) and ensuring control over a site's architecture and dependencies.
 
 Content Security Policy addresses some of this need, but does so in a way that is more granular
 than necessary for the most critical use cases, and with a syntax and grammar that's complicated
@@ -70,7 +70,7 @@ comprehensive.
   This header, delivered along with a document to which a user has navigated, would restrict that
   document to allow requests and connections only to those endpoints which matched the URL patterns
   [[URLPATTERN]] specified in the list: the origin from which the document was delivered,
-  `https://cdn.example`, ny subdomain of any host whose penultimate DNS label is `example`,
+  `https://cdn.example`, any subdomain of any host whose penultimate DNS label is `example`,
   `https://api.example` on any port, and so on.
 
   Attempts to connect to endpoints that don't match the allowlist will be blocked, and reported via
@@ -98,7 +98,7 @@ and/or misconfigurations:
     effective as an exfiltration defense, we must block connections before they're made.
 
 *   There are a plethora of side-channels available as unintended effects of otherwise-excellent
-    web platform APIs. This proposal does not attempt to address them, focusing instead soley on
+    web platform APIs. This proposal does not attempt to address them, focusing instead solely on
     those requests or connections explicitly initiated by the user agent on a page's behalf. This
     certainly includes the clear cases of {{fetch(input)|fetch()}} and {{XMLHttpRequest}}, along with resource
     requests generally. It also includes network connections established through channels that are
