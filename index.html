@@ -4,9 +4,9 @@
   <title>Connection Allowlists</title>
   <meta content="width=device-width, initial-scale=1, shrink-to-fit=no" name="viewport">
   <link href="https://www.w3.org/StyleSheets/TR/2021/W3C-UD" rel="stylesheet">
-  <meta content="Bikeshed version 0ef803fdf, updated Tue Jan 6 11:59:39 2026 -0800" name="generator">
+  <meta content="Bikeshed version 5d4d5b9a8, updated Fri Apr 17 13:49:40 2026 -0700" name="generator">
   <link href="https://wicg.github.io/connection-allowlists/" rel="canonical">
-  <meta content="0e8ffa1bdb4724f7217a43b72b71bdac9f683ec0" name="revision">
+  <meta content="78aea720f404774033c35099f157e5635015d954" name="revision">
   <meta content="dark light" name="color-scheme">
   <link href="https://www.w3.org/StyleSheets/TR/2021/dark.css" media="(prefers-color-scheme: dark)" rel="stylesheet" type="text/css">
 <style>/* Boilerplate: style-autolinks */
@@ -302,7 +302,7 @@ pre .property::before, pre .property::after {
 </style>
 <style>/* Boilerplate: style-counters */
 body {
-    counter-reset: example figure issue;
+    counter-reset: example figure issue table;
 }
 .issue {
     counter-increment: issue;
@@ -327,6 +327,13 @@ figcaption {
 }
 figcaption:not(.no-marker)::before {
     content: "Figure " counter(figure) " ";
+}
+
+figure.table figcaption {
+    counter-increment: table;
+}
+figure.table figcaption:not(.no-marker)::before {
+    content: "Table " counter(table) " ";
 }
 </style>
 <style>/* Boilerplate: style-dfn-panel */
@@ -689,6 +696,30 @@ c-[il] { color: #000000 } /* Literal.Number.Integer.Long */
     c-[vm] { color: #cb4b16 } /* Name.Variable.Magic */
     c-[il] { color: #657b83 } /* Literal.Number.Integer.Long */
 }
+
+@media print {
+    /* Darken colors for print that would otherwise print too faintly */
+    c-[c]  { color: #555555 } /* Comment */
+    c-[d]  { color: #555555 } /* Comment.Multiline */
+    c-[cp] { color: #555555 } /* Comment.Preproc */
+    c-[c1] { color: #555555 } /* Comment.Single */
+    c-[cs] { color: #555555 } /* Comment.Special */
+    c-[o]  { color: #222222 } /* Operator */
+    c-[p]  { color: #222222 } /* Punctuation */
+    c-[ow] { color: #222222 } /* Operator.Word */
+    c-[s]  { color: #664400 } /* Literal.String */
+    c-[t]  { color: #664400 } /* Literal.String.Single */
+    c-[u]  { color: #664400 } /* Literal.String.Double */
+    c-[sb] { color: #664400 } /* Literal.String.Backtick */
+    c-[sc] { color: #664400 } /* Literal.String.Char */
+    c-[sd] { color: #664400 } /* Literal.String.Doc */
+    c-[se] { color: #664400 } /* Literal.String.Escape */
+    c-[sh] { color: #664400 } /* Literal.String.Heredoc */
+    c-[si] { color: #664400 } /* Literal.String.Interpol */
+    c-[sx] { color: #664400 } /* Literal.String.Other */
+    c-[sr] { color: #664400 } /* Literal.String.Regex */
+    c-[ss] { color: #664400 } /* Literal.String.Symbol */
+}
 </style>
 <style>/* Boilerplate: style-var-click-highlighting */
 /*
@@ -737,7 +768,7 @@ var[data-var-color="6"] { --var-vg: #FFBCF2; }
   <div class="head">
    <h1 class="no-ref p-name" id="title">Connection Allowlists</h1>
    <p id="w3c-state"><a href="https://www.w3.org/standards/types/#UD">Unofficial Proposal Draft</a>,
-    <time class="dt-updated" datetime="2026-04-02">2 April 2026</time></p>
+    <time class="dt-updated" datetime="2026-04-19">19 April 2026</time></p>
    <div data-fill-with="spec-metadata">
     <dl>
      <dt>This version:
@@ -828,7 +859,7 @@ in a way that’s narrowly tailored to suit the problem.</p>
      <a href="#references"><span class="secno"></span> <span class="content">References</span></a>
      <ol class="toc">
       <li><a href="#normative"><span class="secno"></span> <span class="content">Normative References</span></a>
-      <li><a href="#informative"><span class="secno"></span> <span class="content">Informative References</span></a>
+      <li><a href="#informative"><span class="secno"></span> <span class="content">Non-Normative References</span></a>
      </ol>
     <li><a href="#idl-index"><span class="secno"></span> <span class="content">IDL Index</span></a>
     <li><a href="#issues-index"><span class="secno"></span> <span class="content">Issues Index</span></a>
@@ -839,7 +870,7 @@ in a way that’s narrowly tailored to suit the problem.</p>
    <p>Developers wish to have control over the resources loaded into their pages' contexts and the
 endpoints to which their pages can make requests. This control is necessary for several purposes,
 including limiting the ways in which users' data can flow through the user agent (mitigating
-exfiltration attacks) and ensuring control over a site’s architecture and depedencies.</p>
+exfiltration attacks) and ensuring control over a site’s architecture and dependencies.</p>
    <p>Content Security Policy addresses some of this need, but does so in a way that is more granular
 than necessary for the most critical use cases, and with a syntax and grammar that’s complicated
 by the other protections CSP is used to deploy. <a data-link-type="biblio" href="#biblio-csp" title="Content Security Policy Level 3">[CSP]</a></p>
@@ -858,7 +889,7 @@ Connection-Allowlist: (response-origin "https://cdn.example" "https://*.example.
     <p>This header, delivered along with a document to which a user has navigated, would restrict that
   document to allow requests and connections only to those endpoints which matched the URL patterns
   <a data-link-type="biblio" href="#biblio-urlpattern" title="URL Pattern Standard">[URLPATTERN]</a> specified in the list: the origin from which the document was delivered,
-  <code>https://cdn.example</code>, ny subdomain of any host whose penultimate DNS label is <code>example</code>,
+  <code>https://cdn.example</code>, any subdomain of any host whose penultimate DNS label is <code>example</code>,
   <code>https://api.example</code> on any port, and so on.</p>
     <p>Attempts to connect to endpoints that don’t match the allowlist will be blocked, and reported via
   a Reporting API <a data-link-type="biblio" href="#biblio-reporting" title="Reporting API">[REPORTING]</a> <a data-link-type="dfn" href="https://w3c.github.io/reporting/#endpoint" id="ref-for-endpoint">endpoint</a> specified in the <code>report-to</code> parameter (and defined
@@ -882,7 +913,7 @@ document/worker contexts.</p>
 effective as an exfiltration defense, we must block connections before they’re made.</p>
     <li data-md>
      <p>There are a plethora of side-channels available as unintended effects of otherwise-excellent
-web platform APIs. This proposal does not attempt to address them, focusing instead soley on
+web platform APIs. This proposal does not attempt to address them, focusing instead solely on
 those requests or connections explicitly initiated by the user agent on a page’s behalf. This
 certainly includes the clear cases of <code class="idl"><a data-link-type="idl" href="https://fetch.spec.whatwg.org/#dom-global-fetch" id="ref-for-dom-global-fetch">fetch()</a></code> and <code class="idl"><a data-link-type="idl" href="https://xhr.spec.whatwg.org/#xmlhttprequest" id="ref-for-xmlhttprequest">XMLHttpRequest</a></code>, along with resource
 requests generally. It also includes network connections established through channels that are
@@ -1802,7 +1833,7 @@ allowed.</p>
    <dt id="biblio-xhr">[XHR]
    <dd>Anne van Kesteren. <a href="https://xhr.spec.whatwg.org/"><cite>XMLHttpRequest Standard</cite></a>. Living Standard. URL: <a href="https://xhr.spec.whatwg.org/">https://xhr.spec.whatwg.org/</a>
   </dl>
-  <h3 class="heading no-num no-ref settled" id="informative"><span class="content">Informative References</span><a class="self-link" href="#informative"></a></h3>
+  <h3 class="heading no-num no-ref settled" id="informative"><span class="content">Non-Normative References</span><a class="self-link" href="#informative"></a></h3>
   <dl>
    <dt id="biblio-csp-embedded-enforcement">[CSP-EMBEDDED-ENFORCEMENT]
    <dd>Mike West. <a href="https://w3c.github.io/webappsec-cspee/"><cite>Content Security Policy: Embedded Enforcement</cite></a>. URL: <a href="https://w3c.github.io/webappsec-cspee/">https://w3c.github.io/webappsec-cspee/</a>
