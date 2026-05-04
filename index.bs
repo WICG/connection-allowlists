@@ -2,7 +2,7 @@
 Title: Connection Allowlists
 Shortname: connection-allowlists
 Level: 1
-Status: UD
+Status: CG-DRAFT
 Group: WICG
 Repository: wicg/connection-allowlists
 URL: https://wicg.github.io/connection-allowlists/
