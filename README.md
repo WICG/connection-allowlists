@@ -108,9 +108,6 @@ client-side attacks and/or misconfigurations:
     by the document (links, forms, speculation rules, navigation API calls etc)
     and not browser initiated navigations (back button, URL bar). 
 
-    
-
-
 Questions
 ---------
 
