@@ -104,6 +104,12 @@ client-side attacks and/or misconfigurations:
     "[You're going to have to rethink a ban on redirects.](#youre-going-to-have-to-rethink-a-ban-on-redirects)"
     below).
 
+*   For navigations - this proposal specifically targets navigations initiated
+    by the document (links, forms, speculation rules, navigation API calls etc)
+    and not browser initiated navigations (back button, URL bar). 
+
+    
+
 
 Questions
 ---------
@@ -128,8 +134,8 @@ Three reasons:
 
 3.  CSP's coverage is incomplete: While CSP does a good job covering HTTP requests which run
     through Fetch, it does not exhaustively cover the myriad ways in which web platform APIs
-    allow connections to be established. DNS prefetch and WebRTC are good examples to start
-    with, but there are many others which have struggled with exactly how they fit into CSP's
+    allow connections to be established. DNS prefetch, `navigate-to`, and WebRTC are good examples
+    to start with, but there are many others which have struggled with exactly how they fit into CSP's
     threat model. By creating a new policy with a narrow focus and explicit promise to developers,
     these discussions will have a defensible answer and a clear mandate to specification authors.
 
