@@ -599,6 +599,23 @@ To constrain WebRTC connections, [[webrtc]] can call into the [$should WebRTC be
 algorithm while determining whether candidates are <a spec="webrtc">administratively prohibited</a>.
 
 
+Integration with Service Workers {#service-workers}
+---------------------
+
+Beyond the default behavior of applying the service worker's own [=WorkerGlobalScope/policy container=],
+service workers need to apply their own connection allowlist when invoking a navigation using {{WindowClient}} APIs.
+
+The {{WindowClient/navigate()}} and {{Clients/openWindow(url)}} algorithms must both be patched as follows:
+
+<div algorithm="monkey patching WindowClient navigate and openWindow">
+  <ol start="4">
+    4. <ins>If [$should url be blocked by Connection Allowlists$] returns [=blocked=] when executed
+        upon <var ignore>url</var>, [=this=]'s [=relevant settings object=], and [=this=]'s
+        [=relevant settings object=]'s [=environment settings object/policy container=]'s [=policy container/connection allowlists=],
+        then return a  [=promise=] rejected with a {{TypeError}}.</ins>
+  </ol>
+</div>
+
 Security and Privacy Considerations {#security}
 ===================================
 
