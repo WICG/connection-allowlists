@@ -612,7 +612,7 @@ The {{WindowClient/navigate()}} and {{Clients/openWindow(url)}} algorithms must 
     4. <ins>If [$should url be blocked by Connection Allowlists$] returns [=blocked=] when executed
         upon <var ignore>url</var>, [=this=]'s [=relevant settings object=], and [=this=]'s
         [=relevant settings object=]'s [=environment settings object/policy container=]'s [=policy container/connection allowlists=],
-        then return a  [=promise=] rejected with a {{TypeError}}.</ins>
+        then return a  [=promise=] rejected with a {{"SecurityError"}} {{DOMException}}.</ins>
   </ol>
 </div>
 
