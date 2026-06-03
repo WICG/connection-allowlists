@@ -600,7 +600,7 @@ algorithm while determining whether candidates are <a spec="webrtc">administrati
 
 
 Integration with Service Workers {#service-workers}
----------------------
+--------------------------------
 
 Beyond the default behavior of applying the service worker's own [=WorkerGlobalScope/policy container=],
 service workers need to apply their own connection allowlist when invoking a navigation using {{WindowClient}} APIs.
