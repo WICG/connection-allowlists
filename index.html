@@ -4,9 +4,9 @@
   <title>Connection Allowlists</title>
   <meta content="width=device-width, initial-scale=1, shrink-to-fit=no" name="viewport">
   <link href="https://www.w3.org/StyleSheets/TR/2021/cg-draft" rel="stylesheet">
-  <meta content="Bikeshed version cfb78d9c0, updated Tue Jun 2 16:21:00 2026 -0700" name="generator">
+  <meta content="Bikeshed version e74aa0952, updated Fri Jun 5 23:16:28 2026 +0000" name="generator">
   <link href="https://wicg.github.io/connection-allowlists/" rel="canonical">
-  <meta content="841d25f3aa443adb5dcd9a9647c68511e3ff779c" name="revision">
+  <meta content="fa24f874c501dc7b8d0755e8c7194e9bc941d0c9" name="revision">
   <meta content="dark light" name="color-scheme">
   <link href="https://www.w3.org/StyleSheets/TR/2021/dark.css" media="(prefers-color-scheme: dark)" rel="stylesheet" type="text/css">
 <style>/* Boilerplate: style-autolinks */
@@ -768,7 +768,7 @@ var[data-var-color="6"] { --var-vg: #FFBCF2; }
   <div class="head">
    <h1 class="no-ref p-name" id="title">Connection Allowlists</h1>
    <p id="w3c-state"><a href="https://www.w3.org/standards/types/#CG-DRAFT">Draft Community Group Report</a>,
-    <time class="dt-updated" datetime="2026-06-03">3 June 2026</time></p>
+    <time class="dt-updated" datetime="2026-06-09">9 June 2026</time></p>
    <div data-fill-with="spec-metadata">
     <dl>
      <dt>This version:
@@ -1452,6 +1452,7 @@ upon <var>url</var>, <a data-link-type="dfn" href="https://webidl.spec.whatwg.or
 then return a  <a data-link-type="dfn" href="https://wicg.github.io/web-smart-card/#transaction-state-promise" id="ref-for-transaction-state-promise">promise</a> rejected with a <code class="idl"><a data-link-type="idl" href="https://webidl.spec.whatwg.org/#securityerror" id="ref-for-securityerror">"SecurityError"</a></code> <code class="idl"><a data-link-type="idl" href="https://webidl.spec.whatwg.org/#idl-DOMException" id="ref-for-idl-DOMException">DOMException</a></code>.</ins>
     </ol>
    </div>
+   <p class="issue" id="issue-adc5e302"><a class="self-link" href="#issue-adc5e302"></a> <code class="idl"><a data-link-type="idl" href="https://w3c.github.io/ServiceWorker/#dom-windowclient-navigate" id="ref-for-dom-windowclient-navigate①">navigate()</a></code> passes the current document as the <code>sourceDocument</code> of the navigation. This seems a bit like an oversight. See <a href="https://github.com/WICG/connection-allowlists/pull/26#discussion_r3348923614">discussion</a>.</p>
    <h2 class="heading settled" data-level="5" id="security"><span class="secno">5. </span><span class="content">Security and Privacy Considerations</span><a class="self-link" href="#security"></a></h2>
    <h3 class="heading settled" data-level="5.1" id="security-same-origin"><span class="secno">5.1. </span><span class="content">Same-Origin Contexts</span><a class="self-link" href="#security-same-origin"></a></h3>
    <p>The threat model described in <a href="#threat-model">§ 1.1 Threat Model</a> is intentionally narrow, and developers will need
@@ -1885,6 +1886,7 @@ algorithms' callsites to identify the allowlist which ought to be used and the c
 for reporting. It might be better to instead ask those callsites to perform the checks themselves.
 My feeling is that we’ll be more successful by centralizing the logic, but it might be simpler to
 take a piecemeal approach. <a class="issue-return" href="#issue-dcabf3fa" title="Jump to section">↵</a></div>
+   <div class="issue"> <code class="idl"><a data-link-type="idl" href="https://w3c.github.io/ServiceWorker/#dom-windowclient-navigate">navigate()</a></code> passes the current document as the <code>sourceDocument</code> of the navigation. This seems a bit like an oversight. See <a href="https://github.com/WICG/connection-allowlists/pull/26#discussion_r3348923614">discussion</a>. <a class="issue-return" href="#issue-adc5e302" title="Jump to section">↵</a></div>
    <div class="issue"> It would also be ideal to give developers control over
 their dependencies' allowlists to some extent. An opt-in mechanism rooted in something like
 <a data-link-type="dfn" href="https://wicg.github.io/document-policy/#required-document-policy">required document policy</a> or <a data-link-type="biblio" href="#biblio-csp-embedded-enforcement" title="Content Security Policy: Embedded Enforcement">[csp-embedded-enforcement]</a>] might
@@ -2191,7 +2193,7 @@ let dfnPanelData = {
 "dom-connectionallowlistviolationreport-connection": {"dfnID":"dom-connectionallowlistviolationreport-connection","dfnText":"connection","external":false,"refSections":[{"refs":[{"id":"ref-for-dom-connectionallowlistviolationreport-connection"},{"id":"ref-for-dom-connectionallowlistviolationreport-connection\u2460"}],"title":"3.3. Reporting"}],"url":"#dom-connectionallowlistviolationreport-connection"},
 "dom-connectionallowlistviolationreport-disposition": {"dfnID":"dom-connectionallowlistviolationreport-disposition","dfnText":"disposition","external":false,"refSections":[{"refs":[{"id":"ref-for-dom-connectionallowlistviolationreport-disposition"},{"id":"ref-for-dom-connectionallowlistviolationreport-disposition\u2460"}],"title":"3.3. Reporting"}],"url":"#dom-connectionallowlistviolationreport-disposition"},
 "dom-connectionallowlistviolationreport-url": {"dfnID":"dom-connectionallowlistviolationreport-url","dfnText":"url","external":false,"refSections":[{"refs":[{"id":"ref-for-dom-connectionallowlistviolationreport-url"}],"title":"3.3. Reporting"}],"url":"#dom-connectionallowlistviolationreport-url"},
-"e76b6e66": {"dfnID":"e76b6e66","dfnText":"navigate(url)","external":true,"refSections":[{"refs":[{"id":"ref-for-dom-windowclient-navigate"}],"title":"4.4. Integration with Service Workers"}],"url":"https://w3c.github.io/ServiceWorker/#dom-windowclient-navigate"},
+"e76b6e66": {"dfnID":"e76b6e66","dfnText":"navigate(url)","external":true,"refSections":[{"refs":[{"id":"ref-for-dom-windowclient-navigate"},{"id":"ref-for-dom-windowclient-navigate\u2460"}],"title":"4.4. Integration with Service Workers"}],"url":"https://w3c.github.io/ServiceWorker/#dom-windowclient-navigate"},
 "ec2b473d": {"dfnID":"ec2b473d","dfnText":"required document policy","external":true,"refSections":[{"refs":[{"id":"ref-for-required-document-policy"}],"title":"5.1. Same-Origin Contexts"}],"url":"https://wicg.github.io/document-policy/#required-document-policy"},
 "ee7bba09": {"dfnID":"ee7bba09","dfnText":"response","external":true,"refSections":[{"refs":[{"id":"ref-for-concept-response"}],"title":"3. Connection Allowlist Headers"},{"refs":[{"id":"ref-for-concept-response\u2460"}],"title":"3.1. Parsing"}],"url":"https://fetch.spec.whatwg.org/#concept-response"},
 "enumdef-connectionallowlistdisposition": {"dfnID":"enumdef-connectionallowlistdisposition","dfnText":"ConnectionAllowlistDisposition","external":false,"refSections":[{"refs":[{"id":"ref-for-enumdef-connectionallowlistdisposition"}],"title":"3.3. Reporting"}],"url":"#enumdef-connectionallowlistdisposition"},
