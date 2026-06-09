@@ -616,6 +616,8 @@ The {{WindowClient/navigate()}} and {{Clients/openWindow(url)}} algorithms must 
   </ol>
 </div>
 
+ISSUE: {{WindowClient/navigate()}} passes the current document as the `sourceDocument` of the navigation. This seems a bit like an oversight. See [discussion](https://github.com/WICG/connection-allowlists/pull/26#discussion_r3348923614).
+
 Security and Privacy Considerations {#security}
 ===================================
 
