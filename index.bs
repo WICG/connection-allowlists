@@ -33,6 +33,7 @@ urlPrefix: https://www.rfc-editor.org/rfc/rfc9651; spec: RFC9651
 <pre class="link-defaults">
 spec:fetch; type:dfn; for:/; text:request
 spec:fetch; type:method; text:fetch(input)
+spec:dom; type:dfn; for:/; text:document
 spec:html; type:dfn; for:/; text:environment
 spec:html; type:dfn; for:/; text:policy container
 spec:html; type:interface; text:BroadcastChannel
@@ -521,6 +522,265 @@ To <dfn abstract-op local-lt="report">report a violation</dfn> given a [=URL=] o
 
 </div>
 
+Embedded Enforcement {#embedded-enforcement}
+====================
+
+Documents often embed content delivered by other servers, and wish to ensure that the embedded
+content is at least as constrained as they require. The [:Connection-Allowlist:] header lets a
+server constrain its own connections, but gives an embedder no control over the
+[=connection allowlists=] applied to the documents it frames. This section defines an opt-in
+mechanism, modeled on [[csp-embedded-enforcement]], that allows an embedder to require a particular
+[=connection allowlist=] of a framed document.
+
+An embedder declares the [=connection allowlist=] it requires of a frame via the
+{{HTMLIFrameElement/connectionAllowlist}} content attribute. The user agent communicates the
+requirement to the framed document in the [:Sec-Required-Connection-Allowlist:] request [=header=].
+The framed document opts into the requirement either by asserting a [:Connection-Allowlist:] which
+[=is at least as strict as=] the requirement, or by returning an [:Allow-Connection-Allowlist-From:]
+response [=header=] naming the embedder's [=/origin=]. Documents delivered from
+[=local scheme|local schemes=] (such as `about:srcdoc` and `data:`) opt in implicitly, as they
+inherit their embedder's [=/policy container=]. A frame that does not opt in is blocked.
+
+When a frame opts in, the required [=connection allowlist=] (or the frame's own stricter assertion)
+is added to the framed [=Document=]'s [=/policy container=], and the requirement is
+[=Document/required connection allowlist|inherited=] by the frame's descendants.
+
+<div class="example" id="example-embedded-enforcement">
+  An embedder constrains a widget to talk only to `https://good.example` and the widget's own
+  origin:
+
+  ```html
+  <iframe connectionAllowlist='("https://good.example" response-origin)'
+          src="https://widget.example/"></iframe>
+  ```
+
+  The user agent sends the requirement along with the navigation request:
+
+  ```http
+  GET / HTTP/1.1
+  Host: widget.example
+  Sec-Required-Connection-Allowlist: ("https://good.example" response-origin)
+  ```
+
+  The widget opts in either by acknowledging the embedder's origin...
+
+  ```http
+  Allow-Connection-Allowlist-From: https://embedder.example
+  ```
+
+  ...or by asserting a [=connection allowlist=] which [=is at least as strict as=] the requirement:
+
+  ```http
+  Connection-Allowlist: ("https://good.example" response-origin)
+  ```
+
+  In either case the frame loads, and the resulting [=Document=] is constrained to
+  `https://good.example` and its own [=/origin=]. Had the widget returned neither header (and not
+  been delivered from a [=local scheme|local scheme=]), the frame would have been blocked.
+</div>
+
+The `connectionAllowlist` attribute {#connection-allowlist-attribute}
+-----------------------------------
+
+<xmp class=idl>
+partial interface HTMLIFrameElement {
+  [CEReactions] attribute DOMString connectionAllowlist;
+};
+</xmp>
+
+The <dfn element-attr for=iframe><code>connectionAllowlist</code></dfn> content attribute gives the
+[=connection allowlist=] which the embedder requires of the [=Document=] the <{iframe}> frames. Its
+value uses the same grammar as the [:Connection-Allowlist:] header: a [=structured header=]
+[=structured header/list=] of [=structured header/inner lists=] (see [[#headers]]).
+
+The <dfn attribute for=HTMLIFrameElement>connectionAllowlist</dfn> IDL attribute must [=reflect=] the
+`connectionAllowlist` content attribute.
+
+Note: Unlike a server-asserted [:Connection-Allowlist:], which a document applies to itself, the
+`connectionAllowlist` attribute is set by an embedder and applied to <em>another</em> document. To
+avoid letting an embedder silently impose a policy upon unwilling cross-origin content, the framed
+document MUST opt in; see [[#embedded-enforcement-checking]].
+
+Embedded Enforcement Headers {#embedded-enforcement-headers}
+----------------------------
+
+The <dfn http-header export>`Sec-Required-Connection-Allowlist`</dfn> request [=header=] communicates
+the [=connection allowlist=] an embedder requires of a framed document. Its value is a
+[=structured header=] [=structured header/list=] using the [:Connection-Allowlist:] grammar. As a
+`Sec-` prefixed header, it is set only by the user agent and cannot be set or modified by script.
+
+The <dfn http-header export>`Allow-Connection-Allowlist-From`</dfn> response [=header=] allows a
+document to opt into having an embedder enforce a required [=connection allowlist=] upon it. Its
+value is either the [=structured header/token=] `*` or a single serialized [=/origin=].
+
+<div algorithm="parse an Allow-Connection-Allowlist-From header">
+To <dfn abstract-op>parse an Allow-Connection-Allowlist-From header</dfn> given a [=/response=]
+(|response|):
+
+1.  Let |value| be the result of [=getting a structured field value=] named
+    [:Allow-Connection-Allowlist-From:] as an "`item`" from |response|'s [=response/header list=].
+
+1.  If |value| is `null`, return `null`.
+
+1.  If |value| is the [=structured header/token=] `*`, return the special value
+    "<dfn>any embedder</dfn>".
+
+1.  If |value| is a [=structured header/string=]:
+
+    1.  Let |url| be the result of running the [=URL parser=] on |value|.
+
+    1.  If |url| is failure, return `null`.
+
+    1.  Return |url|'s [=url/origin=].
+
+1.  Return `null`.
+
+</div>
+
+Note: The [:Allow-Connection-Allowlist-From:] header mirrors
+[[csp-embedded-enforcement#allow-csp-from-header|Allow-CSP-From]], and serves the same purpose for
+[=connection allowlists=].
+
+Comparing allowlists {#embedded-enforcement-strictness}
+--------------------
+
+<div algorithm="is at least as strict as">
+A [=connection allowlist=] (|candidate|) <dfn lt="is at least as strict as|are at least as strict
+as">is at least as strict as</dfn> a [=connection allowlist=] (|requirement|) if all of the following
+are true:
+
+*   For each |pattern| in |candidate|'s [=Connection Allowlist/allowlist=], |requirement|'s
+    [=Connection Allowlist/allowlist=] [=list/contains=] |pattern|.
+
+*   If |requirement|'s [=Connection Allowlist/redirects=] is
+    <a grammar for="Connection Allowlist/redirects">block</a>, then |candidate|'s
+    [=Connection Allowlist/redirects=] is <a grammar for="Connection Allowlist/redirects">block</a>.
+
+*   If |requirement|'s [=Connection Allowlist/webrtc=] is
+    <a grammar for="Connection Allowlist/webrtc">block</a>, then |candidate|'s
+    [=Connection Allowlist/webrtc=] is <a grammar for="Connection Allowlist/webrtc">block</a>.
+
+Note: An empty |candidate| [=Connection Allowlist/allowlist=] permits no endpoints, and is therefore
+trivially at least as strict as any other allowlist.
+
+</div>
+
+ISSUE: Two [=URL patterns=] are treated as equal for the purposes of [=list/contains=] above when
+they were built from the same serialized [=structured header/string=]; the comparison is syntactic,
+not semantic. This is deliberate: deciding whether one [=URL pattern=] semantically subsumes another
+is hard, and a conservative set-membership test is sufficient for the use cases this feature targets.
+Because both allowlists are resolved against the framed [=/response=]'s [=response/URL=], the
+<a grammar for="Connection-Allowlist">`response-origin`</a> token resolves identically in each.
+
+Obtaining and enforcing a requirement {#embedded-enforcement-checking}
+-------------------------------------
+
+Each [=Document=] has a <dfn for=Document>required connection allowlist</dfn>, which is either `null`
+or a [=structured header=] [=structured header/list=]. It represents the requirement that the
+[=Document=] imposes upon the documents it embeds, and is propagated to descendant frames so that a
+constrained document cannot escape its constraints by embedding a more permissive child. It is `null`
+unless set during navigation as described below.
+
+Note: The value is stored as the (unresolved) [=structured header/list=], rather than as a resolved
+[=connection allowlist=], so that the <a grammar for="Connection-Allowlist">`response-origin`</a>
+token resolves against each framed [=/response=]'s [=response/URL=] independently as the requirement
+is inherited down the frame tree.
+
+<div algorithm="obtain the required connection allowlist">
+To <dfn abstract-op>obtain the required connection allowlist</dfn> for a [=child navigable=]
+(|navigable|) given a [=/URL=] (|url|):
+
+1.  Let |container| be |navigable|'s [=navigable/container=].
+
+1.  Let |parent required| be |container|'s [=node document=]'s
+    [=Document/required connection allowlist=].
+
+1.  If |container| is an <{iframe}> element that has a `connectionAllowlist` content attribute whose
+    value (|attribute value|) is not the empty string:
+
+    1.  Let |attribute list| be the result of [=getting a structured field value=] given
+        |attribute value| and "`list`".
+
+    1.  Let |attribute allowlist| be the result of [$parse header|parsing a Connection Allowlist
+        header$] given |attribute list|, |url|, and
+        <a grammar for="Connection Allowlist/disposition">enforce</a>.
+
+    1.  If |attribute allowlist| is not `null`, and either |parent required| is `null` or
+        |attribute allowlist| [=is at least as strict as=] the result of [$parse header|parsing a
+        Connection Allowlist header$] given |parent required|, |url|, and
+        <a grammar for="Connection Allowlist/disposition">enforce</a>:
+
+        1.  Return |attribute list|.
+
+    1.  Otherwise, report a problem with the `connectionAllowlist` attribute to the developer
+        console, and proceed.
+
+1.  Return |parent required|.
+
+</div>
+
+Note: A frame can tighten, but never loosen, the requirement inherited from its parent: a
+`connectionAllowlist` attribute is honored only when it [=is at least as strict as=] the parent's
+requirement; otherwise the parent's requirement is inherited unchanged.
+
+<div algorithm="allow blanket enforcement of a required connection allowlist">
+To <dfn abstract-op>allow blanket enforcement of a required connection allowlist</dfn> given an
+[=/origin=] (|embedder origin|), a [=/URL=] (|response url|), and a [=/response=] (|response|):
+
+1.  If |response url|'s [=url/scheme=] is a [=local scheme=], return true.
+
+1.  Let |allow-from| be the result of [$parse an Allow-Connection-Allowlist-From header$] given
+    |response|.
+
+1.  If |allow-from| is the special value [=any embedder=], return true.
+
+1.  If |allow-from| is an [=/origin=] and |allow-from| is [=same origin=] with |embedder origin|,
+    return true.
+
+1.  Return false.
+
+</div>
+
+Note: [=local scheme|Local scheme=] documents inherit their embedder's [=/policy container=], so it
+is safe for an embedder to enforce its requirement upon them without an explicit opt-in.
+
+<div algorithm="obtain the connection allowlist to enforce">
+To <dfn abstract-op>obtain the connection allowlist to enforce</dfn> given a [=structured header=]
+[=structured header/list=] or `null` (|required list|), a [=/response=] (|response|), and an
+[=/origin=] (|embedder origin|), returning a [=connection allowlist=], `null`, or the special value
+"blocked":
+
+1.  If |required list| is `null`, return `null`.
+
+1.  Let |required| be the result of [$parse header|parsing a Connection Allowlist header$] given
+    |required list|, |response|'s [=response/URL=], and
+    <a grammar for="Connection Allowlist/disposition">enforce</a>.
+
+1.  If |required| is `null`, return `null`.
+
+    Note: A malformed requirement is ignored rather than blocking the frame.
+
+1.  Let |header| be the result of [=getting a structured field value=] named [:Connection-Allowlist:]
+    as a "`list`" from |response|'s [=response/header list=].
+
+1.  Let |asserted| be the result of [$parse header|parsing a Connection Allowlist header$] given
+    |header|, |response|'s [=response/URL=], and
+    <a grammar for="Connection Allowlist/disposition">enforce</a>.
+
+1.  If |asserted| is not `null` and |asserted| [=is at least as strict as=] |required|, return
+    |asserted|.
+
+    Note: The frame's own assertion is honored when it is at least as strict as the requirement, so a
+    document that constrains itself more tightly than its embedder requires is not silently relaxed.
+    A malformed assertion parses to `null` and is not treated as an opt-in.
+
+1.  If [$allow blanket enforcement of a required connection allowlist$] given |embedder origin|,
+    |response|'s [=response/URL=], and |response| returns true, return |required|.
+
+1.  Return "blocked".
+
+</div>
+
 Monkey-Patches {#monkey-patching}
 ==============
 
@@ -595,6 +855,67 @@ step to the [=create a policy container from a fetch response=] algorithm:
 Note: Early hint integration does not need further changes, as the early response's
 [=policy container=] is already used when fetching early hint links.
 
+To support [[#embedded-enforcement]], the user agent communicates an embedder's requirement to a
+framed document when navigating a [=child navigable=], and enforces it upon the response.
+
+<div algorithm="set the required connection allowlist on a navigation request">
+  When the user agent creates the [=/request=] (|request|) for a navigation of a [=child navigable=]
+  (|navigable|), it runs these steps:
+
+  1.  Let |required list| be the result of [$obtain the required connection allowlist$] for
+      |navigable| given |request|'s [=request/URL=].
+
+  1.  Set |required list| aside as part of the navigation's state, so that it is available when the
+      response is processed.
+
+  1.  If |required list| is not `null`, then set the [:Sec-Required-Connection-Allowlist:] header in
+      |request|'s [=request/header list=] to |required list|'s serialization.
+
+</div>
+
+<div algorithm="enforce the required connection allowlist on a navigation response">
+  When the user agent processes the [=/response=] (|response|) for a navigation of a
+  [=child navigable=] (|navigable|), while determining the new [=Document=]'s [=/policy container=]
+  (|policyContainer|), it runs these steps:
+
+  1.  Let |required list| be the requirement that was set aside for this navigation when the
+      navigation's request was created.
+
+  1.  Let |embedder origin| be |navigable|'s [=navigable/container=]'s [=node document=]'s
+      [=/origin=].
+
+  1.  Let |applied| be the result of [$obtain the connection allowlist to enforce$] given
+      |required list|, |response|, and |embedder origin|.
+
+  1.  If |applied| is "blocked", then the navigation is blocked: the user agent MUST NOT create the
+      [=Document=], and SHOULD display an error and report the failure to the developer console.
+
+  1.  If |applied| is a [=connection allowlist=], then set |policyContainer|'s
+      [=policy container/connection allowlists=] to « |applied| ».
+
+  1.  Set the new [=Document=]'s [=Document/required connection allowlist=] to |required list|.
+
+</div>
+
+Note: The new [=Document=] stores the unresolved requirement — not the allowlist that was actually
+enforced — as the value it will impose upon its own descendants. This is what propagates the
+requirement down the frame tree: each descendant re-resolves the requirement (and its
+<a grammar for="Connection-Allowlist">`response-origin`</a> token) against its own [=/response=]. A
+frame is therefore obligated to enforce the policy upon its children even when its own enforced
+allowlist is stricter than the requirement.
+
+For [=Document=]s created from a [=local scheme|local scheme=] (such as `about:srcdoc` and `data:`),
+the [=/policy container=] is inherited from the embedder rather than created from a [=/response=]. In
+that case the allowlist computed above is incorporated into the inherited
+[=policy container/connection allowlists=] only when it does not relax a constraint already present:
+it replaces an inherited enforced allowlist only when that inherited allowlist is absent, or the
+computed allowlist [=is at least as strict as=] it.
+
+ISSUE: Fenced frames and other contexts whose [=requests=] are not governed by their embedder's
+[=/policy container=] cannot be constrained by this mechanism. Such a context MUST be blocked when
+its embedder requires a [=connection allowlist=] of it, rather than being allowed to load
+unconstrained. See [[#security-embedded-enforcement]].
+
 
 Integration with WebRTC {#rtc}
 -----------------------
@@ -644,10 +965,40 @@ away from its normal origin via <{iframe/sandbox}> attributes or Content Securit
 <a spec=CSP>sandbox</a> directive. In those cases, no document will be same-origin, and the
 boundaries will be easier to hold.
 
-ISSUE(WICG/connection-allowlists#1): It would also be ideal to give developers control over
-their dependencies' allowlists to some extent. An opt-in mechanism rooted in something like
-<a spec="document-policy">required document policy</a> or [[csp-embedded-enforcement]]] might
-be helpful to explore.
+Developers may also use the embedded enforcement mechanism described in [[#embedded-enforcement]] to
+require a [=connection allowlist=] of the documents they frame, rather than relying on each framed
+document to constrain itself.
+
+
+Embedded Enforcement {#security-embedded-enforcement}
+--------------------
+
+[[#embedded-enforcement]] lets an embedder require a [=connection allowlist=] of a framed document,
+resolving <a href="https://github.com/WICG/connection-allowlists/issues/1">issue #1</a>. Several
+properties keep this from becoming a new attack surface:
+
+*   <strong>Mandatory opt-in.</strong> An embedder cannot impose a policy upon unwilling cross-origin
+    content. The framed document must either assert a [:Connection-Allowlist:] which
+    [=is at least as strict as=] the requirement, or return an [:Allow-Connection-Allowlist-From:]
+    header naming the embedder. Absent an opt-in (and absent delivery from a
+    [=local scheme|local scheme=]), the frame is blocked. This mirrors the concern that motivated
+    requiring an opt-in for the <{iframe}> `csp` attribute. [[csp-embedded-enforcement]]
+
+*   <strong>No relaxation on inheritance.</strong> The requirement is
+    [=Document/required connection allowlist|inherited=] by descendant frames, and a descendant's own
+    `connectionAllowlist` attribute is honored only when it [=is at least as strict as=] the
+    inherited requirement. A constrained subframe therefore cannot escape its constraints by
+    embedding a more permissive grandchild. For [=local scheme|local scheme=] documents, an inherited
+    allowlist is likewise never loosened by embedded enforcement.
+
+*   <strong>Conservative acceptance.</strong> A malformed asserted [:Connection-Allowlist:] parses to
+    `null` and does not count as an opt-in, and [=is at least as strict as|the strictness comparison=]
+    is a conservative syntactic set-membership test. A framed document therefore cannot satisfy a
+    requirement it does not actually meet.
+
+Contexts whose [=requests=] are not governed by their embedder's [=/policy container=] — for example,
+fenced frames — cannot be constrained by this mechanism. Such a context MUST be blocked when an
+embedder requires a [=connection allowlist=] of it, rather than being allowed to load unconstrained.
 
 
 Service Workers {#security-service-worker}
