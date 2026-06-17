@@ -545,7 +545,7 @@ An embedder declares the [=connection allowlist=] it requires of a frame via the
 {{HTMLIFrameElement/connectionAllowlist}} content attribute. The user agent communicates the
 requirement to the framed document in the [:Sec-Required-Connection-Allowlist:] request [=header=].
 The framed document opts into the requirement either by asserting a [:Connection-Allowlist:] which
-[=satisfies=] the requirement, or by returning an [:Allow-Connection-Allowlist-From:]
+[=connection allowlist/satisfies=] the requirement, or by returning an [:Allow-Connection-Allowlist-From:]
 response [=header=] naming the embedder's [=/origin=]. Documents delivered from [=local schemes=]
 (such as `about:srcdoc` and `data:`) opt in implicitly, as they inherit their embedder's
 [=/policy container=]. A frame that does not opt in is blocked.
@@ -577,7 +577,7 @@ inherited by the frame's descendants via the [=policy container/required connect
   Allow-Connection-Allowlist-From: https://embedder.example
   ```
 
-  ...or by asserting a [=connection allowlist=] which [=satisfies=] the requirement:
+  ...or by asserting a [=connection allowlist=] which [=connection allowlist/satisfies=] the requirement:
 
   ```http
   Connection-Allowlist: ("https://good.example" response-origin)
@@ -615,8 +615,9 @@ Embedded Enforcement Headers {#embedded-enforcement-headers}
 
 The <dfn http-header export>`Sec-Required-Connection-Allowlist`</dfn> request [=header=] communicates
 the [=connection allowlist=] an embedder requires of a framed document. Its value is a
-[=structured header=] [=structured header/list=] using the [:Connection-Allowlist:] grammar. As a
-`Sec-` prefixed header, it is set only by the user agent and cannot be set or modified by script.
+[=structured header=] [=structured header/list=] using the [:Connection-Allowlist:] grammar. Because
+its name is `Sec-`-prefixed, it is a [=forbidden request-header=], so it is set only by the user agent
+and cannot be set or modified by script.
 
 The <dfn http-header export>`Allow-Connection-Allowlist-From`</dfn> response [=header=] allows a
 document to opt into having an embedder enforce a required [=connection allowlist=] upon it. It shares
@@ -632,7 +633,7 @@ A [=/response=] (|response|) <dfn lt="allows a connection allowlist from|allow a
 from">allows a connection allowlist from</dfn> a navigation [=/request=] (|request|) if the following
 steps return true:
 
-1.  Let |origin| be the result of [=header list/getting=] `` `Allow-Connection-Allowlist-From` `` from
+1.  Let |origin| be the result of [=header list/getting=] [:Allow-Connection-Allowlist-From:] from
     |response|'s [=response/header list=].
 
 1.  If |origin| is `` `*` ``, return true.
@@ -651,8 +652,8 @@ Comparing allowlists {#embedded-enforcement-strictness}
 --------------------
 
 <div algorithm="is a subset of">
-A [=list=] of [=URL patterns=] (|a|) <dfn lt="is a subset of|are a subset of">is a subset of</dfn> a
-[=list=] of [=URL patterns=] (|b|) if, for each |pattern| in |a|, |b|
+A [=Connection Allowlist/allowlist=] (|a|) <dfn for="Connection Allowlist/allowlist" lt="is a subset of|are a subset of">is a subset of</dfn> a
+[=Connection Allowlist/allowlist=] (|b|) if, for each |pattern| in |a|, |b|
 [=list/contains=] a [=URL pattern=] struct which is equal to |pattern|.
 
 ISSUE(whatwg/infra#664): Equality for structs is not yet well-defined. Two [=URL patterns=] are equal
@@ -664,7 +665,7 @@ here when they were [=URL pattern/create|created=] from the same serialized
 Note: This is a (non-strict) subset relationship: every [=URL pattern=] in |a| has to appear in |b|,
 but |a| and |b| can be equal. A response asserting exactly the requirement therefore satisfies it.
 
-NOTE: The comparison above requires only that the response's asserted [=URL patterns=] are present in
+Note: The comparison above requires only that the response's asserted [=URL patterns=] are present in
 the requirement, without any semantic analysis of those patterns to determine whether they're
 logically subsumed. This is intentional: deciding whether one [=URL pattern=] fully encompasses
 another is a difficult problem given their syntax, and conservative set-membership is sufficient for
@@ -674,10 +675,10 @@ Note: Because the allowlists being compared are resolved against the same [=/URL
 <a grammar for="Connection-Allowlist">`response-origin`</a> token resolves identically in each.
 
 <div algorithm="connection allowlist satisfies">
-A [=connection allowlist=] (|candidate|) <dfn lt="satisfies">satisfies</dfn> a [=connection allowlist=]
+A [=connection allowlist=] (|candidate|) <dfn for="connection allowlist" lt="satisfies">satisfies</dfn> a [=connection allowlist=]
 (|requirement|) if all of the following are true:
 
-*   |candidate|'s [=Connection Allowlist/allowlist=] [=is a subset of=] |requirement|'s
+*   |candidate|'s [=Connection Allowlist/allowlist=] [=Connection Allowlist/allowlist/is a subset of=] |requirement|'s
     [=Connection Allowlist/allowlist=].
 
 *   If |requirement|'s [=Connection Allowlist/redirects=] is
@@ -689,13 +690,13 @@ A [=connection allowlist=] (|candidate|) <dfn lt="satisfies">satisfies</dfn> a [
     [=Connection Allowlist/webrtc=] is <a grammar for="Connection Allowlist/webrtc">block</a>.
 
 Note: An empty |candidate| [=Connection Allowlist/allowlist=] permits no endpoints, and (being a
-[=is a subset of|subset=] of every allowlist) therefore satisfies any requirement whose redirect and
+[=Connection Allowlist/allowlist/is a subset of|subset=] of every allowlist) therefore satisfies any requirement whose redirect and
 WebRTC dispositions it also meets.
 
 </div>
 
-Note: "[=satisfies=]" captures the "at least as strict as" relationship used throughout this section:
-the [=Connection Allowlist/allowlist=] comparison ([=is a subset of=]) handles the [=URL patterns=],
+Note: "[=connection allowlist/satisfies=]" captures the "at least as strict as" relationship used throughout this section:
+the [=Connection Allowlist/allowlist=] comparison ([=Connection Allowlist/allowlist/is a subset of=]) handles the [=URL patterns=],
 while the [=Connection Allowlist/redirects=] and [=Connection Allowlist/webrtc=] dispositions are
 handled as separate conditions.
 
@@ -705,10 +706,10 @@ Obtaining and enforcing a requirement {#embedded-enforcement-checking}
 We add a <dfn for="policy container">required connection allowlist</dfn> item to the
 [=/policy container=] [=struct=], which is either `null` or a [=string=] (a serialized requirement
 expressed in the [:Connection-Allowlist:] header grammar), and is initially `null`. It represents the
-requirement that a context
-imposes upon the documents (and workers) it embeds, and — because it lives on the
-[=/policy container=] — is inherited by local-scheme documents and by workers, so that a constrained
-context cannot escape its constraints by embedding a more permissive child.
+requirement that a context imposes upon the documents (and workers) it embeds. The requirement is
+inherited by local-scheme documents and workers directly as the [=/policy container=] is copied into
+those contexts, so a constrained context cannot escape its constraints by embedding a more permissive
+child.
 
 Note: The requirement is stored as a serialized [=string=], rather than as a resolved [=connection allowlist=], so
 that the <a grammar for="Connection-Allowlist">`response-origin`</a> token resolves against each framed
@@ -761,7 +762,7 @@ the embedder's own requirement.
 For the comparison above, a [=string=] (|a|)
 <dfn for=requirement lt="is at least as strict as">is at least as strict as</dfn> a [=string=] (|b|)
 when the [=connection allowlist=] produced by [$parse header|parsing a Connection Allowlist header$]
-given |a| parsed as a [=structured header=] [=structured header/list=] [=satisfies=] the
+given |a| parsed as a [=structured header=] [=structured header/list=] [=connection allowlist/satisfies=] the
 [=connection allowlist=] produced by parsing |b| the same way, where in both cases the
 <a grammar for="Connection-Allowlist">`response-origin`</a> [=structured header/token=] is treated as a
 literal [=URL pattern=] built from the string "`response-origin`" rather than being resolved against a
@@ -816,7 +817,7 @@ given a [=string=] or `null` (|requirement|), return
     |header|, |response|'s [=response/URL=], and
     <a grammar for="Connection Allowlist/disposition">enforce</a>.
 
-1.  If |asserted| is not `null` and |asserted| [=satisfies=] |required|, return
+1.  If |asserted| is not `null` and |asserted| [=connection allowlist/satisfies=] |required|, return
     [=allowed=].
 
     Note: A malformed asserted [:Connection-Allowlist:] parses to `null` and is therefore not treated
@@ -931,7 +932,7 @@ its required CSP, threading the embedder's requirement from the embedding elemen
 
 Note: Like the sandboxing flags already carried in [=target snapshot params=], the requirement is
 snapshotted from the <{iframe}> [=navigable/container=] at navigation time, on <em>every</em>
-navigation of the [=navigable=] — including those the framed [=Document=] initiates itself. The
+navigation of the [=navigable=], including those the framed [=Document=] initiates itself. The
 constraint therefore binds subsequent same-[=navigable=] navigations and cannot be escaped by the
 framed content navigating itself elsewhere. A change to the `connectionAllowlist` content attribute
 takes effect on the next navigation of the [=navigable=], mirroring how the `sandbox` attribute
@@ -960,7 +961,7 @@ To <dfn abstract-op>apply a required connection allowlist</dfn> given a [=/polic
 
 1.  If no [=connection allowlist=] in |result|'s [=policy container/connection allowlists=] whose
     [=Connection Allowlist/disposition=] is <a grammar for="Connection Allowlist/disposition">enforce</a>
-    [=satisfies=] |required|, then [=list/append=] |required| to |result|'s
+    [=connection allowlist/satisfies=] |required|, then [=list/append=] |required| to |result|'s
     [=policy container/connection allowlists=].
 
 1.  Set |result|'s [=policy container/required connection allowlist=] to |requirement|.
@@ -972,7 +973,7 @@ Note: The embedder's [=connection allowlist=] is added to |result|'s
 response asserted for itself (including [:Connection-Allowlist-Report-Only:]). Because every allowlist
 in that list is enforced for the document's outgoing requests, both the embedder's requirement and the
 document's own assertions apply. Following [[csp-embedded-enforcement]], the requirement is
-<em>not</em> appended when the response already asserts an allowlist that [=satisfies=] it, since that
+<em>not</em> appended when the response already asserts an allowlist that [=connection allowlist/satisfies=] it, since that
 assertion already meets the requirement and the extra entry is unnecessary.
 
 Note: Storing the unresolved requirement on |result|'s [=/policy container=] is what propagates it to
@@ -1064,7 +1065,7 @@ resolving <a href="https://github.com/WICG/connection-allowlists/issues/1">issue
 properties keep this from becoming a new attack surface:
 
 *   <strong>Mandatory opt-in.</strong> An embedder cannot impose a policy upon unwilling cross-origin
-    content. The framed document must either assert a [:Connection-Allowlist:] which [=satisfies=] the
+    content. The framed document must either assert a [:Connection-Allowlist:] which [=connection allowlist/satisfies=] the
     requirement, or return an [:Allow-Connection-Allowlist-From:] header naming the embedder. Absent an
     opt-in (and absent delivery from a [=local scheme|local scheme=]), the frame is blocked. This
     mirrors the concern that motivated requiring an opt-in for the <{iframe}> `csp` attribute.
@@ -1072,18 +1073,18 @@ properties keep this from becoming a new attack surface:
 
 *   <strong>No relaxation on inheritance.</strong> The requirement is
     [=policy container/required connection allowlist|inherited=] by descendant frames, and a
-    descendant's own `connectionAllowlist` attribute is honored only when it [=satisfies=] the
+    descendant's own `connectionAllowlist` attribute is honored only when it [=connection allowlist/satisfies=] the
     inherited requirement. A constrained subframe therefore cannot escape its constraints by embedding
     a more permissive grandchild. For [=local scheme|local scheme=] documents, an inherited allowlist
     is likewise never loosened by embedded enforcement.
 
 *   <strong>Conservative acceptance.</strong> A malformed asserted [:Connection-Allowlist:] parses to
-    `null` and does not count as an opt-in, and the [=is a subset of|strictness comparison=] is
+    `null` and does not count as an opt-in, and the [=Connection Allowlist/allowlist/is a subset of|strictness comparison=] is
     a conservative syntactic set-membership test. A framed document therefore cannot satisfy a
     requirement it does not actually meet.
 
-Contexts whose [=requests=] are not governed by their embedder's [=/policy container=] — for example,
-fenced frames — cannot be constrained by this mechanism. Such a context MUST be blocked when an
+Contexts whose [=requests=] are not governed by their embedder's [=/policy container=] (for example,
+fenced frames) cannot be constrained by this mechanism. Such a context MUST be blocked when an
 embedder requires a [=connection allowlist=] of it, rather than being allowed to load unconstrained.
 
 
