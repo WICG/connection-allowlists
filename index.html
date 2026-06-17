@@ -4,9 +4,9 @@
   <title>Connection Allowlists</title>
   <meta content="width=device-width, initial-scale=1, shrink-to-fit=no" name="viewport">
   <link href="https://www.w3.org/StyleSheets/TR/2021/cg-draft" rel="stylesheet">
-  <meta content="Bikeshed version e74aa0952, updated Fri Jun 5 23:16:28 2026 +0000" name="generator">
+  <meta content="Bikeshed version d113b2e81, updated Tue Jun 9 14:57:55 2026 -0700" name="generator">
   <link href="https://wicg.github.io/connection-allowlists/" rel="canonical">
-  <meta content="fa24f874c501dc7b8d0755e8c7194e9bc941d0c9" name="revision">
+  <meta content="d2ba689e352bca1f6320af517565bbf8a56ea3b9" name="revision">
   <meta content="dark light" name="color-scheme">
   <link href="https://www.w3.org/StyleSheets/TR/2021/dark.css" media="(prefers-color-scheme: dark)" rel="stylesheet" type="text/css">
 <style>/* Boilerplate: style-autolinks */
@@ -768,7 +768,7 @@ var[data-var-color="6"] { --var-vg: #FFBCF2; }
   <div class="head">
    <h1 class="no-ref p-name" id="title">Connection Allowlists</h1>
    <p id="w3c-state"><a href="https://www.w3.org/standards/types/#CG-DRAFT">Draft Community Group Report</a>,
-    <time class="dt-updated" datetime="2026-06-09">9 June 2026</time></p>
+    <time class="dt-updated" datetime="2026-06-17">17 June 2026</time></p>
    <div data-fill-with="spec-metadata">
     <dl>
      <dt>This version:
@@ -844,6 +844,11 @@ in a way that’s narrowly tailored to suit the problem.</p>
       <li><a href="#security-postmessage"><span class="secno">5.4</span> <span class="content"><code>postMessage(...)</code></span></a>
       <li><a href="#redirects"><span class="secno">5.5</span> <span class="content">Redirects</span></a>
       <li><a href="#webrtc"><span class="secno">5.6</span> <span class="content">WebRTC</span></a>
+     </ol>
+    <li>
+     <a href="#impl"><span class="secno">6</span> <span class="content">Implementation Considerations</span></a>
+     <ol class="toc">
+      <li><a href="#impl-websocket"><span class="secno">6.1</span> <span class="content">WebSockets</span></a>
      </ol>
     <li>
      <a href="#w3c-conformance"><span class="secno"></span> <span class="content">Conformance</span></a>
@@ -1568,6 +1573,14 @@ allowed.</p>
 </pre>
     <p>WebRTC connections will be <strong>allowed</strong>.</p>
    </div>
+   <h2 class="heading settled" data-level="6" id="impl"><span class="secno">6. </span><span class="content">Implementation Considerations</span><a class="self-link" href="#impl"></a></h2>
+   <h3 class="heading settled" data-level="6.1" id="impl-websocket"><span class="secno">6.1. </span><span class="content">WebSockets</span><a class="self-link" href="#impl-websocket"></a></h3>
+   <p>It’s helpful to remember that WebSocket connections are covered by <code>http</code> and <code>https</code> patterns, not
+by patterns specifying <code>ws</code> or <code>wss</code> schemes. When we <u class="link-error" data-lt="establish a WebSocket connection" title="LINK ERROR: No &apos;dfn&apos; refs found for &apos;establish a websocket connection&apos; that are marked for export.
+  (Possible specs this could be from: websockets)">establish a WebSocket connection</u>, step 1
+rewrites those websocket-specific schemes into <code>http</code> and <code>https</code> respectively. This means that
+an allowlist containing patterns like "<code>ws://socket.example</code>" will not have the intended effect,
+as that pattern will never be matched by a resource request.</p>
   </main>
   <div data-fill-with="conformance">
    <h2 class="heading no-num no-ref settled" id="w3c-conformance"><span class="content">Conformance</span><a class="self-link" href="#w3c-conformance"></a></h2>
