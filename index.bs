@@ -785,3 +785,14 @@ allowed.
 </div>
 
 
+Implementation Considerations {#impl}
+=============================
+
+WebSockets {#impl-websocket}
+----------
+
+It's helpful to remember that WebSocket connections are covered by `http` and `https` patterns, not
+by patterns specifying `ws` or `wss` schemes. When we [=establish a WebSocket connection=], step 1
+rewrites those websocket-specific schemes into `http` and `https` respectively. This means that
+an allowlist containing patterns like "`ws://socket.example`" will not have the intended effect,
+as that pattern will never be matched by a resource request.
