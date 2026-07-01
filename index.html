@@ -6,7 +6,7 @@
   <link href="https://www.w3.org/StyleSheets/TR/2021/cg-draft" rel="stylesheet">
   <meta content="Bikeshed version d113b2e81, updated Tue Jun 9 14:57:55 2026 -0700" name="generator">
   <link href="https://wicg.github.io/connection-allowlists/" rel="canonical">
-  <meta content="d2ba689e352bca1f6320af517565bbf8a56ea3b9" name="revision">
+  <meta content="a69c057740c6d49f8b0bce0f1f8c9d9eaaa705d7" name="revision">
   <meta content="dark light" name="color-scheme">
   <link href="https://www.w3.org/StyleSheets/TR/2021/dark.css" media="(prefers-color-scheme: dark)" rel="stylesheet" type="text/css">
 <style>/* Boilerplate: style-autolinks */
@@ -768,7 +768,7 @@ var[data-var-color="6"] { --var-vg: #FFBCF2; }
   <div class="head">
    <h1 class="no-ref p-name" id="title">Connection Allowlists</h1>
    <p id="w3c-state"><a href="https://www.w3.org/standards/types/#CG-DRAFT">Draft Community Group Report</a>,
-    <time class="dt-updated" datetime="2026-06-17">17 June 2026</time></p>
+    <time class="dt-updated" datetime="2026-07-01">1 July 2026</time></p>
    <div data-fill-with="spec-metadata">
     <dl>
      <dt>This version:
@@ -1441,6 +1441,8 @@ given <var>response</var>.</ins>
       <p>Return <var>result</var>.</p>
     </ol>
    </div>
+   <p class="note" role="note"><span class="marker">Note:</span> Early hint integration does not need further changes, as the early response’s
+<a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/browsers.html#policy-container" id="ref-for-policy-container②">policy container</a> is already used when fetching early hint links.</p>
    <h3 class="heading settled" data-level="4.3" id="rtc"><span class="secno">4.3. </span><span class="content">Integration with WebRTC</span><a class="self-link" href="#rtc"></a></h3>
    <p>To constrain WebRTC connections, <a data-link-type="biblio" href="#biblio-webrtc" title="WebRTC: Real-Time Communication in Browsers">[webrtc]</a> can call into the <a data-link-type="abstract-op" href="#abstract-opdef-should-webrtc-be-blocked-by-connection-allowlists" id="ref-for-abstract-opdef-should-webrtc-be-blocked-by-connection-allowlists">should WebRTC be blocked by Connection Allowlists</a>
 algorithm while determining whether candidates are <a data-link-type="dfn" href="https://w3c.github.io/webrtc-pc/#dfn-administratively-prohibited" id="ref-for-dfn-administratively-prohibited">administratively prohibited</a>.</p>
@@ -1464,7 +1466,7 @@ then return a  <a data-link-type="dfn" href="https://wicg.github.io/web-smart-ca
 to carefully consider how to layer the allowlisting mechanism described here into their defenses.
 Most saliently, the mechanism is context-specific, not origin-wide. This leaves broad opportunity
 for an attacker with scripting access to bypass a context’s allowlist by finding a same-origin
-context with lower restrictions. Integration with HTML’s <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/browsers.html#policy-container" id="ref-for-policy-container②">policy container</a> addresses some of
+context with lower restrictions. Integration with HTML’s <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/browsers.html#policy-container" id="ref-for-policy-container③">policy container</a> addresses some of
 those possibilities, but it’s likely that others will exist. An attacker might, for example,
 be able to reach up through the frame tree to a less-restricted parent, or pop open a new window
 via <code>window.open()</code> which retains an opener relationship. Allowlisting the document’s origin
@@ -1480,7 +1482,7 @@ their dependencies' allowlists to some extent. An opt-in mechanism rooted in som
 be helpful to explore. <a href="https://github.com/WICG/connection-allowlists/issues/1">[WICG/connection-allowlists Issue #1]</a></p>
    <h3 class="heading settled" data-level="5.2" id="security-service-worker"><span class="secno">5.2. </span><span class="content">Service Workers</span><a class="self-link" href="#security-service-worker"></a></h3>
    <p><a data-link-type="dfn" href="https://w3c.github.io/ServiceWorker/#dfn-service-worker" id="ref-for-dfn-service-worker">Service Workers</a> complicate the story around allowlists, just as other same-origin contexts do.
-Because they have a <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/browsers.html#policy-container" id="ref-for-policy-container③">policy container</a> distinct from each of the documents they manage, it’s
+Because they have a <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/browsers.html#policy-container" id="ref-for-policy-container④">policy container</a> distinct from each of the documents they manage, it’s
 quite possible for them to respond to messages or requests initiated in documents whose allowlist
 differs from the service worker’s allowlist. This proposal follows other policies' design, allowing
 for these differences in capability.</p>
@@ -1858,7 +1860,7 @@ as that pattern will never be matched by a resource request.</p>
    <dt id="biblio-rfc2119">[RFC2119]
    <dd>S. Bradner. <a href="https://datatracker.ietf.org/doc/html/rfc2119"><cite>Key words for use in RFCs to Indicate Requirement Levels</cite></a>. March 1997. Best Current Practice. URL: <a href="https://datatracker.ietf.org/doc/html/rfc2119">https://datatracker.ietf.org/doc/html/rfc2119</a>
    <dt id="biblio-rfc9651">[RFC9651]
-   <dd>M. Nottingham; P-H. Kamp. <a href="https://www.rfc-editor.org/rfc/rfc9651"><cite>Structured Field Values for HTTP</cite></a>. September 2024. Proposed Standard. URL: <a href="https://www.rfc-editor.org/rfc/rfc9651">https://www.rfc-editor.org/rfc/rfc9651</a>
+   <dd>M. Nottingham; P-H. Kamp. <a href="https://www.rfc-editor.org/info/rfc9651/"><cite>Structured Field Values for HTTP</cite></a>. September 2024. Proposed Standard. URL: <a href="https://www.rfc-editor.org/info/rfc9651/">https://www.rfc-editor.org/info/rfc9651/</a>
    <dt id="biblio-service-workers">[SERVICE-WORKERS]
    <dd>Monica CHINTALA; Yoshisato Yanagisawa. <a href="https://w3c.github.io/ServiceWorker/"><cite>Service Workers Nightly</cite></a>. URL: <a href="https://w3c.github.io/ServiceWorker/">https://w3c.github.io/ServiceWorker/</a>
    <dt id="biblio-url">[URL]
@@ -2172,7 +2174,7 @@ let dfnPanelData = {
 "abstract-opdef-should-webrtc-be-blocked-by-connection-allowlists": {"dfnID":"abstract-opdef-should-webrtc-be-blocked-by-connection-allowlists","dfnText":"should WebRTC be blocked by Connection Allowlists","external":false,"refSections":[{"refs":[{"id":"ref-for-abstract-opdef-should-webrtc-be-blocked-by-connection-allowlists"}],"title":"4.3. Integration with WebRTC"}],"url":"#abstract-opdef-should-webrtc-be-blocked-by-connection-allowlists"},
 "ae56d57e": {"dfnID":"ae56d57e","dfnText":"URL list","external":true,"refSections":[{"refs":[{"id":"ref-for-concept-request-url-list"}],"title":"3.2. Matching"}],"url":"https://fetch.spec.whatwg.org/#concept-request-url-list"},
 "b0d7f3c3": {"dfnID":"b0d7f3c3","dfnText":"USVString","external":true,"refSections":[{"refs":[{"id":"ref-for-idl-USVString"},{"id":"ref-for-idl-USVString\u2460"}],"title":"3.3. Reporting"}],"url":"https://webidl.spec.whatwg.org/#idl-USVString"},
-"b33787b2": {"dfnID":"b33787b2","dfnText":"policy container","external":true,"refSections":[{"refs":[{"id":"ref-for-policy-container"}],"title":"1.1. Threat Model"},{"refs":[{"id":"ref-for-policy-container\u2460"}],"title":"4.2. Integration with HTML"},{"refs":[{"id":"ref-for-policy-container\u2461"}],"title":"5.1. Same-Origin Contexts"},{"refs":[{"id":"ref-for-policy-container\u2462"}],"title":"5.2. Service Workers"}],"url":"https://html.spec.whatwg.org/multipage/browsers.html#policy-container"},
+"b33787b2": {"dfnID":"b33787b2","dfnText":"policy container","external":true,"refSections":[{"refs":[{"id":"ref-for-policy-container"}],"title":"1.1. Threat Model"},{"refs":[{"id":"ref-for-policy-container\u2460"},{"id":"ref-for-policy-container\u2461"}],"title":"4.2. Integration with HTML"},{"refs":[{"id":"ref-for-policy-container\u2462"}],"title":"5.1. Same-Origin Contexts"},{"refs":[{"id":"ref-for-policy-container\u2463"}],"title":"5.2. Service Workers"}],"url":"https://html.spec.whatwg.org/multipage/browsers.html#policy-container"},
 "b410a6ef": {"dfnID":"b410a6ef","dfnText":"ASCII serialization of an origin","external":true,"refSections":[{"refs":[{"id":"ref-for-ascii-serialisation-of-an-origin"}],"title":"3.1. Parsing"}],"url":"https://html.spec.whatwg.org/multipage/browsers.html#ascii-serialisation-of-an-origin"},
 "bd1db03d": {"dfnID":"bd1db03d","dfnText":"policy container (for environment settings object)","external":true,"refSections":[{"refs":[{"id":"ref-for-concept-settings-object-policy-container"}],"title":"3.2. Matching"},{"refs":[{"id":"ref-for-concept-settings-object-policy-container\u2460"}],"title":"4.4. Integration with Service Workers"}],"url":"https://html.spec.whatwg.org/multipage/webappapis.html#concept-settings-object-policy-container"},
 "bf8d9616": {"dfnID":"bf8d9616","dfnText":"failure","external":true,"refSections":[{"refs":[{"id":"ref-for-failure"},{"id":"ref-for-failure\u2460"},{"id":"ref-for-failure\u2461"},{"id":"ref-for-failure\u2462"}],"title":"3.2. Matching"},{"refs":[{"id":"ref-for-failure\u2463"},{"id":"ref-for-failure\u2464"}],"title":"4.1. Integration with Fetch"}],"url":"https://infra.spec.whatwg.org/#failure"},
