@@ -591,6 +591,9 @@ step to the [=create a policy container from a fetch response=] algorithm:
   </ol>
 </div>
 
+Note: Early hint integration does not need further changes, as the early response's
+[=policy container=] is already used when fetching early hint links.
+
 
 Integration with WebRTC {#rtc}
 -----------------------
