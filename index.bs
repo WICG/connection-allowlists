@@ -28,6 +28,18 @@ urlPrefix: https://www.rfc-editor.org/rfc/rfc9651; spec: RFC9651
             text: parameters; url: #name-parameters
     type: abstract-op
         text: parsing structured fields; url: text-parse
+urlPrefix: https://html.spec.whatwg.org/multipage/semantics.html; spec: html
+    type: dfn
+        text: fetch and process the linked resource; url: #fetch-and-process-the-linked-resource
+        text: link processing options; url: #link-processing-options
+        for: link processing options
+            text: environment; url: #link-options-environment
+urlPrefix: https://html.spec.whatwg.org/multipage/links.html; spec: html
+    type: dfn
+        text: preconnect; url: #preconnect
+urlPrefix: https://websockets.spec.whatwg.org/; spec: websockets
+    type: dfn
+        text: establish a WebSocket connection; url: #concept-websocket-establish
 </pre>
 <pre class="link-defaults">
 spec:fetch; type:dfn; for:/; text:request
@@ -39,7 +51,8 @@ spec:infra; type:dfn; for:/; text:list
 spec:infra; type:dfn; for:/; text:string
 spec:infra; type:dfn; text:success
 spec:url; type:dfn; for:/; text:url
-
+spec:dom; type:dfn; for:/; text:document
+spec:url; type:dfn; text:origin
 </pre>
 
 Introduction {#intro}
@@ -546,23 +559,25 @@ which aren't based on [=requests=]. We'll hook into [=resolve an origin=] and [=
 connection=] to handle things like DNS prefetch, Web Transport, etc:
 
 <div algorithm="monkey patching resolve an origin">
-  In [=resolve an origin=], we'll call out to the host-only matching algorithm above to determine
-  whether any pattern could potentially allow a connection to a given host. If not, we'll fail
-  resolution.
+  In [=resolve an origin=], we'll update the signature to accept an optional [=environment settings object=] |environment| (defaulting to null).
 
-  1. <ins>If [$should host be blocked by Connection Allowlists$] returns [=blocked=] when executed
-     upon <var ignore>origin</var>'s [=origin/host=], <var ignore>environment</var>, and
-     <var ignore>allowlists</var>, then return [=failure=].</ins>
+  We'll call out to the host-only matching algorithm above to determine whether any pattern could potentially allow a connection to a given host. If not, we'll fail resolution.
+
+  1. <ins>If |environment| is not null:
+     1. Let |allowlists| be |environment|'s [=policy container=]'s [=policy container/connection allowlists=].
+     2. If [$should host be blocked by Connection Allowlists$] returns [=blocked=] when executed upon <var ignore>origin</var>'s [=origin/host=], |environment|, and |allowlists|, then return [=failure=].</ins>
 
 </div>
 
 <div algorithm="monkey patching obtain a connection">
-  In [=obtain a connection=], we'll add a check before the current step 2:
+  In [=obtain a connection=], we'll update the signature to accept an optional [=environment settings object=] or {{Document}} |environment| (defaulting to null):
+
+  We'll add a check before the current step 2:
 
   <ol start=2>
-    2.  <ins>If [$should url be blocked by Connection Allowlists$] returns [=blocked=] when executed
-        upon <var ignore>url</var>, <var ignore>environment</var>, and <var ignore>allowlists</var>,
-        then return [=failure=].</ins>
+    2.  <ins>If |environment| is not null:
+        1. Let |allowlists| be |environment|'s [=policy container=]'s [=policy container/connection allowlists=].
+        2. If [$should url be blocked by Connection Allowlists$] returns [=blocked=] when executed upon <var ignore>url</var>, |environment|, and |allowlists|, then return [=failure=].</ins>
   </ol>
 </div>
 
@@ -593,6 +608,34 @@ step to the [=create a policy container from a fetch response=] algorithm:
 
 Note: Early hint integration does not need further changes, as the early response's
 [=policy container=] is already used when fetching early hint links.
+
+
+DNS Prefetching {#html-dns-prefetch}
+-------------------------
+
+In the [=fetch and process the linked resource=] steps for the <a attr-value for="link/rel">`dns-prefetch`</a> link type, we'll pass the link element's [=node document=] to [=resolve an origin=]:
+
+<div algorithm="monkey patching HTML dns-prefetch">
+  In HTML's [=fetch and process the linked resource=] steps for the <a attr-value for="link/rel">`dns-prefetch`</a> link type, step 4 is updated as follows:
+
+  <ol start="4">
+    4. The user agent should [=resolve an origin=] given <var ignore>partitionKey</var>, <var ignore>url</var>'s [=origin=], <ins>and <var ignore>el</var>'s [=relevant settings object=]</ins>.
+  </ol>
+</div>
+
+
+Preconnecting {#html-preconnect}
+----------------------
+
+In the [=preconnect=] algorithm, we'll pass the link options' [=link processing options/environment=] to [=obtain a connection=]:
+
+<div algorithm="monkey patching HTML preconnect">
+  In HTML's [=preconnect=] algorithm, step 5 is updated as follows:
+
+  <ol start="5">
+    5. The user agent should [=obtain a connection=] given <var ignore>partitionKey</var>, <var ignore>url</var>'s [=origin=], <var ignore>useCredentials</var>, <ins>and <var ignore>options</var>'s [=link processing options/environment=]</ins>.
+  </ol>
+</div>
 
 
 Integration with WebRTC {#rtc}
