@@ -6,6 +6,7 @@ Status: CG-DRAFT
 Group: WICG
 Repository: wicg/connection-allowlists
 URL: https://wicg.github.io/connection-allowlists/
+Editor: Noam Rosenthal, Google
 Editor: Mike West, Google
 Abstract:
   The `Connection-Allowlist` mechanism provides a concise policy language and delivery mechanism
