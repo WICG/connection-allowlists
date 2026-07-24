@@ -597,7 +597,7 @@ partial interface HTMLIFrameElement {
 };
 </xmp>
 
-The <dfn element-attr for=iframe><code>connectionAllowlist</code></dfn> content attribute gives the
+The <dfn element-attr for=iframe>connectionAllowlist</dfn> content attribute gives the
 [=connection allowlist=] which the embedder requires of the [=Document=] the <{iframe}> frames. Its
 value uses the same grammar as the [:Connection-Allowlist:] header: a [=structured header=]
 [=structured header/list=] of [=structured header/inner lists=] (see [[#headers]]).
@@ -747,10 +747,14 @@ attribute value</dfn> given a requirement |parent required| if all of the follow
 
 *   |value|'s [=string/length=] is less than or equal to 4096.
 
+    Note: The 4096 limit is an arbitrary bound that keeps the serialized requirement small enough to
+    carry in the [:Sec-Required-Connection-Allowlist:] request [=header=] and prevents it from growing
+    without limit as it is inherited down the frame tree. The exact value is not significant.
+
 *   |value| can be parsed as a [=structured header=] [=structured header/list=] whose first item is an
     [=inner list=].
 
-*   |parent required| is `null`, or |value| [=requirement/is at least as strict as=] |parent required|.
+*   |parent required| is `null`, or |value| [=connection allowlist/is at least as strict as=] |parent required|.
 
 Note: A frame can tighten, but never loosen, the requirement inherited from its parent: a
 `connectionAllowlist` attribute is honored only when it is at least as strict as the parent's
@@ -760,7 +764,7 @@ the embedder's own requirement.
 
 <div algorithm="requirement is at least as strict as">
 For the comparison above, a [=string=] (|a|)
-<dfn for=requirement lt="is at least as strict as">is at least as strict as</dfn> a [=string=] (|b|)
+<dfn for="connection allowlist">is at least as strict as</dfn> a [=string=] (|b|)
 when the [=connection allowlist=] produced by [$parse header|parsing a Connection Allowlist header$]
 given |a| parsed as a [=structured header=] [=structured header/list=] [=connection allowlist/satisfies=] the
 [=connection allowlist=] produced by parsing |b| the same way, where in both cases the
@@ -938,13 +942,6 @@ framed content navigating itself elsewhere. A change to the `connectionAllowlist
 takes effect on the next navigation of the [=navigable=], mirroring how the `sandbox` attribute
 behaves. (Note that this differs from `referrerpolicy`, which only influences navigations the
 [=navigable/container=] itself initiates.)
-
-ISSUE: An alternative model would store the requirement in the
-[navigable's container policy](https://w3c.github.io/webappsec-permissions-policy/#container-policy)
-(as `allowfullscreen` does), fixing it when the [=navigable=] is created so that the embedder reloads
-the frame to change it, instead of re-reading the attribute on each navigation. Both models prevent
-the framed content from loosening the constraint; they differ only in how an embedder's later
-attribute change propagates. Resolving this is deferred to the HTML integration.
 
 <div algorithm="apply a required connection allowlist">
 To <dfn abstract-op>apply a required connection allowlist</dfn> given a [=/policy container=]
