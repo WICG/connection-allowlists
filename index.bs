@@ -633,7 +633,7 @@ In the [=preconnect=] algorithm, we'll pass the link options' [=link processing 
   In HTML's [=preconnect=] algorithm, step 5 is updated as follows:
 
   <ol start="5">
-    5. The user agent should [=obtain a connection=] given <var ignore>partitionKey</var>, <var ignore>url</var>'s [=origin=], <var ignore>useCredentials</var>, <ins>and <var ignore>options</var>'s [=link processing options/environment=]</ins>.
+    5. The user agent should [=obtain a connection=] given <var ignore>partitionKey</var>, <var ignore>url</var>'s [=url/origin=], <var ignore>useCredentials</var>, <ins>and <var ignore>options</var>'s [=link processing options/environment=]</ins>.
   </ol>
 </div>
 
