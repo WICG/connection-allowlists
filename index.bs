@@ -619,7 +619,7 @@ In the [=fetch and process the linked resource=] steps for the <a attr-value for
   In HTML's [=fetch and process the linked resource=] steps for the <a attr-value for="link/rel">`dns-prefetch`</a> link type, step 4 is updated as follows:
 
   <ol start="4">
-    4. The user agent should [=resolve an origin=] given <var ignore>partitionKey</var>, <var ignore>url</var>'s [=origin=], <ins>and <var ignore>el</var>'s [=relevant settings object=]</ins>.
+    4. The user agent should [=resolve an origin=] given <var ignore>partitionKey</var>, <var ignore>url</var>'s [=url/origin=], <ins>and <var ignore>el</var>'s [=relevant settings object=]</ins>.
   </ol>
 </div>
 
