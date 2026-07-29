@@ -52,7 +52,6 @@ spec:infra; type:dfn; for:/; text:string
 spec:infra; type:dfn; text:success
 spec:url; type:dfn; for:/; text:url
 spec:dom; type:dfn; for:/; text:document
-spec:url; type:dfn; text:origin
 </pre>
 
 Introduction {#intro}
