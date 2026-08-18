@@ -204,3 +204,8 @@ the entire allowlist or individual rules. Feedback here as well would be much ap
 Of course! It could be a dictionary (`allowlist=("a" "b" "c"), report-to=ReportingAPIEndpointGoesHere`)!
 It could be multiple headers! It could be a new CSP directive! The spelling above seems reasonable to me,
 but feedback on different approaches is welcome!
+
+
+### Is there a demo? ###
+
+Yes, you can check out the demo [here](https://safecontentframe.static.usercontent.goog/).
