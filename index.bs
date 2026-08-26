@@ -1127,7 +1127,7 @@ fenced frames) cannot be constrained by this mechanism. Such a context MUST be b
 embedder requires a [=connection allowlist=] of it, rather than being allowed to load unconstrained.
 
 
-Service Workers {#security-service-worker}
+Service Workers {#security-service-workers}
 ---------------
 
 [=/Service Workers=] complicate the story around allowlists, just as other same-origin contexts do.
@@ -1136,9 +1136,23 @@ quite possible for them to respond to messages or requests initiated in document
 differs from the service worker's allowlist. This proposal follows other policies' design, allowing
 for these differences in capability.
 
-If developers wish to constrain service workers' ability to make requests, they can deliver an
-allowlist along with the worker script, but they'll need to ensure that this allowlist is a superset
-of the allowlists of any document it might service. 
+Note that a document's connection allowlist is enforced before a service worker intercepts a request.
+Therefore, a service worker will never see a request from a document if that request is blocked by the
+document's own connection allowlist.
+
+However, a service worker can still help a document bypass its own connection allowlist by facilitating fetch requests
+outwards on behalf of the document (e.g., via `postMessage(...)`). To protect against this exfiltration channel, developers
+can deliver an equally-restrictive allowlist along with worker scripts. This can be done efficiently by conditionally sending the
+[:Connection-Allowlist:] header when the `Sec-Fetch-Dest` request header is `serviceworker`, rather than applying it to every script served
+ Note that for service workers, this allowlist must be a superset of the allowlists of any document the worker might service.
+
+
+Shared Workers {#security-shared-workers}
+--------------
+
+Like service workers, shared workers have a distinct [=/policy container=] and can potentially facilitate exfiltration on behalf of a document via `postMessage(...)`. Developers can similarly deliver a restrictive allowlist along with shared worker scripts (by checking if the `Sec-Fetch-Dest` request header is `sharedworker`).
+Shared workers created from `blob:` URLs present a unique bypass risk. While `data:` URL shared workers safely inherit their initiator's policy container, a `blob:` URL shared worker can be connected to from multiple documents with different connection allowlists. To prevent this cross-document bypass, developers who use connections allowlists
+are advised to specify a `worker-src` Content Security Policy directive that excludes `blob:` URLs.
 
 
 DNS {#security-dns}
