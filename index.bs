@@ -1130,10 +1130,10 @@ embedder requires a [=connection allowlist=] of it, rather than being allowed to
 Service Workers {#security-service-workers}
 ---------------
 
-[=/Service Workers=] complicate the story around allowlists, just as other same-origin contexts do.
+[=/Service Workers=] and shared workers complicate the story around allowlists, just as other same-origin contexts do.
 Because they have a [=/policy container=] distinct from each of the documents they manage, it's
 quite possible for them to respond to messages or requests initiated in documents whose allowlist
-differs from the service worker's allowlist. This proposal follows other policies' design, allowing
+differs from the worker's allowlist. This proposal follows other policies' design, allowing
 for these differences in capability.
 
 Note that a document's connection allowlist is enforced before a service worker intercepts a request.
