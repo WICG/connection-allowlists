@@ -1137,9 +1137,14 @@ differs from the service worker's allowlist. This proposal follows other policie
 for these differences in capability.
 
 Note that a document's connection allowlist is enforced before a service worker intercepts a request.
-Therefore, a service worker will never see a request from a document if that request is blocked by the document's own connection allowlist.
+Therefore, a service worker will never see a request from a document if that request is blocked by the
+document's own connection allowlist.
 
-However, a service worker can still help a document bypass its own connection allowlist by facilitating fetch requests outwards on behalf of the document (e.g., via `postMessage(...)`). To protect against this exfiltration channel, developers can deliver an equally-restrictive allowlist along with worker scripts. This can be done efficiently by conditionally sending the [:Connection-Allowlist:] header when the `Sec-Fetch-Dest` request header is `serviceworker`, rather than applying it to every script served. Note that for service workers, this allowlist must be a superset of the allowlists of any document the worker might service.
+However, a service worker can still help a document bypass its own connection allowlist by facilitating fetch requests
+outwards on behalf of the document (e.g., via `postMessage(...)`). To protect against this exfiltration channel, developers
+can deliver an equally-restrictive allowlist along with worker scripts. This can be done efficiently by conditionally sending the
+[:Connection-Allowlist:] header when the `Sec-Fetch-Dest` request header is `serviceworker`, rather than applying it to every script served
+ Note that for service workers, this allowlist must be a superset of the allowlists of any document the worker might service.
 
 
 Shared Workers {#security-shared-workers}
