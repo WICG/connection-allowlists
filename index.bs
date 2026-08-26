@@ -1127,18 +1127,22 @@ fenced frames) cannot be constrained by this mechanism. Such a context MUST be b
 embedder requires a [=connection allowlist=] of it, rather than being allowed to load unconstrained.
 
 
-Service Workers {#security-service-worker}
----------------
+Service and Shared Workers {#security-workers}
+--------------------------
 
-[=/Service Workers=] complicate the story around allowlists, just as other same-origin contexts do.
+[=/Service Workers=] and shared workers complicate the story around allowlists, just as other same-origin contexts do.
 Because they have a [=/policy container=] distinct from each of the documents they manage, it's
 quite possible for them to respond to messages or requests initiated in documents whose allowlist
-differs from the service worker's allowlist. This proposal follows other policies' design, allowing
+differs from the worker's allowlist. This proposal follows other policies' design, allowing
 for these differences in capability.
 
-If developers wish to constrain service workers' ability to make requests, they can deliver an
-allowlist along with the worker script, but they'll need to ensure that this allowlist is a superset
-of the allowlists of any document it might service. 
+Note that a document's connection allowlist is enforced before a service worker intercepts a request.
+Therefore, a service worker will never see a request from a document if that request is blocked by the document's own connection allowlist.
+
+However, a service or shared worker can still help a document bypass its own connection allowlist by facilitating fetch requests outwards on behalf of the document (e.g., via `postMessage(...)`). To protect against this exfiltration channel, developers can:
+
+*   Deliver an equally-restrictive allowlist along with _every script_ they serve. This ensures that any worker spawned from those scripts is appropriately constrained. Note that for service workers, this allowlist must be a superset of the allowlists of any document the worker might service.
+*   Specify a `worker-src` Content Security Policy directive that excludes `blob:` URLs. While `data:` URL shared workers safely inherit their initiator's policy container, `blob:` URL shared workers can be connected to from multiple documents with different connection allowlists. Banning `blob:` URLs prevents this cross-document bypass.
 
 
 DNS {#security-dns}
