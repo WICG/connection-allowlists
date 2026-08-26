@@ -1146,8 +1146,8 @@ Shared Workers {#security-shared-workers}
 --------------
 
 Like service workers, shared workers have a distinct [=/policy container=] and can potentially facilitate exfiltration on behalf of a document via `postMessage(...)`. Developers can similarly deliver a restrictive allowlist along with shared worker scripts (by checking if the `Sec-Fetch-Dest` request header is `sharedworker`).
-
-However, shared workers created from `blob:` URLs present a unique bypass risk. While `data:` URL shared workers safely inherit their initiator's policy container, a `blob:` URL shared worker can be connected to from multiple documents with different connection allowlists. To prevent this cross-document bypass, developers should specify a `worker-src` Content Security Policy directive that excludes `blob:` URLs.
+Shared workers created from `blob:` URLs present a unique bypass risk. While `data:` URL shared workers safely inherit their initiator's policy container, a `blob:` URL shared worker can be connected to from multiple documents with different connection allowlists. To prevent this cross-document bypass, developers who use connections allowlists
+are advised to specify a `worker-src` Content Security Policy directive that excludes `blob:` URLs.
 
 
 DNS {#security-dns}
