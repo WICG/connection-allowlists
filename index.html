@@ -4,9 +4,9 @@
   <title>Connection Allowlists</title>
   <meta content="width=device-width, initial-scale=1, shrink-to-fit=no" name="viewport">
   <link href="https://www.w3.org/StyleSheets/TR/2021/cg-draft" rel="stylesheet">
-  <meta content="Bikeshed version ac92c2f0d, updated Fri Aug 21 16:01:29 2026 -0700" name="generator">
+  <meta content="Bikeshed version ea4009a02, updated Thu Sep 17 15:24:44 2026 -0700" name="generator">
   <link href="https://wicg.github.io/connection-allowlists/" rel="canonical">
-  <meta content="60348607cbfa4aedbdc65da9e94a6f6047fc3210" name="revision">
+  <meta content="fb9080d67b3b2c75770a34e7f6877a714b862ba3" name="revision">
   <meta content="dark light" name="color-scheme">
   <link href="https://www.w3.org/StyleSheets/TR/2021/dark.css" media="(prefers-color-scheme: dark)" rel="stylesheet" type="text/css">
 <style>/* Boilerplate: style-autolinks */
@@ -768,7 +768,7 @@ var[data-var-color="6"] { --var-vg: #FFBCF2; }
   <div class="head">
    <h1 class="no-ref p-name" id="title">Connection Allowlists</h1>
    <p id="w3c-state"><a href="https://www.w3.org/standards/types/#CG-DRAFT">Draft Community Group Report</a>,
-    <time class="dt-updated" datetime="2026-08-26">26 August 2026</time></p>
+    <time class="dt-updated" datetime="2026-09-27">27 September 2026</time></p>
    <div data-fill-with="spec-metadata">
     <dl>
      <dt>This version:
@@ -1222,7 +1222,7 @@ The <dfn class="dfn-paneled" data-dfn-type="abstract-op" data-export id="abstrac
       <p><a data-link-type="dfn" href="https://infra.spec.whatwg.org/#list-iterate" id="ref-for-list-iterate④">For each</a> <var>connection allowlist</var> in <var>connection allowlists</var>:</p>
       <ol>
        <li data-md>
-        <p>If <var>url</var> <a data-link-type="dfn" href="https://webbluetoothcg.github.io/web-bluetooth/#bluetoothdatafilterinit-matches" id="ref-for-bluetoothdatafilterinit-matches">matches</a> <var>connection allowlist</var>, <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#iteration-continue" id="ref-for-iteration-continue②">continue</a>.</p>
+        <p>If <var>url</var> <a data-link-type="dfn" href="https://bluetooth.spec.whatwg.org/#bluetoothdatafilterinit-matches" id="ref-for-bluetoothdatafilterinit-matches">matches</a> <var>connection allowlist</var>, <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#iteration-continue" id="ref-for-iteration-continue②">continue</a>.</p>
        <li data-md>
         <p><a data-link-type="abstract-op" href="#abstract-opdef-report-a-violation" id="ref-for-abstract-opdef-report-a-violation">Report a violation</a> given <var>url</var>, <var>environment</var>, and
 <var>connection allowlist</var>.</p>
@@ -1266,7 +1266,7 @@ than necessary about redirect targets.</p>
           <p><a data-link-type="dfn" href="https://infra.spec.whatwg.org/#iteration-continue" id="ref-for-iteration-continue④">Continue</a>.</p>
         </ol>
        <li data-md>
-        <p>If <var>request</var>’s <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-request-url" id="ref-for-concept-request-url②">url</a> <a data-link-type="dfn" href="https://webbluetoothcg.github.io/web-bluetooth/#bluetoothdatafilterinit-matches" id="ref-for-bluetoothdatafilterinit-matches①">matches</a> <var>allowlist</var>, <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#iteration-continue" id="ref-for-iteration-continue⑤">continue</a>.</p>
+        <p>If <var>request</var>’s <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-request-url" id="ref-for-concept-request-url②">url</a> <a data-link-type="dfn" href="https://bluetooth.spec.whatwg.org/#bluetoothdatafilterinit-matches" id="ref-for-bluetoothdatafilterinit-matches①">matches</a> <var>allowlist</var>, <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#iteration-continue" id="ref-for-iteration-continue⑤">continue</a>.</p>
        <li data-md>
         <p><a data-link-type="abstract-op" href="#abstract-opdef-report-a-violation" id="ref-for-abstract-opdef-report-a-violation②">Report a violation</a> given <var>request</var>’s <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-request-url" id="ref-for-concept-request-url③">url</a>, <var>request</var>’s
 <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-request-client" id="ref-for-concept-request-client①">client</a>, and <var>allowlist</var>.</p>
@@ -1739,6 +1739,21 @@ given <var>response</var>.</ins>
       <p>Return <var>result</var>.</p>
     </ol>
    </div>
+   <p>Additionally, the <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/browsers.html#clone-a-policy-container" id="ref-for-clone-a-policy-container">clone a policy container</a> algorithm is patched to copy the allowlists and requirement:</p>
+   <div class="algorithm" data-algorithm="monkey patching policy container cloning">
+    <ol start="5">
+     <li data-md>
+      <p>Set <var>clone</var>’s integrity policy to a copy of <var>policyContainer</var>’s integrity policy.</p>
+     <li data-md>
+      <ins>Set <var>clone</var>’s <a data-link-type="dfn" href="#policy-container-connection-allowlists" id="ref-for-policy-container-connection-allowlists⑨">connection allowlists</a> to a copy of
+<var>policyContainer</var>’s <a data-link-type="dfn" href="#policy-container-connection-allowlists" id="ref-for-policy-container-connection-allowlists①⓪">connection allowlists</a>.</ins>
+     <li data-md>
+      <ins>Set <var>clone</var>’s <a data-link-type="dfn" href="#policy-container-required-connection-allowlist" id="ref-for-policy-container-required-connection-allowlist②">required connection allowlist</a> to
+<var>policyContainer</var>’s <a data-link-type="dfn" href="#policy-container-required-connection-allowlist" id="ref-for-policy-container-required-connection-allowlist③">required connection allowlist</a>.</ins>
+     <li data-md>
+      <p>Return <var>clone</var>.</p>
+    </ol>
+   </div>
    <p class="note" role="note"><span class="marker">Note:</span> Early hint integration does not need further changes, as the early response’s
 <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/browsers.html#policy-container" id="ref-for-policy-container①②">policy container</a> is already used when fetching early hint links.</p>
    <p>To support <a href="#embedded-enforcement">§ 4 Embedded Enforcement</a>, we follow the model that <a data-link-type="biblio" href="#biblio-csp-embedded-enforcement" title="Content Security Policy: Embedded Enforcement">[csp-embedded-enforcement]</a> uses for
@@ -1747,7 +1762,7 @@ its required CSP, threading the embedder’s requirement from the embedding elem
 <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/browsers.html#policy-container" id="ref-for-policy-container①③">policy container</a>. Concretely, HTML and Fetch are patched as follows:</p>
    <ol>
     <li data-md>
-     <p>A <a data-link-type="dfn" href="#policy-container-required-connection-allowlist" id="ref-for-policy-container-required-connection-allowlist②">required connection allowlist</a> item is added to the <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/browsers.html#policy-container" id="ref-for-policy-container①④">policy container</a>
+     <p>A <a data-link-type="dfn" href="#policy-container-required-connection-allowlist" id="ref-for-policy-container-required-connection-allowlist④">required connection allowlist</a> item is added to the <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/browsers.html#policy-container" id="ref-for-policy-container①④">policy container</a>
 <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#struct" id="ref-for-struct③">struct</a> (defined in <a href="#embedded-enforcement-checking">§ 4.4 Obtaining and enforcing a requirement</a>).</p>
     <li data-md>
      <p>A required connection allowlist item, either <code>null</code> or a <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#string" id="ref-for-string⑧">string</a>, is added to the
@@ -1764,7 +1779,7 @@ set it from the <a data-link-type="dfn" href="https://html.spec.whatwg.org/multi
 <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/browsing-the-web.html#target-snapshot-params" id="ref-for-target-snapshot-params③">target snapshot params</a> item, when that item is not <code>null</code>.</p>
     <li data-md>
      <p><a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/browsers.html#creating-a-policy-container-from-a-fetch-response" id="ref-for-creating-a-policy-container-from-a-fetch-response①">create a policy container from a fetch response</a> takes the requirement as an additional
-argument, and after populating <var>result</var>’s <a data-link-type="dfn" href="#policy-container-connection-allowlists" id="ref-for-policy-container-connection-allowlists⑨">connection allowlists</a> runs the
+argument, and after populating <var>result</var>’s <a data-link-type="dfn" href="#policy-container-connection-allowlists" id="ref-for-policy-container-connection-allowlists①①">connection allowlists</a> runs the
 <a data-link-type="abstract-op" href="#abstract-opdef-apply-a-required-connection-allowlist" id="ref-for-abstract-opdef-apply-a-required-connection-allowlist">apply a required connection allowlist</a> steps below.</p>
    </ol>
    <p class="note" role="note"><span class="marker">Note:</span> Like the sandboxing flags already carried in <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/browsing-the-web.html#target-snapshot-params" id="ref-for-target-snapshot-params④">target snapshot params</a>, the requirement is
@@ -1792,16 +1807,16 @@ requirement</a> given <var>requirement</var>, <var>response</var>’s <a data-li
      <li data-md>
       <p>If <var>required</var> is <code>null</code>, return.</p>
      <li data-md>
-      <p>If no <a data-link-type="dfn" href="#connection-allowlist" id="ref-for-connection-allowlist①⑥">connection allowlist</a> in <var>result</var>’s <a data-link-type="dfn" href="#policy-container-connection-allowlists" id="ref-for-policy-container-connection-allowlists①⓪">connection allowlists</a> whose
+      <p>If no <a data-link-type="dfn" href="#connection-allowlist" id="ref-for-connection-allowlist①⑥">connection allowlist</a> in <var>result</var>’s <a data-link-type="dfn" href="#policy-container-connection-allowlists" id="ref-for-policy-container-connection-allowlists①②">connection allowlists</a> whose
 <a data-link-type="dfn" href="#connection-allowlist-disposition" id="ref-for-connection-allowlist-disposition①⓪">disposition</a> is <a data-link-type="grammar" href="#grammardef-connection-allowlist-disposition-enforce" id="ref-for-grammardef-connection-allowlist-disposition-enforce⑨">enforce</a>
 <a data-link-type="dfn" href="#connection-allowlist-satisfies" id="ref-for-connection-allowlist-satisfies⑤">satisfies</a> <var>required</var>, then <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#list-append" id="ref-for-list-append①">append</a> <var>required</var> to <var>result</var>’s
-<a data-link-type="dfn" href="#policy-container-connection-allowlists" id="ref-for-policy-container-connection-allowlists①①">connection allowlists</a>.</p>
+<a data-link-type="dfn" href="#policy-container-connection-allowlists" id="ref-for-policy-container-connection-allowlists①③">connection allowlists</a>.</p>
      <li data-md>
-      <p>Set <var>result</var>’s <a data-link-type="dfn" href="#policy-container-required-connection-allowlist" id="ref-for-policy-container-required-connection-allowlist③">required connection allowlist</a> to <var>requirement</var>.</p>
+      <p>Set <var>result</var>’s <a data-link-type="dfn" href="#policy-container-required-connection-allowlist" id="ref-for-policy-container-required-connection-allowlist⑤">required connection allowlist</a> to <var>requirement</var>.</p>
     </ol>
    </div>
    <p class="note" role="note"><span class="marker">Note:</span> The embedder’s <a data-link-type="dfn" href="#connection-allowlist" id="ref-for-connection-allowlist①⑦">connection allowlist</a> is added to <var>result</var>’s
-<a data-link-type="dfn" href="#policy-container-connection-allowlists" id="ref-for-policy-container-connection-allowlists①②">connection allowlists</a> as an <em>additional</em> entry, alongside any the
+<a data-link-type="dfn" href="#policy-container-connection-allowlists" id="ref-for-policy-container-connection-allowlists①④">connection allowlists</a> as an <em>additional</em> entry, alongside any the
 response asserted for itself (including `<code><a data-link-type="http-header" href="#http-headerdef-connection-allowlist-report-only" id="ref-for-http-headerdef-connection-allowlist-report-only①">Connection-Allowlist-Report-Only</a></code>`). Because every allowlist
 in that list is enforced for the document’s outgoing requests, both the embedder’s requirement and the
 document’s own assertions apply. Following <a data-link-type="biblio" href="#biblio-csp-embedded-enforcement" title="Content Security Policy: Embedded Enforcement">[csp-embedded-enforcement]</a>, the requirement is
@@ -1874,7 +1889,7 @@ service workers need to apply their own connection allowlist when invoking a nav
      <li data-md>
       <ins>If <a data-link-type="abstract-op" href="#abstract-opdef-should-url-be-blocked-by-connection-allowlists" id="ref-for-abstract-opdef-should-url-be-blocked-by-connection-allowlists①">should url be blocked by Connection Allowlists</a> returns <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#blocked" id="ref-for-blocked①④">blocked</a> when executed
 upon <var>url</var>, <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#this" id="ref-for-this">this</a>’s <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#relevant-settings-object" id="ref-for-relevant-settings-object①">relevant settings object</a>, and <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#this" id="ref-for-this①">this</a>’s
-<a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#relevant-settings-object" id="ref-for-relevant-settings-object②">relevant settings object</a>’s <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#concept-settings-object-policy-container" id="ref-for-concept-settings-object-policy-container①">policy container</a>’s <a data-link-type="dfn" href="#policy-container-connection-allowlists" id="ref-for-policy-container-connection-allowlists①③">connection allowlists</a>,
+<a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#relevant-settings-object" id="ref-for-relevant-settings-object②">relevant settings object</a>’s <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#concept-settings-object-policy-container" id="ref-for-concept-settings-object-policy-container①">policy container</a>’s <a data-link-type="dfn" href="#policy-container-connection-allowlists" id="ref-for-policy-container-connection-allowlists①⑤">connection allowlists</a>,
 then return a  <a data-link-type="dfn" href="https://wicg.github.io/web-smart-card/#transaction-state-promise" id="ref-for-transaction-state-promise">promise</a> rejected with a <code class="idl"><a data-link-type="idl" href="https://webidl.spec.whatwg.org/#securityerror" id="ref-for-securityerror">"SecurityError"</a></code> <code class="idl"><a data-link-type="idl" href="https://webidl.spec.whatwg.org/#idl-DOMException" id="ref-for-idl-DOMException">DOMException</a></code>.</ins>
     </ol>
    </div>
@@ -1912,7 +1927,7 @@ mirrors the concern that motivated requiring an opt-in for the <code><a data-lin
 <a data-link-type="biblio" href="#biblio-csp-embedded-enforcement" title="Content Security Policy: Embedded Enforcement">[csp-embedded-enforcement]</a></p>
     <li data-md>
      <p><strong>No relaxation on inheritance.</strong> The requirement is
-<a data-link-type="dfn" href="#policy-container-required-connection-allowlist" id="ref-for-policy-container-required-connection-allowlist④">inherited</a> by descendant frames, and a
+<a data-link-type="dfn" href="#policy-container-required-connection-allowlist" id="ref-for-policy-container-required-connection-allowlist⑥">inherited</a> by descendant frames, and a
 descendant’s own <code>connectionAllowlist</code> attribute is honored only when it <a data-link-type="dfn" href="#connection-allowlist-satisfies" id="ref-for-connection-allowlist-satisfies⑧">satisfies</a> the
 inherited requirement. A constrained subframe therefore cannot escape its constraints by embedding
 a more permissive grandchild. For <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#local-scheme" id="ref-for-local-scheme⑤">local scheme</a> documents, an inherited allowlist
@@ -2172,6 +2187,11 @@ as that pattern will never be matched by a resource request.</p>
   <h3 class="heading no-num no-ref settled" id="index-defined-elsewhere"><span class="content">Terms defined by reference</span><a class="self-link" href="#index-defined-elsewhere"></a></h3>
   <ul class="index">
    <li>
+    <a data-link-type="biblio">[BLUETOOTH-SCANNING]</a> defines the following terms:
+    <ul>
+     <li><span class="dfn-paneled" id="cf23430d">matches</span>
+    </ul>
+   <li>
     <a data-link-type="biblio">[CSP]</a> defines the following terms:
     <ul>
      <li><span class="dfn-paneled" id="9b40f5cd">fetch directives</span>
@@ -2221,6 +2241,7 @@ as that pattern will never be matched by a resource request.</p>
      <li><span class="dfn-paneled" id="02fb8691">MessageChannel</span>
      <li><span class="dfn-paneled" id="b410a6ef">ASCII serialization of an origin</span>
      <li><span class="dfn-paneled" id="f23dc013">child navigable</span>
+     <li><span class="dfn-paneled" id="00c57527">clone a policy container</span>
      <li><span class="dfn-paneled" id="762210c0">container</span>
      <li><span class="dfn-paneled" id="07ad3048">create navigation params by fetching</span>
      <li><span class="dfn-paneled" id="658bcdaa">create navigation params from a srcdoc resource</span>
@@ -2316,11 +2337,6 @@ as that pattern will never be matched by a resource request.</p>
      <li><span class="dfn-paneled" id="60393e82">URL pattern</span>
     </ul>
    <li>
-    <a data-link-type="biblio">[WEB-BLUETOOTH]</a> defines the following terms:
-    <ul>
-     <li><span class="dfn-paneled" id="4d372bae">matches</span>
-    </ul>
-   <li>
     <a data-link-type="biblio">[WEB-SMART-CARD]</a> defines the following terms:
     <ul>
      <li><span class="dfn-paneled" id="c81d8804">promise</span>
@@ -2354,6 +2370,8 @@ as that pattern will never be matched by a resource request.</p>
   <h2 class="heading no-num no-ref settled" id="references"><span class="content">References</span><a class="self-link" href="#references"></a></h2>
   <h3 class="heading no-num no-ref settled" id="normative"><span class="content">Normative References</span><a class="self-link" href="#normative"></a></h3>
   <dl>
+   <dt id="biblio-bluetooth-scanning">[BLUETOOTH-SCANNING]
+   <dd><a href="https://bluetooth.spec.whatwg.org/scanning.html"><cite>Web Bluetooth Scanning</cite></a>. Draft Community Group Report. URL: <a href="https://bluetooth.spec.whatwg.org/scanning.html">https://bluetooth.spec.whatwg.org/scanning.html</a>
    <dt id="biblio-csp">[CSP]
    <dd>Mike West; Antonio Sartori. <a href="https://w3c.github.io/webappsec-csp/"><cite>Content Security Policy Level 3</cite></a>. URL: <a href="https://w3c.github.io/webappsec-csp/">https://w3c.github.io/webappsec-csp/</a>
    <dt id="biblio-csp-embedded-enforcement">[CSP-EMBEDDED-ENFORCEMENT]
@@ -2378,8 +2396,6 @@ as that pattern will never be matched by a resource request.</p>
    <dd>Anne van Kesteren. <a href="https://url.spec.whatwg.org/"><cite>URL Standard</cite></a>. Living Standard. URL: <a href="https://url.spec.whatwg.org/">https://url.spec.whatwg.org/</a>
    <dt id="biblio-urlpattern">[URLPATTERN]
    <dd>Ben Kelly; Jeremy Roman; 宍戸俊哉 (Shunya Shishido). <a href="https://urlpattern.spec.whatwg.org/"><cite>URL Pattern Standard</cite></a>. Living Standard. URL: <a href="https://urlpattern.spec.whatwg.org/">https://urlpattern.spec.whatwg.org/</a>
-   <dt id="biblio-web-bluetooth">[WEB-BLUETOOTH]
-   <dd>Jeffrey Yasskin. <a href="https://webbluetoothcg.github.io/web-bluetooth/"><cite>Web Bluetooth</cite></a>. URL: <a href="https://webbluetoothcg.github.io/web-bluetooth/">https://webbluetoothcg.github.io/web-bluetooth/</a>
    <dt id="biblio-web-smart-card">[WEB-SMART-CARD]
    <dd><a href="https://wicg.github.io/web-smart-card/"><cite>Web Smart Card API</cite></a>. Unofficial Proposal Draft. URL: <a href="https://wicg.github.io/web-smart-card/">https://wicg.github.io/web-smart-card/</a>
    <dt id="biblio-webidl">[WEBIDL]
@@ -2630,6 +2646,7 @@ function parseHTML(markup) {
 "use strict";
 {
 let dfnPanelData = {
+"00c57527": {"dfnID":"00c57527","dfnText":"clone a policy container","external":true,"refSections":[{"refs":[{"id":"ref-for-clone-a-policy-container"}],"title":"5.2. Integration with HTML"}],"url":"https://html.spec.whatwg.org/multipage/browsers.html#clone-a-policy-container"},
 "0204d188": {"dfnID":"0204d188","dfnText":"size","external":true,"refSections":[{"refs":[{"id":"ref-for-list-size"}],"title":"3.1. Parsing"},{"refs":[{"id":"ref-for-list-size\u2460"}],"title":"3.2. Matching"}],"url":"https://infra.spec.whatwg.org/#list-size"},
 "02fb8691": {"dfnID":"02fb8691","dfnText":"MessageChannel","external":true,"refSections":[{"refs":[{"id":"ref-for-messagechannel"}],"title":"6.6. postMessage(...)"}],"url":"https://html.spec.whatwg.org/multipage/web-messaging.html#messagechannel"},
 "0698d556": {"dfnID":"0698d556","dfnText":"string","external":true,"refSections":[{"refs":[{"id":"ref-for-string"}],"title":"3.1. Parsing"},{"refs":[{"id":"ref-for-string\u2460"}],"title":"3.3. Reporting"},{"refs":[{"id":"ref-for-string\u2461"},{"id":"ref-for-string\u2462"},{"id":"ref-for-string\u2463"},{"id":"ref-for-string\u2464"},{"id":"ref-for-string\u2465"},{"id":"ref-for-string\u2466"}],"title":"4.4. Obtaining and enforcing a requirement"},{"refs":[{"id":"ref-for-string\u2467"},{"id":"ref-for-string\u2468"}],"title":"5.2. Integration with HTML"}],"url":"https://infra.spec.whatwg.org/#string"},
@@ -2659,7 +2676,6 @@ let dfnPanelData = {
 "4437edc6": {"dfnID":"4437edc6","dfnText":"navigation params","external":true,"refSections":[{"refs":[{"id":"ref-for-navigation-params"},{"id":"ref-for-navigation-params\u2460"},{"id":"ref-for-navigation-params\u2461"}],"title":"5.2. Integration with HTML"}],"url":"https://html.spec.whatwg.org/multipage/browsing-the-web.html#navigation-params"},
 "45d80b74": {"dfnID":"45d80b74","dfnText":"hostname component","external":true,"refSections":[{"refs":[{"id":"ref-for-url-pattern-hostname-component"}],"title":"3.2. Matching"}],"url":"https://urlpattern.spec.whatwg.org/#url-pattern-hostname-component"},
 "4acd57ce": {"dfnID":"4acd57ce","dfnText":"token","external":true,"refSections":[{"refs":[{"id":"ref-for-name-tokens"},{"id":"ref-for-name-tokens\u2460"},{"id":"ref-for-name-tokens\u2461"},{"id":"ref-for-name-tokens\u2462"},{"id":"ref-for-name-tokens\u2463"},{"id":"ref-for-name-tokens\u2464"}],"title":"3. Connection Allowlist Headers"},{"refs":[{"id":"ref-for-name-tokens\u2465"},{"id":"ref-for-name-tokens\u2466"},{"id":"ref-for-name-tokens\u2467"},{"id":"ref-for-name-tokens\u2468"}],"title":"3.1. Parsing"},{"refs":[{"id":"ref-for-name-tokens\u2460\u24ea"}],"title":"4.4. Obtaining and enforcing a requirement"}],"url":"https://www.rfc-editor.org/rfc/rfc9651#name-tokens"},
-"4d372bae": {"dfnID":"4d372bae","dfnText":"matches","external":true,"refSections":[{"refs":[{"id":"ref-for-bluetoothdatafilterinit-matches"},{"id":"ref-for-bluetoothdatafilterinit-matches\u2460"}],"title":"3.2. Matching"}],"url":"https://webbluetoothcg.github.io/web-bluetooth/#bluetoothdatafilterinit-matches"},
 "5216e1a0": {"dfnID":"5216e1a0","dfnText":"node document","external":true,"refSections":[{"refs":[{"id":"ref-for-concept-node-document"}],"title":"4.4. Obtaining and enforcing a requirement"},{"refs":[{"id":"ref-for-concept-node-document\u2460"}],"title":"5.3. DNS Prefetching"}],"url":"https://dom.spec.whatwg.org/#concept-node-document"},
 "53275e46": {"dfnID":"53275e46","dfnText":"append","external":true,"refSections":[{"refs":[{"id":"ref-for-list-append"}],"title":"3.1. Parsing"},{"refs":[{"id":"ref-for-list-append\u2460"}],"title":"5.2. Integration with HTML"}],"url":"https://infra.spec.whatwg.org/#list-append"},
 "55213b5b": {"dfnID":"55213b5b","dfnText":"request","external":true,"refSections":[{"refs":[{"id":"ref-for-concept-request"},{"id":"ref-for-concept-request\u2460"}],"title":"3.2. Matching"},{"refs":[{"id":"ref-for-concept-request\u2461"}],"title":"4.2. Embedded Enforcement Headers"},{"refs":[{"id":"ref-for-concept-request\u2462"}],"title":"4.4. Obtaining and enforcing a requirement"},{"refs":[{"id":"ref-for-concept-request\u2463"},{"id":"ref-for-concept-request\u2464"}],"title":"5.1. Integration with Fetch"},{"refs":[{"id":"ref-for-concept-request\u2465"},{"id":"ref-for-concept-request\u2466"},{"id":"ref-for-concept-request\u2467"}],"title":"5.2. Integration with HTML"},{"refs":[{"id":"ref-for-concept-request\u2468"}],"title":"6.2. Embedded Enforcement"}],"url":"https://fetch.spec.whatwg.org/#concept-request"},
@@ -2737,6 +2753,7 @@ let dfnPanelData = {
 "c9e7c11a": {"dfnID":"c9e7c11a","dfnText":"header","external":true,"refSections":[{"refs":[{"id":"ref-for-concept-header"},{"id":"ref-for-concept-header\u2460"}],"title":"3. Connection Allowlist Headers"},{"refs":[{"id":"ref-for-concept-header\u2461"},{"id":"ref-for-concept-header\u2462"}],"title":"4. Embedded Enforcement"},{"refs":[{"id":"ref-for-concept-header\u2463"},{"id":"ref-for-concept-header\u2464"}],"title":"4.2. Embedded Enforcement Headers"},{"refs":[{"id":"ref-for-concept-header\u2465"}],"title":"4.4. Obtaining and enforcing a requirement"}],"url":"https://fetch.spec.whatwg.org/#concept-header"},
 "ca3ca4ae": {"dfnID":"ca3ca4ae","dfnText":"URL parser","external":true,"refSections":[{"refs":[{"id":"ref-for-concept-url-parser"}],"title":"3.2. Matching"}],"url":"https://url.spec.whatwg.org/#concept-url-parser"},
 "cae9bd49": {"dfnID":"cae9bd49","dfnText":"byte-serializing a request origin","external":true,"refSections":[{"refs":[{"id":"ref-for-byte-serializing-a-request-origin"},{"id":"ref-for-byte-serializing-a-request-origin\u2460"}],"title":"4.2. Embedded Enforcement Headers"}],"url":"https://fetch.spec.whatwg.org/#byte-serializing-a-request-origin"},
+"cf23430d": {"dfnID":"cf23430d","dfnText":"matches","external":true,"refSections":[{"refs":[{"id":"ref-for-bluetoothdatafilterinit-matches"},{"id":"ref-for-bluetoothdatafilterinit-matches\u2460"}],"title":"3.2. Matching"}],"url":"https://bluetooth.spec.whatwg.org/#bluetoothdatafilterinit-matches"},
 "cfb6031b": {"dfnID":"cfb6031b","dfnText":"creating a policy container from a fetch response","external":true,"refSections":[{"refs":[{"id":"ref-for-creating-a-policy-container-from-a-fetch-response"},{"id":"ref-for-creating-a-policy-container-from-a-fetch-response\u2460"}],"title":"5.2. Integration with HTML"}],"url":"https://html.spec.whatwg.org/multipage/browsers.html#creating-a-policy-container-from-a-fetch-response"},
 "cfe36e16": {"dfnID":"cfe36e16","dfnText":"Reporting-Endpoints","external":true,"refSections":[{"refs":[{"id":"ref-for-reporting-endpoints"}],"title":"1. Introduction"}],"url":"https://w3c.github.io/reporting/#reporting-endpoints"},
 "connection-allowlist": {"dfnID":"connection-allowlist","dfnText":"Connection Allowlist","external":false,"refSections":[{"refs":[{"id":"ref-for-connection-allowlist"}],"title":"3.1. Parsing"},{"refs":[{"id":"ref-for-connection-allowlist\u2460"},{"id":"ref-for-connection-allowlist\u2461"}],"title":"3.2. Matching"},{"refs":[{"id":"ref-for-connection-allowlist\u2462"}],"title":"3.3. Reporting"},{"refs":[{"id":"ref-for-connection-allowlist\u2463"},{"id":"ref-for-connection-allowlist\u2464"},{"id":"ref-for-connection-allowlist\u2465"},{"id":"ref-for-connection-allowlist\u2466"}],"title":"4. Embedded Enforcement"},{"refs":[{"id":"ref-for-connection-allowlist\u2467"}],"title":"4.1. The connectionAllowlist attribute"},{"refs":[{"id":"ref-for-connection-allowlist\u2468"},{"id":"ref-for-connection-allowlist\u2460\u24ea"}],"title":"4.2. Embedded Enforcement Headers"},{"refs":[{"id":"ref-for-connection-allowlist\u2460\u2460"},{"id":"ref-for-connection-allowlist\u2460\u2461"}],"title":"4.3. Comparing allowlists"},{"refs":[{"id":"ref-for-connection-allowlist\u2460\u2462"},{"id":"ref-for-connection-allowlist\u2460\u2463"},{"id":"ref-for-connection-allowlist\u2460\u2464"}],"title":"4.4. Obtaining and enforcing a requirement"},{"refs":[{"id":"ref-for-connection-allowlist\u2460\u2465"},{"id":"ref-for-connection-allowlist\u2460\u2466"},{"id":"ref-for-connection-allowlist\u2460\u2467"}],"title":"5.2. Integration with HTML"},{"refs":[{"id":"ref-for-connection-allowlist\u2460\u2468"}],"title":"6.1. Same-Origin Contexts"},{"refs":[{"id":"ref-for-connection-allowlist\u2461\u24ea"},{"id":"ref-for-connection-allowlist\u2461\u2460"}],"title":"6.2. Embedded Enforcement"}],"url":"#connection-allowlist"},
@@ -2793,8 +2810,8 @@ let dfnPanelData = {
 "http-headerdef-connection-allowlist": {"dfnID":"http-headerdef-connection-allowlist","dfnText":"Connection-Allowlist","external":false,"refSections":[{"refs":[{"id":"ref-for-http-headerdef-connection-allowlist"}],"title":"1. Introduction"},{"refs":[{"id":"ref-for-http-headerdef-connection-allowlist\u2460"}],"title":"3.1. Parsing"},{"refs":[{"id":"ref-for-http-headerdef-connection-allowlist\u2461"},{"id":"ref-for-http-headerdef-connection-allowlist\u2462"}],"title":"4. Embedded Enforcement"},{"refs":[{"id":"ref-for-http-headerdef-connection-allowlist\u2463"},{"id":"ref-for-http-headerdef-connection-allowlist\u2464"}],"title":"4.1. The connectionAllowlist attribute"},{"refs":[{"id":"ref-for-http-headerdef-connection-allowlist\u2465"}],"title":"4.2. Embedded Enforcement Headers"},{"refs":[{"id":"ref-for-http-headerdef-connection-allowlist\u2466"},{"id":"ref-for-http-headerdef-connection-allowlist\u2467"},{"id":"ref-for-http-headerdef-connection-allowlist\u2468"}],"title":"4.4. Obtaining and enforcing a requirement"},{"refs":[{"id":"ref-for-http-headerdef-connection-allowlist\u2460\u24ea"},{"id":"ref-for-http-headerdef-connection-allowlist\u2460\u2460"}],"title":"6.2. Embedded Enforcement"},{"refs":[{"id":"ref-for-http-headerdef-connection-allowlist\u2460\u2461"}],"title":"6.3. Service Workers"}],"url":"#http-headerdef-connection-allowlist"},
 "http-headerdef-connection-allowlist-report-only": {"dfnID":"http-headerdef-connection-allowlist-report-only","dfnText":"Connection-Allowlist-Report-Only","external":false,"refSections":[{"refs":[{"id":"ref-for-http-headerdef-connection-allowlist-report-only"}],"title":"3.1. Parsing"},{"refs":[{"id":"ref-for-http-headerdef-connection-allowlist-report-only\u2460"}],"title":"5.2. Integration with HTML"}],"url":"#http-headerdef-connection-allowlist-report-only"},
 "http-headerdef-sec-required-connection-allowlist": {"dfnID":"http-headerdef-sec-required-connection-allowlist","dfnText":"Sec-Required-Connection-Allowlist","external":false,"refSections":[{"refs":[{"id":"ref-for-http-headerdef-sec-required-connection-allowlist"}],"title":"4. Embedded Enforcement"},{"refs":[{"id":"ref-for-http-headerdef-sec-required-connection-allowlist\u2460"}],"title":"4.4. Obtaining and enforcing a requirement"},{"refs":[{"id":"ref-for-http-headerdef-sec-required-connection-allowlist\u2461"}],"title":"5.2. Integration with HTML"}],"url":"#http-headerdef-sec-required-connection-allowlist"},
-"policy-container-connection-allowlists": {"dfnID":"policy-container-connection-allowlists","dfnText":"connection allowlists","external":false,"refSections":[{"refs":[{"id":"ref-for-policy-container-connection-allowlists"},{"id":"ref-for-policy-container-connection-allowlists\u2460"},{"id":"ref-for-policy-container-connection-allowlists\u2461"},{"id":"ref-for-policy-container-connection-allowlists\u2462"}],"title":"3.2. Matching"},{"refs":[{"id":"ref-for-policy-container-connection-allowlists\u2463"}],"title":"4. Embedded Enforcement"},{"refs":[{"id":"ref-for-policy-container-connection-allowlists\u2464"},{"id":"ref-for-policy-container-connection-allowlists\u2465"}],"title":"5.1. Integration with Fetch"},{"refs":[{"id":"ref-for-policy-container-connection-allowlists\u2466"},{"id":"ref-for-policy-container-connection-allowlists\u2467"},{"id":"ref-for-policy-container-connection-allowlists\u2468"},{"id":"ref-for-policy-container-connection-allowlists\u2460\u24ea"},{"id":"ref-for-policy-container-connection-allowlists\u2460\u2460"},{"id":"ref-for-policy-container-connection-allowlists\u2460\u2461"}],"title":"5.2. Integration with HTML"},{"refs":[{"id":"ref-for-policy-container-connection-allowlists\u2460\u2462"}],"title":"5.6. Integration with Service Workers"}],"url":"#policy-container-connection-allowlists"},
-"policy-container-required-connection-allowlist": {"dfnID":"policy-container-required-connection-allowlist","dfnText":"required connection allowlist","external":false,"refSections":[{"refs":[{"id":"ref-for-policy-container-required-connection-allowlist"}],"title":"4. Embedded Enforcement"},{"refs":[{"id":"ref-for-policy-container-required-connection-allowlist\u2460"}],"title":"4.4. Obtaining and enforcing a requirement"},{"refs":[{"id":"ref-for-policy-container-required-connection-allowlist\u2461"},{"id":"ref-for-policy-container-required-connection-allowlist\u2462"}],"title":"5.2. Integration with HTML"},{"refs":[{"id":"ref-for-policy-container-required-connection-allowlist\u2463"}],"title":"6.2. Embedded Enforcement"}],"url":"#policy-container-required-connection-allowlist"},
+"policy-container-connection-allowlists": {"dfnID":"policy-container-connection-allowlists","dfnText":"connection allowlists","external":false,"refSections":[{"refs":[{"id":"ref-for-policy-container-connection-allowlists"},{"id":"ref-for-policy-container-connection-allowlists\u2460"},{"id":"ref-for-policy-container-connection-allowlists\u2461"},{"id":"ref-for-policy-container-connection-allowlists\u2462"}],"title":"3.2. Matching"},{"refs":[{"id":"ref-for-policy-container-connection-allowlists\u2463"}],"title":"4. Embedded Enforcement"},{"refs":[{"id":"ref-for-policy-container-connection-allowlists\u2464"},{"id":"ref-for-policy-container-connection-allowlists\u2465"}],"title":"5.1. Integration with Fetch"},{"refs":[{"id":"ref-for-policy-container-connection-allowlists\u2466"},{"id":"ref-for-policy-container-connection-allowlists\u2467"},{"id":"ref-for-policy-container-connection-allowlists\u2468"},{"id":"ref-for-policy-container-connection-allowlists\u2460\u24ea"},{"id":"ref-for-policy-container-connection-allowlists\u2460\u2460"},{"id":"ref-for-policy-container-connection-allowlists\u2460\u2461"},{"id":"ref-for-policy-container-connection-allowlists\u2460\u2462"},{"id":"ref-for-policy-container-connection-allowlists\u2460\u2463"}],"title":"5.2. Integration with HTML"},{"refs":[{"id":"ref-for-policy-container-connection-allowlists\u2460\u2464"}],"title":"5.6. Integration with Service Workers"}],"url":"#policy-container-connection-allowlists"},
+"policy-container-required-connection-allowlist": {"dfnID":"policy-container-required-connection-allowlist","dfnText":"required connection allowlist","external":false,"refSections":[{"refs":[{"id":"ref-for-policy-container-required-connection-allowlist"}],"title":"4. Embedded Enforcement"},{"refs":[{"id":"ref-for-policy-container-required-connection-allowlist\u2460"}],"title":"4.4. Obtaining and enforcing a requirement"},{"refs":[{"id":"ref-for-policy-container-required-connection-allowlist\u2461"},{"id":"ref-for-policy-container-required-connection-allowlist\u2462"},{"id":"ref-for-policy-container-required-connection-allowlist\u2463"},{"id":"ref-for-policy-container-required-connection-allowlist\u2464"}],"title":"5.2. Integration with HTML"},{"refs":[{"id":"ref-for-policy-container-required-connection-allowlist\u2465"}],"title":"6.2. Embedded Enforcement"}],"url":"#policy-container-required-connection-allowlist"},
 };
 
 document.addEventListener("DOMContentLoaded", ()=>{
@@ -3229,6 +3246,7 @@ let refsData = {
 "#http-headerdef-sec-required-connection-allowlist": {"displayText":"sec-required-connection-allowlist","export":true,"for_":[],"level":"1","normative":true,"shortname":"connection-allowlists","spec":"connection-allowlists-1","status":"local","text":"sec-required-connection-allowlist","type":"http-header","url":"#http-headerdef-sec-required-connection-allowlist"},
 "#policy-container-connection-allowlists": {"displayText":"connection allowlists","export":true,"for_":["policy container"],"level":"1","normative":true,"shortname":"connection-allowlists","spec":"connection-allowlists-1","status":"local","text":"connection allowlists","type":"dfn","url":"#policy-container-connection-allowlists"},
 "#policy-container-required-connection-allowlist": {"displayText":"required connection allowlist","export":true,"for_":["policy container"],"level":"1","normative":true,"shortname":"connection-allowlists","spec":"connection-allowlists-1","status":"local","text":"required connection allowlist","type":"dfn","url":"#policy-container-required-connection-allowlist"},
+"https://bluetooth.spec.whatwg.org/#bluetoothdatafilterinit-matches": {"displayText":"matches","export":true,"for_":["BluetoothDataFilterInit"],"level":"1","normative":true,"shortname":"bluetooth-scanning","spec":"bluetooth-scanning","status":"current","text":"matches","type":"dfn","url":"https://bluetooth.spec.whatwg.org/#bluetoothdatafilterinit-matches"},
 "https://dom.spec.whatwg.org/#concept-document": {"displayText":"document","export":true,"for_":[],"level":"1","normative":true,"shortname":"dom","spec":"dom","status":"current","text":"document","type":"dfn","url":"https://dom.spec.whatwg.org/#concept-document"},
 "https://dom.spec.whatwg.org/#concept-node-document": {"displayText":"node document","export":true,"for_":["Node"],"level":"1","normative":true,"shortname":"dom","spec":"dom","status":"current","text":"node document","type":"dfn","url":"https://dom.spec.whatwg.org/#concept-node-document"},
 "https://dom.spec.whatwg.org/#document": {"displayText":"Document","export":true,"for_":[],"level":"1","normative":true,"shortname":"dom","spec":"dom","status":"current","text":"Document","type":"interface","url":"https://dom.spec.whatwg.org/#document"},
@@ -3256,6 +3274,7 @@ let refsData = {
 "https://fetch.spec.whatwg.org/#resolve-an-origin": {"displayText":"resolve an origin","export":true,"for_":[],"level":"1","normative":true,"shortname":"fetch","spec":"fetch","status":"current","text":"resolve an origin","type":"dfn","url":"https://fetch.spec.whatwg.org/#resolve-an-origin"},
 "https://fetch.spec.whatwg.org/#wildcard": {"displayText":"wildcard","export":true,"for_":[],"level":"1","normative":true,"shortname":"fetch","spec":"fetch","status":"current","text":"wildcard","type":"dfn","url":"https://fetch.spec.whatwg.org/#wildcard"},
 "https://html.spec.whatwg.org/multipage/browsers.html#ascii-serialisation-of-an-origin": {"displayText":"ASCII serialization of an origin","export":true,"for_":[],"level":"1","normative":true,"shortname":"html","spec":"html","status":"current","text":"ascii serialization of an origin","type":"dfn","url":"https://html.spec.whatwg.org/multipage/browsers.html#ascii-serialisation-of-an-origin"},
+"https://html.spec.whatwg.org/multipage/browsers.html#clone-a-policy-container": {"displayText":"clone a policy container","export":true,"for_":[],"level":"1","normative":true,"shortname":"html","spec":"html","status":"current","text":"clone a policy container","type":"dfn","url":"https://html.spec.whatwg.org/multipage/browsers.html#clone-a-policy-container"},
 "https://html.spec.whatwg.org/multipage/browsers.html#concept-origin": {"displayText":"origin","export":true,"for_":[],"level":"1","normative":true,"shortname":"html","spec":"html","status":"current","text":"origin","type":"dfn","url":"https://html.spec.whatwg.org/multipage/browsers.html#concept-origin"},
 "https://html.spec.whatwg.org/multipage/browsers.html#concept-origin-host": {"displayText":"host","export":true,"for_":["origin"],"level":"1","normative":true,"shortname":"html","spec":"html","status":"current","text":"host","type":"dfn","url":"https://html.spec.whatwg.org/multipage/browsers.html#concept-origin-host"},
 "https://html.spec.whatwg.org/multipage/browsers.html#creating-a-policy-container-from-a-fetch-response": {"displayText":"creating a policy container from a fetch response","export":true,"for_":[],"level":"1","normative":true,"shortname":"html","spec":"html","status":"current","text":"creating a policy container from a fetch response","type":"dfn","url":"https://html.spec.whatwg.org/multipage/browsers.html#creating-a-policy-container-from-a-fetch-response"},
@@ -3328,7 +3347,6 @@ let refsData = {
 "https://w3c.github.io/webappsec-csp/#grammardef-host-source": {"displayText":"host-source","export":true,"for_":[],"level":"3","normative":true,"shortname":"csp","spec":"csp3","status":"current","text":"host-source","type":"grammar","url":"https://w3c.github.io/webappsec-csp/#grammardef-host-source"},
 "https://w3c.github.io/webappsec-csp/#sandbox": {"displayText":"sandbox","export":true,"for_":[],"level":"3","normative":true,"shortname":"csp","spec":"csp3","status":"current","text":"sandbox","type":"dfn","url":"https://w3c.github.io/webappsec-csp/#sandbox"},
 "https://w3c.github.io/webrtc-pc/#dfn-administratively-prohibited": {"displayText":"administratively prohibited","export":false,"for_":[],"level":"1","normative":true,"shortname":"webrtc","spec":"webrtc","status":"current","text":"administratively prohibited","type":"dfn","url":"https://w3c.github.io/webrtc-pc/#dfn-administratively-prohibited"},
-"https://webbluetoothcg.github.io/web-bluetooth/#bluetoothdatafilterinit-matches": {"displayText":"matches","export":true,"for_":["BluetoothDataFilterInit"],"level":"1","normative":true,"shortname":"web-bluetooth","spec":"web-bluetooth","status":"current","text":"matches","type":"dfn","url":"https://webbluetoothcg.github.io/web-bluetooth/#bluetoothdatafilterinit-matches"},
 "https://webidl.spec.whatwg.org/#idl-DOMException": {"displayText":"DOMException","export":true,"for_":[],"level":"1","normative":true,"shortname":"webidl","spec":"webidl","status":"current","text":"DOMException","type":"interface","url":"https://webidl.spec.whatwg.org/#idl-DOMException"},
 "https://webidl.spec.whatwg.org/#idl-DOMString": {"displayText":"DOMString","export":true,"for_":[],"level":"1","normative":true,"shortname":"webidl","spec":"webidl","status":"current","text":"DOMString","type":"interface","url":"https://webidl.spec.whatwg.org/#idl-DOMString"},
 "https://webidl.spec.whatwg.org/#idl-USVString": {"displayText":"USVString","export":true,"for_":[],"level":"1","normative":true,"shortname":"webidl","spec":"webidl","status":"current","text":"USVString","type":"interface","url":"https://webidl.spec.whatwg.org/#idl-USVString"},
