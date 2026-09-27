@@ -57,6 +57,7 @@ spec:html; type:dfn; text:snapshotting target snapshot params
 spec:html; type:dfn; text:create navigation params by fetching
 spec:html; type:dfn; text:create navigation params from a srcdoc resource
 spec:html; type:dfn; text:create a policy container from a fetch response
+spec:html; type:dfn; text:clone a policy container
 spec:html; type:interface; text:BroadcastChannel
 spec:infra; type:dfn; for:/; text:list
 spec:infra; type:dfn; for:/; text:string
@@ -917,6 +918,19 @@ step to the [=create a policy container from a fetch response=] algorithm:
         [$parse a response's Connection Allowlists|parsing a response's Connection Allowlists$]
         given |response|.</ins>
     8.  Return |result|.
+  </ol>
+</div>
+
+Additionally, the [=clone a policy container=] algorithm is patched to copy the allowlists and requirement:
+
+<div algorithm="monkey patching policy container cloning">
+  <ol start="5">
+    5.  Set |clone|'s integrity policy to a copy of |policyContainer|'s integrity policy.
+    6.  <ins>Set |clone|'s [=policy container/connection allowlists=] to a copy of
+        |policyContainer|'s [=policy container/connection allowlists=].</ins>
+    7.  <ins>Set |clone|'s [=policy container/required connection allowlist=] to
+        |policyContainer|'s [=policy container/required connection allowlist=].</ins>
+    8.  Return |clone|.
   </ol>
 </div>
 
