@@ -667,11 +667,7 @@ Comparing allowlists {#embedded-enforcement-strictness}
 <div algorithm="is a subset of">
 A [=Connection Allowlist/allowlist=] (|a|) <dfn for="Connection Allowlist/allowlist" lt="is a subset of|are a subset of">is a subset of</dfn> a
 [=Connection Allowlist/allowlist=] (|b|) if, for each |pattern| in |a|, |b|
-[=list/contains=] a [=URL pattern=] struct which is equal to |pattern|.
-
-ISSUE(whatwg/infra#664): Equality for structs is not yet well-defined. Two [=URL patterns=] are equal
-here when they were [=URL pattern/create|created=] from the same serialized
-[=structured header/string=]. (See also [whatwg/infra#710](https://github.com/whatwg/infra/pull/710).)
+[=list/contains=] a [=URL pattern=] struct which [=/equals=] |pattern|.
 
 </div>
 
