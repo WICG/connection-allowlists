@@ -6,7 +6,7 @@
   <link href="https://www.w3.org/StyleSheets/TR/2021/cg-draft" rel="stylesheet">
   <meta content="Bikeshed version ea4009a02, updated Thu Sep 17 15:24:44 2026 -0700" name="generator">
   <link href="https://wicg.github.io/connection-allowlists/" rel="canonical">
-  <meta content="fb9080d67b3b2c75770a34e7f6877a714b862ba3" name="revision">
+  <meta content="3ffefecb57a9e30a73432d780a31d76997a51851" name="revision">
   <meta content="dark light" name="color-scheme">
   <link href="https://www.w3.org/StyleSheets/TR/2021/dark.css" media="(prefers-color-scheme: dark)" rel="stylesheet" type="text/css">
 <style>/* Boilerplate: style-autolinks */
@@ -768,7 +768,7 @@ var[data-var-color="6"] { --var-vg: #FFBCF2; }
   <div class="head">
    <h1 class="no-ref p-name" id="title">Connection Allowlists</h1>
    <p id="w3c-state"><a href="https://www.w3.org/standards/types/#CG-DRAFT">Draft Community Group Report</a>,
-    <time class="dt-updated" datetime="2026-09-27">27 September 2026</time></p>
+    <time class="dt-updated" datetime="2026-10-06">6 October 2026</time></p>
    <div data-fill-with="spec-metadata">
     <dl>
      <dt>This version:
@@ -1476,21 +1476,16 @@ otherwise return false.</p>
 parsed at all (neither as a <a data-link-type="dfn" href="https://url.spec.whatwg.org/#concept-url" id="ref-for-concept-url⑦">URL</a> nor as an <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/browsers.html#concept-origin" id="ref-for-concept-origin③">origin</a>).</p>
    <h3 class="heading settled" data-level="4.3" id="embedded-enforcement-strictness"><span class="secno">4.3. </span><span class="content">Comparing allowlists</span><a class="self-link" href="#embedded-enforcement-strictness"></a></h3>
    <div class="algorithm" data-algorithm="is a subset of">
-    
 A <a data-link-type="dfn" href="#connection-allowlist-allowlist" id="ref-for-connection-allowlist-allowlist⑤">allowlist</a> (<var>a</var>) <dfn class="dfn-paneled" data-dfn-for="Connection Allowlist/allowlist" data-dfn-type="dfn" data-lt="is a subset of|are a subset of" data-noexport id="connection-allowlist-allowlist-is-a-subset-of">is a subset of</dfn> a
 <a data-link-type="dfn" href="#connection-allowlist-allowlist" id="ref-for-connection-allowlist-allowlist⑥">allowlist</a> (<var>b</var>) if, for each <var>pattern</var> in <var>a</var>, <var>b</var>
-<a data-link-type="dfn" href="https://infra.spec.whatwg.org/#list-contain" id="ref-for-list-contain">contains</a> a <a data-link-type="dfn" href="https://urlpattern.spec.whatwg.org/#url-pattern" id="ref-for-url-pattern②">URL pattern</a> struct which is equal to <var>pattern</var>.
+<a data-link-type="dfn" href="https://infra.spec.whatwg.org/#list-contain" id="ref-for-list-contain">contains</a> a <a data-link-type="dfn" href="https://urlpattern.spec.whatwg.org/#url-pattern" id="ref-for-url-pattern②">URL pattern</a> struct which <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#equal" id="ref-for-equal">equals</a> <var>pattern</var>.
 
-
-    <p class="issue" id="issue-33bab0db"><a class="self-link" href="#issue-33bab0db"></a> Equality for structs is not yet well-defined. Two <a data-link-type="dfn" href="https://urlpattern.spec.whatwg.org/#url-pattern" id="ref-for-url-pattern③">URL patterns</a> are equal
-here when they were <a data-link-type="dfn" href="https://urlpattern.spec.whatwg.org/#url-pattern-create" id="ref-for-url-pattern-create①">created</a> from the same serialized
-<a data-link-type="dfn" href="https://www.rfc-editor.org/rfc/rfc9651#name-string" id="ref-for-name-string①">string</a>. (See also <a href="https://github.com/whatwg/infra/pull/710">whatwg/infra#710</a>.) <a href="https://github.com/whatwg/infra/issues/664">[whatwg/infra Issue #664]</a></p>
-   </div>
-   <p class="note" role="note"><span class="marker">Note:</span> This is a (non-strict) subset relationship: every <a data-link-type="dfn" href="https://urlpattern.spec.whatwg.org/#url-pattern" id="ref-for-url-pattern④">URL pattern</a> in <var>a</var> has to appear in <var>b</var>,
+</div>
+   <p class="note" role="note"><span class="marker">Note:</span> This is a (non-strict) subset relationship: every <a data-link-type="dfn" href="https://urlpattern.spec.whatwg.org/#url-pattern" id="ref-for-url-pattern③">URL pattern</a> in <var>a</var> has to appear in <var>b</var>,
 but <var>a</var> and <var>b</var> can be equal. A response asserting exactly the requirement therefore satisfies it.</p>
-   <p class="note" role="note"><span class="marker">Note:</span> The comparison above requires only that the response’s asserted <a data-link-type="dfn" href="https://urlpattern.spec.whatwg.org/#url-pattern" id="ref-for-url-pattern⑤">URL patterns</a> are present in
+   <p class="note" role="note"><span class="marker">Note:</span> The comparison above requires only that the response’s asserted <a data-link-type="dfn" href="https://urlpattern.spec.whatwg.org/#url-pattern" id="ref-for-url-pattern④">URL patterns</a> are present in
 the requirement, without any semantic analysis of those patterns to determine whether they’re
-logically subsumed. This is intentional: deciding whether one <a data-link-type="dfn" href="https://urlpattern.spec.whatwg.org/#url-pattern" id="ref-for-url-pattern⑥">URL pattern</a> fully encompasses
+logically subsumed. This is intentional: deciding whether one <a data-link-type="dfn" href="https://urlpattern.spec.whatwg.org/#url-pattern" id="ref-for-url-pattern⑤">URL pattern</a> fully encompasses
 another is a difficult problem given their syntax, and conservative set-membership is sufficient for
 developers' use cases today.</p>
    <p class="note" role="note"><span class="marker">Note:</span> Because the allowlists being compared are resolved against the same <a data-link-type="dfn" href="https://url.spec.whatwg.org/#concept-url" id="ref-for-concept-url⑧">URL</a>, the
@@ -1519,7 +1514,7 @@ A <a data-link-type="dfn" href="#connection-allowlist" id="ref-for-connection-al
 WebRTC dispositions it also meets.</p>
    </div>
    <p class="note" role="note"><span class="marker">Note:</span> "<a data-link-type="dfn" href="#connection-allowlist-satisfies" id="ref-for-connection-allowlist-satisfies②">satisfies</a>" captures the "at least as strict as" relationship used throughout this section:
-the <a data-link-type="dfn" href="#connection-allowlist-allowlist" id="ref-for-connection-allowlist-allowlist①⓪">allowlist</a> comparison (<a data-link-type="dfn" href="#connection-allowlist-allowlist-is-a-subset-of" id="ref-for-connection-allowlist-allowlist-is-a-subset-of②">is a subset of</a>) handles the <a data-link-type="dfn" href="https://urlpattern.spec.whatwg.org/#url-pattern" id="ref-for-url-pattern⑦">URL patterns</a>,
+the <a data-link-type="dfn" href="#connection-allowlist-allowlist" id="ref-for-connection-allowlist-allowlist①⓪">allowlist</a> comparison (<a data-link-type="dfn" href="#connection-allowlist-allowlist-is-a-subset-of" id="ref-for-connection-allowlist-allowlist-is-a-subset-of②">is a subset of</a>) handles the <a data-link-type="dfn" href="https://urlpattern.spec.whatwg.org/#url-pattern" id="ref-for-url-pattern⑥">URL patterns</a>,
 while the <a data-link-type="dfn" href="#connection-allowlist-redirects" id="ref-for-connection-allowlist-redirects⑥">redirects</a> and <a data-link-type="dfn" href="#connection-allowlist-webrtc" id="ref-for-connection-allowlist-webrtc⑥">webrtc</a> dispositions are
 handled as separate conditions.</p>
    <h3 class="heading settled" data-level="4.4" id="embedded-enforcement-checking"><span class="secno">4.4. </span><span class="content">Obtaining and enforcing a requirement</span><a class="self-link" href="#embedded-enforcement-checking"></a></h3>
@@ -1560,7 +1555,7 @@ return <var>attribute value</var>.</p>
       <p>Return <var>parent required</var>.</p>
     </ol>
    </div>
-   <p>A <a data-link-type="dfn" href="https://www.rfc-editor.org/rfc/rfc9651#name-string" id="ref-for-name-string②">string</a> (<var>value</var>) is a <dfn class="dfn-paneled" data-dfn-for="Connection Allowlist" data-dfn-type="dfn" data-lt="valid connectionAllowlist attribute value" data-noexport id="connection-allowlist-valid-connectionallowlist-attribute-value">valid connectionAllowlist
+   <p>A <a data-link-type="dfn" href="https://www.rfc-editor.org/rfc/rfc9651#name-string" id="ref-for-name-string①">string</a> (<var>value</var>) is a <dfn class="dfn-paneled" data-dfn-for="Connection Allowlist" data-dfn-type="dfn" data-lt="valid connectionAllowlist attribute value" data-noexport id="connection-allowlist-valid-connectionallowlist-attribute-value">valid connectionAllowlist
 attribute value</dfn> given a requirement <var>parent required</var> if all of the following are true:</p>
    <ul>
     <li data-md>
@@ -1588,7 +1583,7 @@ when the <a data-link-type="dfn" href="#connection-allowlist" id="ref-for-connec
 given <var>a</var> parsed as a <a data-link-type="dfn" href="https://www.rfc-editor.org/rfc/rfc9651#name-introduction" id="ref-for-name-introduction⑥">structured header</a> <a data-link-type="dfn" href="https://www.rfc-editor.org/rfc/rfc9651#name-list" id="ref-for-name-list⑦">list</a> <a data-link-type="dfn" href="#connection-allowlist-satisfies" id="ref-for-connection-allowlist-satisfies③">satisfies</a> the
 <a data-link-type="dfn" href="#connection-allowlist" id="ref-for-connection-allowlist①⑤">connection allowlist</a> produced by parsing <var>b</var> the same way, where in both cases the
 <a data-link-type="grammar" href="#grammardef-connection-allowlist-response-origin" id="ref-for-grammardef-connection-allowlist-response-origin③"><code>response-origin</code></a> <a data-link-type="dfn" href="https://www.rfc-editor.org/rfc/rfc9651#name-tokens" id="ref-for-name-tokens①⓪">token</a> is treated as a
-literal <a data-link-type="dfn" href="https://urlpattern.spec.whatwg.org/#url-pattern" id="ref-for-url-pattern⑧">URL pattern</a> built from the string "<code>response-origin</code>" rather than being resolved against a
+literal <a data-link-type="dfn" href="https://urlpattern.spec.whatwg.org/#url-pattern" id="ref-for-url-pattern⑦">URL pattern</a> built from the string "<code>response-origin</code>" rather than being resolved against a
 <a data-link-type="dfn" href="https://url.spec.whatwg.org/#concept-url" id="ref-for-concept-url⑨">URL</a>.
 
 </div>
@@ -2187,7 +2182,7 @@ as that pattern will never be matched by a resource request.</p>
   <h3 class="heading no-num no-ref settled" id="index-defined-elsewhere"><span class="content">Terms defined by reference</span><a class="self-link" href="#index-defined-elsewhere"></a></h3>
   <ul class="index">
    <li>
-    <a data-link-type="biblio">[BLUETOOTH-SCANNING]</a> defines the following terms:
+    <a data-link-type="biblio">[BLUETOOTH]</a> defines the following terms:
     <ul>
      <li><span class="dfn-paneled" id="cf23430d">matches</span>
     </ul>
@@ -2278,6 +2273,7 @@ as that pattern will never be matched by a resource request.</p>
      <li><span class="dfn-paneled" id="83af367f">blocked</span>
      <li><span class="dfn-paneled" id="ae8def21">contain</span>
      <li><span class="dfn-paneled" id="f937b7b6">continue</span>
+     <li><span class="dfn-paneled" id="e75bfa59">equals</span>
      <li><span class="dfn-paneled" id="bf8d9616">failure</span>
      <li><span class="dfn-paneled" id="56ad2aed">insert</span>
      <li><span class="dfn-paneled" id="c88f3887">item</span>
@@ -2370,8 +2366,8 @@ as that pattern will never be matched by a resource request.</p>
   <h2 class="heading no-num no-ref settled" id="references"><span class="content">References</span><a class="self-link" href="#references"></a></h2>
   <h3 class="heading no-num no-ref settled" id="normative"><span class="content">Normative References</span><a class="self-link" href="#normative"></a></h3>
   <dl>
-   <dt id="biblio-bluetooth-scanning">[BLUETOOTH-SCANNING]
-   <dd><a href="https://bluetooth.spec.whatwg.org/scanning.html"><cite>Web Bluetooth Scanning</cite></a>. Draft Community Group Report. URL: <a href="https://bluetooth.spec.whatwg.org/scanning.html">https://bluetooth.spec.whatwg.org/scanning.html</a>
+   <dt id="biblio-bluetooth">[BLUETOOTH]
+   <dd>Web Bluetooth URL: <a href="https://bluetooth.spec.whatwg.org/">https://bluetooth.spec.whatwg.org/</a>
    <dt id="biblio-csp">[CSP]
    <dd>Mike West; Antonio Sartori. <a href="https://w3c.github.io/webappsec-csp/"><cite>Content Security Policy Level 3</cite></a>. URL: <a href="https://w3c.github.io/webappsec-csp/">https://w3c.github.io/webappsec-csp/</a>
    <dt id="biblio-csp-embedded-enforcement">[CSP-EMBEDDED-ENFORCEMENT]
@@ -2424,9 +2420,6 @@ as that pattern will never be matched by a resource request.</p>
 </pre>
   <h2 class="heading no-num no-ref settled" id="issues-index"><span class="content">Issues Index</span><a class="self-link" href="#issues-index"></a></h2>
   <div style="counter-reset:issue">
-   <div class="issue"> Equality for structs is not yet well-defined. Two <a data-link-type="dfn" href="https://urlpattern.spec.whatwg.org/#url-pattern">URL patterns</a> are equal
-here when they were <a data-link-type="dfn" href="https://urlpattern.spec.whatwg.org/#url-pattern-create">created</a> from the same serialized
-<a data-link-type="dfn" href="https://www.rfc-editor.org/rfc/rfc9651#name-string">string</a>. (See also <a href="https://github.com/whatwg/infra/pull/710">whatwg/infra#710</a>.) <a href="https://github.com/whatwg/infra/issues/664">[whatwg/infra Issue #664]</a> <a class="issue-return" href="#issue-33bab0db" title="Jump to section">↵</a></div>
    <div class="issue"> The changes to Fetch will require us to pass additional information into low-level
 algorithms' callsites to identify the allowlist which ought to be used and the context to be used
 for reporting. It might be better to instead ask those callsites to perform the checks themselves.
@@ -2685,7 +2678,7 @@ let dfnPanelData = {
 "5c35dd47": {"dfnID":"5c35dd47","dfnText":"sandbox","external":true,"refSections":[{"refs":[{"id":"ref-for-attr-iframe-sandbox"}],"title":"6.1. Same-Origin Contexts"}],"url":"https://html.spec.whatwg.org/multipage/iframe-embed-object.html#attr-iframe-sandbox"},
 "5c4f772b": {"dfnID":"5c4f772b","dfnText":"match","external":true,"refSections":[{"refs":[{"id":"ref-for-url-pattern-match"},{"id":"ref-for-url-pattern-match\u2460"}],"title":"3.2. Matching"}],"url":"https://urlpattern.spec.whatwg.org/#url-pattern-match"},
 "5c66de35": {"dfnID":"5c66de35","dfnText":"get a structured field value","external":true,"refSections":[{"refs":[{"id":"ref-for-concept-header-list-get-structured-header"},{"id":"ref-for-concept-header-list-get-structured-header\u2460"}],"title":"3.1. Parsing"},{"refs":[{"id":"ref-for-concept-header-list-get-structured-header\u2461"}],"title":"4.4. Obtaining and enforcing a requirement"}],"url":"https://fetch.spec.whatwg.org/#concept-header-list-get-structured-header"},
-"60393e82": {"dfnID":"60393e82","dfnText":"URL pattern","external":true,"refSections":[{"refs":[{"id":"ref-for-url-pattern"},{"id":"ref-for-url-pattern\u2460"}],"title":"2. Connection Allowlists"},{"refs":[{"id":"ref-for-url-pattern\u2461"},{"id":"ref-for-url-pattern\u2462"},{"id":"ref-for-url-pattern\u2463"},{"id":"ref-for-url-pattern\u2464"},{"id":"ref-for-url-pattern\u2465"},{"id":"ref-for-url-pattern\u2466"}],"title":"4.3. Comparing allowlists"},{"refs":[{"id":"ref-for-url-pattern\u2467"}],"title":"4.4. Obtaining and enforcing a requirement"}],"url":"https://urlpattern.spec.whatwg.org/#url-pattern"},
+"60393e82": {"dfnID":"60393e82","dfnText":"URL pattern","external":true,"refSections":[{"refs":[{"id":"ref-for-url-pattern"},{"id":"ref-for-url-pattern\u2460"}],"title":"2. Connection Allowlists"},{"refs":[{"id":"ref-for-url-pattern\u2461"},{"id":"ref-for-url-pattern\u2462"},{"id":"ref-for-url-pattern\u2463"},{"id":"ref-for-url-pattern\u2464"},{"id":"ref-for-url-pattern\u2465"}],"title":"4.3. Comparing allowlists"},{"refs":[{"id":"ref-for-url-pattern\u2466"}],"title":"4.4. Obtaining and enforcing a requirement"}],"url":"https://urlpattern.spec.whatwg.org/#url-pattern"},
 "61c338be": {"dfnID":"61c338be","dfnText":"resolve an origin","external":true,"refSections":[{"refs":[{"id":"ref-for-resolve-an-origin"},{"id":"ref-for-resolve-an-origin\u2460"}],"title":"5.1. Integration with Fetch"},{"refs":[{"id":"ref-for-resolve-an-origin\u2461"},{"id":"ref-for-resolve-an-origin\u2462"}],"title":"5.3. DNS Prefetching"},{"refs":[{"id":"ref-for-resolve-an-origin\u2463"}],"title":"6.5. DNS"}],"url":"https://fetch.spec.whatwg.org/#resolve-an-origin"},
 "63340982": {"dfnID":"63340982","dfnText":"local scheme","external":true,"refSections":[{"refs":[{"id":"ref-for-local-scheme"},{"id":"ref-for-local-scheme\u2460"}],"title":"4. Embedded Enforcement"},{"refs":[{"id":"ref-for-local-scheme\u2461"}],"title":"4.4. Obtaining and enforcing a requirement"},{"refs":[{"id":"ref-for-local-scheme\u2462"}],"title":"5.2. Integration with HTML"},{"refs":[{"id":"ref-for-local-scheme\u2463"},{"id":"ref-for-local-scheme\u2464"}],"title":"6.2. Embedded Enforcement"}],"url":"https://fetch.spec.whatwg.org/#local-scheme"},
 "649608b9": {"dfnID":"649608b9","dfnText":"list","external":true,"refSections":[{"refs":[{"id":"ref-for-list"}],"title":"2. Connection Allowlists"},{"refs":[{"id":"ref-for-list\u2460"}],"title":"3.1. Parsing"},{"refs":[{"id":"ref-for-list\u2461"},{"id":"ref-for-list\u2462"}],"title":"3.2. Matching"},{"refs":[{"id":"ref-for-list\u2463"}],"title":"5.2. Integration with HTML"}],"url":"https://infra.spec.whatwg.org/#list"},
@@ -2744,12 +2737,12 @@ let dfnPanelData = {
 "b410a6ef": {"dfnID":"b410a6ef","dfnText":"ASCII serialization of an origin","external":true,"refSections":[{"refs":[{"id":"ref-for-ascii-serialisation-of-an-origin"}],"title":"3.1. Parsing"}],"url":"https://html.spec.whatwg.org/multipage/browsers.html#ascii-serialisation-of-an-origin"},
 "bd1db03d": {"dfnID":"bd1db03d","dfnText":"policy container (for environment settings object)","external":true,"refSections":[{"refs":[{"id":"ref-for-concept-settings-object-policy-container"}],"title":"3.2. Matching"},{"refs":[{"id":"ref-for-concept-settings-object-policy-container\u2460"}],"title":"5.6. Integration with Service Workers"}],"url":"https://html.spec.whatwg.org/multipage/webappapis.html#concept-settings-object-policy-container"},
 "bf8d9616": {"dfnID":"bf8d9616","dfnText":"failure","external":true,"refSections":[{"refs":[{"id":"ref-for-failure"},{"id":"ref-for-failure\u2460"},{"id":"ref-for-failure\u2461"},{"id":"ref-for-failure\u2462"}],"title":"3.2. Matching"},{"refs":[{"id":"ref-for-failure\u2463"},{"id":"ref-for-failure\u2464"}],"title":"5.1. Integration with Fetch"}],"url":"https://infra.spec.whatwg.org/#failure"},
-"bf9f0d4e": {"dfnID":"bf9f0d4e","dfnText":"create","external":true,"refSections":[{"refs":[{"id":"ref-for-url-pattern-create"}],"title":"3.2. Matching"},{"refs":[{"id":"ref-for-url-pattern-create\u2460"}],"title":"4.3. Comparing allowlists"}],"url":"https://urlpattern.spec.whatwg.org/#url-pattern-create"},
+"bf9f0d4e": {"dfnID":"bf9f0d4e","dfnText":"create","external":true,"refSections":[{"refs":[{"id":"ref-for-url-pattern-create"}],"title":"3.2. Matching"}],"url":"https://urlpattern.spec.whatwg.org/#url-pattern-create"},
 "c3e881ef": {"dfnID":"c3e881ef","dfnText":"SecurityError","external":true,"refSections":[{"refs":[{"id":"ref-for-securityerror"}],"title":"5.6. Integration with Service Workers"}],"url":"https://webidl.spec.whatwg.org/#securityerror"},
 "c60ed63a": {"dfnID":"c60ed63a","dfnText":"service worker","external":true,"refSections":[{"refs":[{"id":"ref-for-dfn-service-worker"}],"title":"6.3. Service Workers"}],"url":"https://w3c.github.io/ServiceWorker/#dfn-service-worker"},
 "c81d8804": {"dfnID":"c81d8804","dfnText":"promise","external":true,"refSections":[{"refs":[{"id":"ref-for-transaction-state-promise"}],"title":"5.6. Integration with Service Workers"}],"url":"https://wicg.github.io/web-smart-card/#transaction-state-promise"},
 "c88f3887": {"dfnID":"c88f3887","dfnText":"item","external":true,"refSections":[{"refs":[{"id":"ref-for-struct-item"}],"title":"2. Connection Allowlists"}],"url":"https://infra.spec.whatwg.org/#struct-item"},
-"c9aec5e7": {"dfnID":"c9aec5e7","dfnText":"string","external":true,"refSections":[{"refs":[{"id":"ref-for-name-string"}],"title":"3. Connection Allowlist Headers"},{"refs":[{"id":"ref-for-name-string\u2460"}],"title":"4.3. Comparing allowlists"},{"refs":[{"id":"ref-for-name-string\u2461"}],"title":"4.4. Obtaining and enforcing a requirement"}],"url":"https://www.rfc-editor.org/rfc/rfc9651#name-string"},
+"c9aec5e7": {"dfnID":"c9aec5e7","dfnText":"string","external":true,"refSections":[{"refs":[{"id":"ref-for-name-string"}],"title":"3. Connection Allowlist Headers"},{"refs":[{"id":"ref-for-name-string\u2460"}],"title":"4.4. Obtaining and enforcing a requirement"}],"url":"https://www.rfc-editor.org/rfc/rfc9651#name-string"},
 "c9e7c11a": {"dfnID":"c9e7c11a","dfnText":"header","external":true,"refSections":[{"refs":[{"id":"ref-for-concept-header"},{"id":"ref-for-concept-header\u2460"}],"title":"3. Connection Allowlist Headers"},{"refs":[{"id":"ref-for-concept-header\u2461"},{"id":"ref-for-concept-header\u2462"}],"title":"4. Embedded Enforcement"},{"refs":[{"id":"ref-for-concept-header\u2463"},{"id":"ref-for-concept-header\u2464"}],"title":"4.2. Embedded Enforcement Headers"},{"refs":[{"id":"ref-for-concept-header\u2465"}],"title":"4.4. Obtaining and enforcing a requirement"}],"url":"https://fetch.spec.whatwg.org/#concept-header"},
 "ca3ca4ae": {"dfnID":"ca3ca4ae","dfnText":"URL parser","external":true,"refSections":[{"refs":[{"id":"ref-for-concept-url-parser"}],"title":"3.2. Matching"}],"url":"https://url.spec.whatwg.org/#concept-url-parser"},
 "cae9bd49": {"dfnID":"cae9bd49","dfnText":"byte-serializing a request origin","external":true,"refSections":[{"refs":[{"id":"ref-for-byte-serializing-a-request-origin"},{"id":"ref-for-byte-serializing-a-request-origin\u2460"}],"title":"4.2. Embedded Enforcement Headers"}],"url":"https://fetch.spec.whatwg.org/#byte-serializing-a-request-origin"},
@@ -2783,6 +2776,7 @@ let dfnPanelData = {
 "dom-connectionallowlistviolationreport-url": {"dfnID":"dom-connectionallowlistviolationreport-url","dfnText":"url","external":false,"refSections":[{"refs":[{"id":"ref-for-dom-connectionallowlistviolationreport-url"}],"title":"3.3. Reporting"}],"url":"#dom-connectionallowlistviolationreport-url"},
 "dom-htmliframeelement-connectionallowlist": {"dfnID":"dom-htmliframeelement-connectionallowlist","dfnText":"connectionAllowlist","external":false,"refSections":[{"refs":[{"id":"ref-for-dom-htmliframeelement-connectionallowlist"}],"title":"4. Embedded Enforcement"},{"refs":[{"id":"ref-for-dom-htmliframeelement-connectionallowlist\u2460"}],"title":"4.1. The connectionAllowlist attribute"}],"url":"#dom-htmliframeelement-connectionallowlist"},
 "e0f03d6c": {"dfnID":"e0f03d6c","dfnText":"preconnect","external":true,"refSections":[{"refs":[{"id":"ref-for-preconnect"},{"id":"ref-for-preconnect\u2460"}],"title":"5.4. Preconnecting"}],"url":"https://html.spec.whatwg.org/multipage/links.html#preconnect"},
+"e75bfa59": {"dfnID":"e75bfa59","dfnText":"equals","external":true,"refSections":[{"refs":[{"id":"ref-for-equal"}],"title":"4.3. Comparing allowlists"}],"url":"https://infra.spec.whatwg.org/#equal"},
 "e76b6e66": {"dfnID":"e76b6e66","dfnText":"navigate(url)","external":true,"refSections":[{"refs":[{"id":"ref-for-dom-windowclient-navigate"},{"id":"ref-for-dom-windowclient-navigate\u2460"}],"title":"5.6. Integration with Service Workers"}],"url":"https://w3c.github.io/ServiceWorker/#dom-windowclient-navigate"},
 "eb1b1af3": {"dfnID":"eb1b1af3","dfnText":"network error","external":true,"refSections":[{"refs":[{"id":"ref-for-concept-network-error"},{"id":"ref-for-concept-network-error\u2460"}],"title":"5.2. Integration with HTML"}],"url":"https://fetch.spec.whatwg.org/#concept-network-error"},
 "ee7bba09": {"dfnID":"ee7bba09","dfnText":"response","external":true,"refSections":[{"refs":[{"id":"ref-for-concept-response"}],"title":"3. Connection Allowlist Headers"},{"refs":[{"id":"ref-for-concept-response\u2460"}],"title":"3.1. Parsing"},{"refs":[{"id":"ref-for-concept-response\u2461"}],"title":"4.2. Embedded Enforcement Headers"},{"refs":[{"id":"ref-for-concept-response\u2462"},{"id":"ref-for-concept-response\u2463"},{"id":"ref-for-concept-response\u2464"},{"id":"ref-for-concept-response\u2465"}],"title":"4.4. Obtaining and enforcing a requirement"},{"refs":[{"id":"ref-for-concept-response\u2466"},{"id":"ref-for-concept-response\u2467"},{"id":"ref-for-concept-response\u2468"},{"id":"ref-for-concept-response\u2460\u24ea"}],"title":"5.2. Integration with HTML"}],"url":"https://fetch.spec.whatwg.org/#concept-response"},
@@ -3246,7 +3240,7 @@ let refsData = {
 "#http-headerdef-sec-required-connection-allowlist": {"displayText":"sec-required-connection-allowlist","export":true,"for_":[],"level":"1","normative":true,"shortname":"connection-allowlists","spec":"connection-allowlists-1","status":"local","text":"sec-required-connection-allowlist","type":"http-header","url":"#http-headerdef-sec-required-connection-allowlist"},
 "#policy-container-connection-allowlists": {"displayText":"connection allowlists","export":true,"for_":["policy container"],"level":"1","normative":true,"shortname":"connection-allowlists","spec":"connection-allowlists-1","status":"local","text":"connection allowlists","type":"dfn","url":"#policy-container-connection-allowlists"},
 "#policy-container-required-connection-allowlist": {"displayText":"required connection allowlist","export":true,"for_":["policy container"],"level":"1","normative":true,"shortname":"connection-allowlists","spec":"connection-allowlists-1","status":"local","text":"required connection allowlist","type":"dfn","url":"#policy-container-required-connection-allowlist"},
-"https://bluetooth.spec.whatwg.org/#bluetoothdatafilterinit-matches": {"displayText":"matches","export":true,"for_":["BluetoothDataFilterInit"],"level":"1","normative":true,"shortname":"bluetooth-scanning","spec":"bluetooth-scanning","status":"current","text":"matches","type":"dfn","url":"https://bluetooth.spec.whatwg.org/#bluetoothdatafilterinit-matches"},
+"https://bluetooth.spec.whatwg.org/#bluetoothdatafilterinit-matches": {"displayText":"matches","export":true,"for_":["BluetoothDataFilterInit"],"level":"1","normative":true,"shortname":"bluetooth","spec":"bluetooth","status":"current","text":"matches","type":"dfn","url":"https://bluetooth.spec.whatwg.org/#bluetoothdatafilterinit-matches"},
 "https://dom.spec.whatwg.org/#concept-document": {"displayText":"document","export":true,"for_":[],"level":"1","normative":true,"shortname":"dom","spec":"dom","status":"current","text":"document","type":"dfn","url":"https://dom.spec.whatwg.org/#concept-document"},
 "https://dom.spec.whatwg.org/#concept-node-document": {"displayText":"node document","export":true,"for_":["Node"],"level":"1","normative":true,"shortname":"dom","spec":"dom","status":"current","text":"node document","type":"dfn","url":"https://dom.spec.whatwg.org/#concept-node-document"},
 "https://dom.spec.whatwg.org/#document": {"displayText":"Document","export":true,"for_":[],"level":"1","normative":true,"shortname":"dom","spec":"dom","status":"current","text":"Document","type":"interface","url":"https://dom.spec.whatwg.org/#document"},
@@ -3309,6 +3303,7 @@ let refsData = {
 "https://html.spec.whatwg.org/multipage/workers.html#concept-workerglobalscope-policy-container": {"displayText":"policy container","export":true,"for_":["WorkerGlobalScope"],"level":"1","normative":true,"shortname":"html","spec":"html","status":"current","text":"policy container","type":"dfn","url":"https://html.spec.whatwg.org/multipage/workers.html#concept-workerglobalscope-policy-container"},
 "https://infra.spec.whatwg.org/#allowed": {"displayText":"allowed","export":true,"for_":[],"level":"1","normative":true,"shortname":"infra","spec":"infra","status":"current","text":"allowed","type":"dfn","url":"https://infra.spec.whatwg.org/#allowed"},
 "https://infra.spec.whatwg.org/#blocked": {"displayText":"blocked","export":true,"for_":[],"level":"1","normative":true,"shortname":"infra","spec":"infra","status":"current","text":"blocked","type":"dfn","url":"https://infra.spec.whatwg.org/#blocked"},
+"https://infra.spec.whatwg.org/#equal": {"displayText":"equals","export":true,"for_":[],"level":"1","normative":true,"shortname":"infra","spec":"infra","status":"current","text":"equals","type":"dfn","url":"https://infra.spec.whatwg.org/#equal"},
 "https://infra.spec.whatwg.org/#failure": {"displayText":"failure","export":true,"for_":[],"level":"1","normative":true,"shortname":"infra","spec":"infra","status":"current","text":"failure","type":"dfn","url":"https://infra.spec.whatwg.org/#failure"},
 "https://infra.spec.whatwg.org/#iteration-continue": {"displayText":"continue","export":true,"for_":["iteration"],"level":"1","normative":true,"shortname":"infra","spec":"infra","status":"current","text":"continue","type":"dfn","url":"https://infra.spec.whatwg.org/#iteration-continue"},
 "https://infra.spec.whatwg.org/#list": {"displayText":"list","export":true,"for_":[],"level":"1","normative":true,"shortname":"infra","spec":"infra","status":"current","text":"list","type":"dfn","url":"https://infra.spec.whatwg.org/#list"},
